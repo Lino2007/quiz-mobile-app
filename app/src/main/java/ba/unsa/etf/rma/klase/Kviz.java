@@ -7,6 +7,12 @@ public class Kviz {
     ArrayList<Pitanje> pitanja= new ArrayList<>();
     Kategorija kategorija;
 
+    public Kviz(String naziv, ArrayList<Pitanje> pitanja, Kategorija kategorija) {
+        this.naziv = naziv;
+        this.pitanja = pitanja;
+        this.kategorija = kategorija;
+    }
+
     public String getNaziv() {
         return naziv;
     }
