@@ -85,7 +85,7 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
             //View Holder Object to contain tabitem.xml file elements
 
             holder = new ViewHolder();
-            holder.nazivPitanja= (TextView) vi.findViewById(R.id.nazivKviza);
+            holder.nazivPitanja= (TextView) vi.findViewById(R.id.nazivPitanja);
             holder.dot= (ImageView) vi.findViewById(R.id.image);
 
 

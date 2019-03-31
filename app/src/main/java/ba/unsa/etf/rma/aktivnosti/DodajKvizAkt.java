@@ -30,21 +30,22 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      private ArrayList<Pitanje> pitanjaKviza= new ArrayList<> ();
      private ArrayList<Kviz>  listaKvizova= new ArrayList<>();
       public Kviz noviKviz;
-
+     DodajKvizAkt dkaAkk=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dodaj_kviz_akt);
-
+         dkaAkk=this;
         Bundle b= getIntent().getExtras();
-        ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>)b.getSerializable("mogucaPitanja");
+        final ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>)b.getSerializable("mogucaPitanja");
         Bundle c= getIntent().getExtras();
         ArrayList<Kviz> listaKvizova= (ArrayList<Kviz>)b.getSerializable("sviKvizovi");
-    /*   if (t) {
-           mogucaPitanja.add(new Pitanje ("dummy", "dummy", "dummy", null));
+
+     if (t) {
+          pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
            t=false;
-       } */
+       }
         dodaj= (Button)  findViewById(R.id.button);
         editText= (EditText) findViewById(R.id.editText);
         listaMogucih= (ListView) findViewById(R.id.lvMogucaPitanja);
@@ -53,11 +54,11 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
           mogucaAdapter= new MogucaListAdapter(this, mogucaPitanja, getResources());
 
-       //  pitanjaAdapter= new PitanjaListAdapter(DodajKvizAkt,)
+        pitanjaAdapter= new PitanjaListAdapter(this,pitanjaKviza, getResources());
         dkaSpinner.setOnItemSelectedListener(this);
        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, KvizoviAkt.getCategories());
         dkaSpinner.setAdapter(dataAdapter);
-
+         listaPitanja.setAdapter(pitanjaAdapter);
         listaMogucih.setAdapter(mogucaAdapter);
 
         System.out.println("nesto");
@@ -78,6 +79,9 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
                 String changedName = "Thomas";
                 itemListAdapter.getItem(position).setItemName(changedName); */
+               mogucaPitanja.remove(0);
+                mogucaAdapter= new MogucaListAdapter(dkaAkk,mogucaPitanja, getResources());
+                listaMogucih.setAdapter(mogucaAdapter);
                 System.out.println(position);
 
             }
