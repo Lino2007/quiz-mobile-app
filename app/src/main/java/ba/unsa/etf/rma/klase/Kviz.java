@@ -3,7 +3,7 @@ package ba.unsa.etf.rma.klase;
 import java.util.ArrayList;
 
 public class Kviz {
-    String naziv;
+    String naziv=new String();
     ArrayList<Pitanje> pitanja= new ArrayList<>();
     Kategorija kategorija;
 

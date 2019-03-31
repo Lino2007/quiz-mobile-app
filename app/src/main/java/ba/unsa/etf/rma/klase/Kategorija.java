@@ -1,7 +1,7 @@
 package ba.unsa.etf.rma.klase;
 
 public class Kategorija {
-   String naziv, id;
+  public String naziv, id;
 
     public Kategorija(String naziv, String id) {
         this.naziv = naziv;
@@ -22,5 +22,10 @@ public class Kategorija {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return  "Naziv: "+ getNaziv()+ "Id: " + getId();
     }
 }

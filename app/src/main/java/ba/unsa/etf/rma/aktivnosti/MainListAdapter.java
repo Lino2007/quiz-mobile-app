@@ -16,6 +16,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
+import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
@@ -27,7 +28,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
     public Resources res;
     Kviz tempValues=null;
     int i=0;
-    boolean global;
+    boolean global=false;
 
     //  CustomAdapter Constructor
     public MainListAdapter(Activity a, ArrayList d, Resources resLocal) {
@@ -35,9 +36,8 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
         // Take passed values
         activity = a;
         data=d;
-        data.add(new Kviz(null,null,null));
         res = resLocal;
-        global=false;
+
         // Layout inflator to call external xml layout ()
         System.out.println(activity + " " +  data  +" " +  resLocal);
         inflater = ( LayoutInflater )activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -51,6 +51,8 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
             return 1;
         return data.size();
     }
+
+
 
     public Object getItem(int position) {
         return position;
@@ -117,14 +119,9 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
                 holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
             }
 
-
-
-
-
-            // Set Item Click Listner for LayoutInflater for each row
-
             vi.setOnClickListener(new OnItemClickListener( position ));
         }
+
         return vi;
     }
 
@@ -133,7 +130,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
         Log.v("CustomAdapter", "=====Row button clicked=====");
     }
 
-    /********* Called when Item click in ListView ************/
+
     private class OnItemClickListener  implements View.OnClickListener {
         private int mPosition;
 
@@ -143,12 +140,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
 
         @Override
         public void onClick(View arg0) {
-
-
             KvizoviAkt sct = (KvizoviAkt) activity;
-
-            //  Call  onItemClick Method inside CustomListViewAndroidExample Class ( See Below )
-
             sct.onItemClick(mPosition);
         }
     }

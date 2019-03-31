@@ -1,11 +1,19 @@
 package ba.unsa.etf.rma.klase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-class Pitanje {
+public class Pitanje implements Serializable {
     String naziv, tekstPitanja, tacan;
-    ArrayList<String> odgovori;
+    ArrayList<String> odgovori=  new ArrayList<>();
+
+    public Pitanje(String naziv, String tekstPitanja, String tacan, ArrayList<String> odgovori) {
+        this.naziv = naziv;
+        this.tekstPitanja = tekstPitanja;
+        this.tacan = tacan;
+        this.odgovori = odgovori;
+    }
 
     public String getNaziv() {
         return naziv;
