@@ -25,7 +25,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
    public ArrayList<Kategorija> listaKategorija =new ArrayList<>();
     public static ArrayList<String> categories= new ArrayList<>();
     public KvizoviAkt kvizoviAkt ;
-    public static ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
+    public  ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
 
 
     private String trenutnaKategorija= new String ();
@@ -167,6 +167,10 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
             Bundle b= new Bundle(), c=new Bundle();
             ArrayList<Pitanje> pitanjaKviza= new ArrayList<>();
             b.putSerializable("mogucaPitanja", (Serializable) mogPitanja);
+            ArrayList<Kviz>  pomListaKvizova=new ArrayList<>();
+            pomListaKvizova=  kopiraj(listaKvizova,pomListaKvizova);
+            c.putSerializable("sviKvizovi", (Serializable) pomListaKvizova);
+
             Intent dodajIntent= new Intent( KvizoviAkt.this, DodajKvizAkt.class);
             dodajIntent.putExtras(b);
             KvizoviAkt.this.startActivity(dodajIntent);
@@ -175,6 +179,13 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
        else System.out.println("Item clicked");
     }
 
+     public ArrayList<Kviz> kopiraj (ArrayList<Kviz> a, ArrayList<Kviz> b) {
+        for (Kviz x: a) {
+            b.add(x);
+        }
+        b.remove(b.size()-1);
+        return b;
+     }
     public void dodajKviz (Kviz kviz) {
         listaKvizova.add(kviz);
     }

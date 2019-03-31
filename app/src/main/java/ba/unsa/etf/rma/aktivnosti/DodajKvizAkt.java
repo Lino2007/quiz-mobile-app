@@ -28,7 +28,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      public MogucaListAdapter mogucaAdapter=null;
      public boolean t=true;
      private ArrayList<Pitanje> pitanjaKviza= new ArrayList<> ();
-     public Kviz noviKviz;
+     private ArrayList<Kviz>  listaKvizova= new ArrayList<>();
+      public Kviz noviKviz;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         Bundle b= getIntent().getExtras();
         ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>)b.getSerializable("mogucaPitanja");
+        Bundle c= getIntent().getExtras();
+        ArrayList<Kviz> listaKvizova= (ArrayList<Kviz>)b.getSerializable("sviKvizovi");
     /*   if (t) {
            mogucaPitanja.add(new Pitanje ("dummy", "dummy", "dummy", null));
            t=false;
@@ -54,9 +57,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         dkaSpinner.setOnItemSelectedListener(this);
        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, KvizoviAkt.getCategories());
         dkaSpinner.setAdapter(dataAdapter);
+
         listaMogucih.setAdapter(mogucaAdapter);
 
-
+        System.out.println("nesto");
         dodaj.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -64,7 +68,25 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
 
             }});
+
+        listaMogucih.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+
+               /* String beforeName = itemListAdapter.getItem(position).getItemName().toString();
+
+                String changedName = "Thomas";
+                itemListAdapter.getItem(position).setItemName(changedName); */
+                System.out.println(position);
+
+            }
+
+        });
+
     }
+
+
 
 
     @Override

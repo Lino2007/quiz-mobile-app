@@ -1,8 +1,9 @@
 package ba.unsa.etf.rma.klase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Kviz {
+public class Kviz implements Serializable {
     String naziv=new String();
     ArrayList<Pitanje> pitanja= new ArrayList<>();
     Kategorija kategorija;

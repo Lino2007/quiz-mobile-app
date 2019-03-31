@@ -21,7 +21,7 @@ import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class MogucaListAdapter extends BaseAdapter implements View.OnClickListener  {
+public class MogucaListAdapter extends BaseAdapter {
     /*********** Declare Used Variables *********/
     private Activity activity= null;
     private ArrayList data;
@@ -117,13 +117,13 @@ public class MogucaListAdapter extends BaseAdapter implements View.OnClickListen
 
 
 
-            vi.setOnClickListener(new OnItemClickListener( position ));
+          //  vi.setOnClickListener(new OnItemClickListener( position ));
         }
 
         return vi;
     }
 
-    @Override
+  /*  @Override
     public void onClick(View v) {
         Log.v("CustomAdapter", "=====Row button clicked=====");
     }
@@ -140,7 +140,8 @@ public class MogucaListAdapter extends BaseAdapter implements View.OnClickListen
         public void onClick(View arg0) {
            DodajKvizAkt sct = (DodajKvizAkt) activity;
             sct.onItemClick(mPosition);
+          //  System.out.println(mPosition);
         }
     }
-
+ */
 }
