@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -22,12 +23,12 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      private ListView listaPitanja;
      private ListView listaMogucih;
      private Spinner dkaSpinner;
-    // private ArrayList<String> test= (ArrayList<String>) getIntent().getSerializableExtra("key");
-  //     private ArrayList<Pitanje> mogucaPitanja= new ArrayList<>();
-
-     // private ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>) getIntent().getSerializableExtra("mogucaPitanja");
-
- //    private KvizoviAkt kvAkt;
+     private Button dodaj;
+     public PitanjaListAdapter pitanjaAdapter=null;
+     public MogucaListAdapter mogucaAdapter=null;
+     public boolean t=true;
+     private ArrayList<Pitanje> pitanjaKviza= new ArrayList<> ();
+     public Kviz noviKviz;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +38,32 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         Bundle b= getIntent().getExtras();
         ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>)b.getSerializable("mogucaPitanja");
-        System.out.println(mogucaPitanja.size());
+    /*   if (t) {
+           mogucaPitanja.add(new Pitanje ("dummy", "dummy", "dummy", null));
+           t=false;
+       } */
+        dodaj= (Button)  findViewById(R.id.button);
         editText= (EditText) findViewById(R.id.editText);
         listaMogucih= (ListView) findViewById(R.id.lvMogucaPitanja);
         listaPitanja= (ListView)  findViewById(R.id.lvDodanaPitanja);
         dkaSpinner= (Spinner) findViewById(R.id.dkaSpinner);
 
+          mogucaAdapter= new MogucaListAdapter(this, mogucaPitanja, getResources());
+
+       //  pitanjaAdapter= new PitanjaListAdapter(DodajKvizAkt,)
         dkaSpinner.setOnItemSelectedListener(this);
        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, KvizoviAkt.getCategories());
         dkaSpinner.setAdapter(dataAdapter);
+        listaMogucih.setAdapter(mogucaAdapter);
+
+
+        dodaj.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+
+
+            }});
     }
 
 
@@ -70,7 +88,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-
-
-
+    public void onItemClick(int mPosition) {
+    }
 }
