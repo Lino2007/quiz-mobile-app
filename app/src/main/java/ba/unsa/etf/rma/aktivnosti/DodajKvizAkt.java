@@ -16,16 +16,19 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
+import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
+import ba.unsa.etf.rma.klase.MainListAdapter;
 import ba.unsa.etf.rma.klase.MogucaListAdapter;
 import ba.unsa.etf.rma.klase.PitanjaListAdapter;
 import ba.unsa.etf.rma.klase.Pitanje;
 
+
+
 public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
      private EditText editText;
-     private ListView listaPitanja;
-     private ListView listaMogucih;
+     private ListView listaPitanja, listaMogucih;
      private Spinner dkaSpinner;
      private Button dodaj;
      private boolean valid=false;
@@ -36,7 +39,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      public int poz_kat=0;
      private ArrayList<Pitanje> pitanjaKviza= new ArrayList<> ();
      private ArrayList<Kviz>  listaKvizova= new ArrayList<>();
-      public Kviz noviKviz;
      DodajKvizAkt dkaAkk=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +48,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
          dkaAkk=this;
         pozicija= getIntent().getExtras().getInt("poz_kviza");
         poz_kat=getIntent().getExtras().getInt("poz_kategorije");
-        System.out.println("------------"+ poz_kat);
-
+         pitanjaKviza.clear();
         dodaj= (Button)  findViewById(R.id.button);
         editText= (EditText) findViewById(R.id.editText);
         listaMogucih= (ListView) findViewById(R.id.lvMogucaPitanja);
@@ -59,7 +60,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             naziv_kviza=getIntent().getExtras().getString("naziv_kviza");
             editText.setText(naziv_kviza);
         }
-        if (pitanjaKviza.size()>0 && pitanjaKviza.get(pitanjaKviza.size()-1).getNaziv()!="dummy") {
+        if ((pitanjaKviza.size()>0 && pitanjaKviza.get(pitanjaKviza.size()-1).getNaziv()!="dummy") || pitanjaKviza.size()==0) {
             pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
         }
           mogucaAdapter= new MogucaListAdapter(this, KvizoviAkt.mogPitanja , getResources());
@@ -72,7 +73,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         dkaSpinner.setSelection(poz_kat); //postavka pozicije
 
          listaPitanja.setAdapter(pitanjaAdapter);
-        if (KvizoviAkt.mogPitanja.size()==0)  listaMogucih.setAdapter(null);
+          if (KvizoviAkt.mogPitanja.size()==0)  listaMogucih.setAdapter(null);
           else  listaMogucih.setAdapter(mogucaAdapter);
 
 
@@ -81,15 +82,23 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                  validacija();
-                 if( valid==true) System.out.println("---------------------------------------------");
+            /*  if(pozicija==-1 && valid==true) {
+                  shut();
+                  Kviz noviKviz= new Kviz (editText.getText().toString(), pitanjaKviza, KvizoviAkt.listaKategorija.get(dkaSpinner.getSelectedItemPosition()));
+                KvizoviAkt.listaKvizova.remove(listaKvizova.size()-1);
+                  KvizoviAkt.listaKvizova.add (noviKviz);
+                 listaKvizova.add (new Kviz (null, null , new Kategorija("dummy", "dummy")));
+
+                  finish();
+
+              } */
+
 
             }});
 
         listaMogucih.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-
                 if (pitanjaKviza.size()>0) pitanjaKviza.remove(pitanjaKviza.size()-1);
                   pitanjaKviza.add (KvizoviAkt.mogPitanja.get(position));
                   KvizoviAkt.mogPitanja.remove(position);
@@ -103,13 +112,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         });
 
-
         listaPitanja.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
              if (position< pitanjaKviza.size()-1) {
-                // .add(.get(position));
                  KvizoviAkt.mogPitanja.add(pitanjaKviza.get(position));
                  pitanjaKviza.remove(position);
                  listaPitanja.setAdapter(pitanjaAdapter);
@@ -118,11 +124,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             }
 
         });
-
-
     }
 
     void validacija () {
+        System.out.println(pitanjaKviza.size()+ "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if (pitanjaKviza.size()==1) listaPitanja.setBackgroundColor(Color.RED);
         else {
             valid = true;
@@ -139,34 +144,24 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             valid = true;
             dkaSpinner.setBackgroundColor(Color.WHITE);
         }
-
     }
 
     void refresh() {
         pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
     }
 
+    void shut() {
+        pitanjaKviza.remove(pitanjaKviza.size()-1);
+    }
+
     @Override
     public void onItemSelected (AdapterView< ? > parent, View view, int position, long id){
         String item = parent.getItemAtPosition(position).toString();
-     /*   if (position>=0 && position< categories.size()) {
-            dajKvizoveKategorije(item) ;
-        }
-
-   */
-        // Showing selected spinner item
         Toast.makeText(parent.getContext(), item, Toast.LENGTH_LONG).show();
-
     }
-
-
 
     @Override
     public void onNothingSelected (AdapterView < ? > parent){
 
-    }
-
-
-    public void onItemClick(int mPosition) {
     }
 }

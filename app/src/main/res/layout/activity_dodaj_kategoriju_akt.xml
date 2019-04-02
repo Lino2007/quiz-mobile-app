@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".aktivnosti.DodajKategorijuAkt">
+
+    <EditText
+        android:id="@+id/etNaziv"
+        android:layout_width="338dp"
+        android:layout_height="41dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Naziv Kategorije"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/etIkona"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="72dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Ikona"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnDodajIkonu"
+        android:layout_width="139dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="256dp"
+        android:layout_marginTop="72dp"
+        android:text="Dodaj Ikonu"
+        android:textColor="#FFFF"
+        android:background="#0263BD"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnDodajKategoriju"
+        android:layout_width="356dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="132dp"
+        android:text="Spasi Kategoriju"
+        android:textColor="#FFFF"
+        android:background="#0263BD"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>
