@@ -29,8 +29,6 @@ public class MogucaListAdapter extends BaseAdapter {
     public Resources res;
     Pitanje tempValues=null;
     int i=0;
-    boolean global=false;
-
     //  CustomAdapter Constructor
     public  MogucaListAdapter (Activity a, ArrayList d, Resources resLocal) {
 
@@ -98,9 +96,7 @@ public class MogucaListAdapter extends BaseAdapter {
 
         if(data.size()<=0)
         {
-            holder.nazivPitanja.setText("Dodaj Kviz");
-            holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
-            global=false;
+            holder.nazivPitanja.setText("No Data");
         }
         else
         {
@@ -108,40 +104,12 @@ public class MogucaListAdapter extends BaseAdapter {
             tempValues=null;
             tempValues = ( Pitanje ) data.get( position );
 
-            //  Set Model values in Holder elements
-
-            //  holder.ime.setText( tempValues.getIme() + tempValues.getPrezime() );
-
                 holder.nazivPitanja.setText(tempValues.getNaziv());
                 holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
 
-
-
-          //  vi.setOnClickListener(new OnItemClickListener( position ));
         }
 
         return vi;
     }
 
-  /*  @Override
-    public void onClick(View v) {
-        Log.v("CustomAdapter", "=====Row button clicked=====");
-    }
-
-
-    private class OnItemClickListener  implements View.OnClickListener {
-        private int mPosition;
-
-        OnItemClickListener(int position){
-            mPosition = position;
-        }
-
-        @Override
-        public void onClick(View arg0) {
-           DodajKvizAkt sct = (DodajKvizAkt) activity;
-            sct.onItemClick(mPosition);
-          //  System.out.println(mPosition);
-        }
-    }
- */
 }

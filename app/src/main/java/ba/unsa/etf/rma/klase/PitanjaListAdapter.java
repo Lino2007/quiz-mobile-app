@@ -121,7 +121,7 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
                 holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
             }
 
-            vi.setOnClickListener(new OnItemClickListener( position ));
+          //  vi.setOnClickListener(new OnItemClickListener( position ));
         }
 
         return vi;

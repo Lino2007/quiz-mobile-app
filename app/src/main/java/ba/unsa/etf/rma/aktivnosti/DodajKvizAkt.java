@@ -69,9 +69,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         dkaSpinner.setSelection(poz_kat); //postavka pozicije
 
          listaPitanja.setAdapter(pitanjaAdapter);
-        listaMogucih.setAdapter(mogucaAdapter);
+        if (KvizoviAkt.mogPitanja.size()==0)  listaMogucih.setAdapter(null);
+          else  listaMogucih.setAdapter(mogucaAdapter);
 
-        System.out.println("nesto");
+
         dodaj.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -85,24 +86,43 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 
-               /* String beforeName = itemListAdapter.getItem(position).getItemName().toString();
-
-                String changedName = "Thomas";
-                itemListAdapter.getItem(position).setItemName(changedName); */
-               KvizoviAkt.mogPitanja.remove(0);
+                if (pitanjaKviza.size()>0) pitanjaKviza.remove(pitanjaKviza.size()-1);
+                  pitanjaKviza.add (KvizoviAkt.mogPitanja.get(position));
+                  KvizoviAkt.mogPitanja.remove(position);
+                   refresh();
                 mogucaAdapter= new MogucaListAdapter(dkaAkk, KvizoviAkt.mogPitanja, getResources());
-                listaMogucih.setAdapter(mogucaAdapter);
-
+               if (KvizoviAkt.mogPitanja.size()==0)  listaMogucih.setAdapter(null);
+                else listaMogucih.setAdapter(mogucaAdapter);
+                listaPitanja.setAdapter(pitanjaAdapter);
 
             }
 
         });
 
+
+        listaPitanja.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+             if (position< pitanjaKviza.size()-1) {
+                // .add(.get(position));
+                 KvizoviAkt.mogPitanja.add(pitanjaKviza.get(position));
+                 pitanjaKviza.remove(position);
+                 listaPitanja.setAdapter(pitanjaAdapter);
+                 listaMogucih.setAdapter(mogucaAdapter);
+             }
+            }
+
+        });
+
+
     }
 
 
 
-
+    void refresh() {
+        pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
+    }
 
     @Override
     public void onItemSelected (AdapterView< ? > parent, View view, int position, long id){
