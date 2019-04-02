@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.aktivnosti;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      private ListView listaMogucih;
      private Spinner dkaSpinner;
      private Button dodaj;
+     private boolean valid=false;
      public PitanjaListAdapter pitanjaAdapter=null;
      public MogucaListAdapter mogucaAdapter=null;
      public String naziv_kviza;
@@ -77,7 +80,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         {
             @Override
             public void onClick(View v) {
-
+                 validacija();
+                 if( valid==true) System.out.println("---------------------------------------------");
 
             }});
 
@@ -118,7 +122,25 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    void validacija () {
+        if (pitanjaKviza.size()==1) listaPitanja.setBackgroundColor(Color.RED);
+        else {
+            valid = true;
+            listaPitanja.setBackgroundColor(Color.WHITE);
+        }
+        if (editText.getText().length()==0) editText.setBackgroundColor(Color.RED);
+        else {
+            valid = true;
+            editText.setBackgroundColor(Color.WHITE);
 
+        }
+        if (dkaSpinner.getSelectedItemPosition()==0) dkaSpinner.setBackgroundColor(Color.RED);
+        else {
+            valid = true;
+            dkaSpinner.setBackgroundColor(Color.WHITE);
+        }
+
+    }
 
     void refresh() {
         pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
