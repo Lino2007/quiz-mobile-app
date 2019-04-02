@@ -15,6 +15,8 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.klase.Kviz;
+import ba.unsa.etf.rma.klase.MogucaListAdapter;
+import ba.unsa.etf.rma.klase.PitanjaListAdapter;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -37,10 +39,13 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dodaj_kviz_akt);
          dkaAkk=this;
-        Bundle b= getIntent().getExtras();
-        final ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>)b.getSerializable("mogucaPitanja");
-        Bundle c= getIntent().getExtras();
-        ArrayList<Kviz> listaKvizova= (ArrayList<Kviz>)b.getSerializable("sviKvizovi");
+     //   Bundle b= getIntent().getExtras();
+
+        //TODO -ukloniti
+     //   final ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>)b.getSerializable("mogucaPitanja");
+    //    Bundle c= getIntent().getExtras();
+
+      //  ArrayList<Kviz> listaKvizova= (ArrayList<Kviz>)b.getSerializable("sviKvizovi");
 
      if (t) {
           pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
@@ -52,7 +57,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         listaPitanja= (ListView)  findViewById(R.id.lvDodanaPitanja);
         dkaSpinner= (Spinner) findViewById(R.id.dkaSpinner);
 
-          mogucaAdapter= new MogucaListAdapter(this, mogucaPitanja, getResources());
+          mogucaAdapter= new MogucaListAdapter(this, KvizoviAkt.mogPitanja , getResources());
 
         pitanjaAdapter= new PitanjaListAdapter(this,pitanjaKviza, getResources());
         dkaSpinner.setOnItemSelectedListener(this);
@@ -79,10 +84,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
                 String changedName = "Thomas";
                 itemListAdapter.getItem(position).setItemName(changedName); */
-               mogucaPitanja.remove(0);
-                mogucaAdapter= new MogucaListAdapter(dkaAkk,mogucaPitanja, getResources());
+               KvizoviAkt.mogPitanja.remove(0);
+                mogucaAdapter= new MogucaListAdapter(dkaAkk, KvizoviAkt.mogPitanja, getResources());
                 listaMogucih.setAdapter(mogucaAdapter);
-                System.out.println(position);
+
 
             }
 

@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.aktivnosti;
+package ba.unsa.etf.rma.klase;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 
+import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 

@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.klase.*;
@@ -22,18 +21,18 @@ import ba.unsa.etf.rma.klase.*;
 
 public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedListener {
 
-   public ArrayList<Kategorija> listaKategorija =new ArrayList<>();
+   public static ArrayList<Kategorija> listaKategorija =new ArrayList<>();
     public static ArrayList<String> categories= new ArrayList<>();
     public KvizoviAkt kvizoviAkt ;
-    public  ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
+    public static ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
 
 
     private String trenutnaKategorija= new String ();
 
     //Za listu
-   private ListView mainList;
+    private ListView mainList;
     public MainListAdapter mainListAdapter=null;
-    public ArrayList<Kviz> listaKvizova= new ArrayList<>();
+    public static ArrayList<Kviz> listaKvizova= new ArrayList<>();
     private  Spinner spinner;
 
     @Override
@@ -50,11 +49,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         mainList= (ListView) findViewById(R.id.lvKvizovi);
       spinner.setOnItemSelectedListener(this);
 
-
-
-
-
-         ListView mainList= (ListView) findViewById(R.id.lvKvizovi);
+      ListView mainList= (ListView) findViewById(R.id.lvKvizovi);
         mainListAdapter= new MainListAdapter (kvizoviAkt,listaKvizova, res);
        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
 
@@ -164,15 +159,16 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
     public void onItemClick(int mPosition) {
         if (mPosition==listaKvizova.size()-1) {
-            Bundle b= new Bundle(), c=new Bundle();
-            ArrayList<Pitanje> pitanjaKviza= new ArrayList<>();
-            b.putSerializable("mogucaPitanja", (Serializable) mogPitanja);
-            ArrayList<Kviz>  pomListaKvizova=new ArrayList<>();
-            pomListaKvizova=  kopiraj(listaKvizova,pomListaKvizova);
-            c.putSerializable("sviKvizovi", (Serializable) pomListaKvizova);
+            //TODO ukloniti
+         //   Bundle b= new Bundle(), c=new Bundle();
+        //    ArrayList<Pitanje> pitanjaKviza= new ArrayList<>();
+           // b.putSerializable("mogucaPitanja", (Serializable) mogPitanja);
+        //    ArrayList<Kviz>  pomListaKvizova=new ArrayList<>();
+          //  pomListaKvizova=  kopiraj(listaKvizova,pomListaKvizova);
+         //   c.putSerializable("sviKvizovi", (Serializable) pomListaKvizova);
 
             Intent dodajIntent= new Intent( KvizoviAkt.this, DodajKvizAkt.class);
-            dodajIntent.putExtras(b);
+         //   dodajIntent.putExtras(b);
             KvizoviAkt.this.startActivity(dodajIntent);
 
             System.out.println("Dodaj aktivnost"); }
