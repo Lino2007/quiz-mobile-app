@@ -29,6 +29,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      public PitanjaListAdapter pitanjaAdapter=null;
      public MogucaListAdapter mogucaAdapter=null;
      public boolean t=true;
+     public int pozicija=-1;
      private ArrayList<Pitanje> pitanjaKviza= new ArrayList<> ();
      private ArrayList<Kviz>  listaKvizova= new ArrayList<>();
       public Kviz noviKviz;
@@ -39,27 +40,24 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dodaj_kviz_akt);
          dkaAkk=this;
-     //   Bundle b= getIntent().getExtras();
+        pozicija= getIntent().getExtras().getInt("poz_kviza");
 
-        //TODO -ukloniti
-     //   final ArrayList<Pitanje> mogucaPitanja= (ArrayList<Pitanje>)b.getSerializable("mogucaPitanja");
-    //    Bundle c= getIntent().getExtras();
 
-      //  ArrayList<Kviz> listaKvizova= (ArrayList<Kviz>)b.getSerializable("sviKvizovi");
-
-     if (t) {
-          pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
-           t=false;
-       }
         dodaj= (Button)  findViewById(R.id.button);
         editText= (EditText) findViewById(R.id.editText);
         listaMogucih= (ListView) findViewById(R.id.lvMogucaPitanja);
         listaPitanja= (ListView)  findViewById(R.id.lvDodanaPitanja);
         dkaSpinner= (Spinner) findViewById(R.id.dkaSpinner);
-
+        if (pozicija!=-1 && KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja()!=null) {
+            pitanjaKviza= KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja();
+        }
+        if (pitanjaKviza.size()>0 && pitanjaKviza.get(pitanjaKviza.size()-1).getNaziv()!="dummy") {
+            pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
+            t=false;
+        }
           mogucaAdapter= new MogucaListAdapter(this, KvizoviAkt.mogPitanja , getResources());
+          pitanjaAdapter= new PitanjaListAdapter(this, pitanjaKviza, getResources());
 
-        pitanjaAdapter= new PitanjaListAdapter(this,pitanjaKviza, getResources());
         dkaSpinner.setOnItemSelectedListener(this);
        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, KvizoviAkt.getCategories());
         dkaSpinner.setAdapter(dataAdapter);

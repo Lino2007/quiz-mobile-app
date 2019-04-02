@@ -25,6 +25,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
     public static ArrayList<String> categories= new ArrayList<>();
     public KvizoviAkt kvizoviAkt ;
     public static ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
+    public static ArrayList<Kviz>  odabraniKvizovi= new ArrayList<> ();
 
 
     private String trenutnaKategorija= new String ();
@@ -104,8 +105,8 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
 
     private void dajKvizoveKategorije(String item) {
-        ArrayList<Kviz>  odabraniKvizovi=new ArrayList<>();
         int i=0;
+        odabraniKvizovi.clear();
         if (item!="Sve") {
             for (Kviz x : listaKvizova) {
                 if (x.getKategorija().getNaziv() == item) {
@@ -119,7 +120,8 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
             mainList.setAdapter(mainListAdapter);
             return ;
         }
-        mainListAdapter=new MainListAdapter(kvizoviAkt,listaKvizova,getResources());
+       kopiraj(listaKvizova,odabraniKvizovi);
+        mainListAdapter=new MainListAdapter(kvizoviAkt,odabraniKvizovi,getResources());
       mainList.setAdapter(mainListAdapter);
     }
 
@@ -152,34 +154,39 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         listaKvizova.add (new Kviz ("Toyota", b, prva));
         listaKvizova.add (new Kviz ("Kawasaki", a, druga));
         listaKvizova.add (new Kviz ("airbus", b, treca));
-        listaKvizova.add (new Kviz ("krila", a, treca));
+        listaKvizova.add (new Kviz ("krila", null, treca));
         listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy")));
 
     }
 
     public void onItemClick(int mPosition) {
         if (mPosition==listaKvizova.size()-1) {
-            //TODO ukloniti
-         //   Bundle b= new Bundle(), c=new Bundle();
-        //    ArrayList<Pitanje> pitanjaKviza= new ArrayList<>();
-           // b.putSerializable("mogucaPitanja", (Serializable) mogPitanja);
-        //    ArrayList<Kviz>  pomListaKvizova=new ArrayList<>();
-          //  pomListaKvizova=  kopiraj(listaKvizova,pomListaKvizova);
-         //   c.putSerializable("sviKvizovi", (Serializable) pomListaKvizova);
-
             Intent dodajIntent= new Intent( KvizoviAkt.this, DodajKvizAkt.class);
-         //   dodajIntent.putExtras(b);
-            KvizoviAkt.this.startActivity(dodajIntent);
-
-            System.out.println("Dodaj aktivnost"); }
-       else System.out.println("Item clicked");
+            KvizoviAkt.this.startActivity(dodajIntent); }
+       else {
+             Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
+             dodajIntent.putExtra ("poz_kviza", mPosition);
+             int indexKategorije;
+             try {
+                indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
+             }
+             catch (Exception e) {
+                 System.out.println(e + "!!!!!!!!!!!!!!!!!!!!!");
+                 return ;
+            }
+            dodajIntent.putExtra ("poz_kategorije", indexKategorije);
+          //   dodajIntent.putExtra ("naziv_kviza", odabraniKvizovi.get(mPosition).getNaziv());
+             KvizoviAkt.this.startActivity(dodajIntent);
+       //     System.out.println(odabraniKvizovi.get(mPosition).toString());
+           System.out.println("Item clicked");
+        }
     }
 
-     public ArrayList<Kviz> kopiraj (ArrayList<Kviz> a, ArrayList<Kviz> b) {
+     public  ArrayList<Kviz> kopiraj (ArrayList<Kviz> a, ArrayList<Kviz> b) {
         for (Kviz x: a) {
             b.add(x);
         }
-        b.remove(b.size()-1);
+
         return b;
      }
     public void dodajKviz (Kviz kviz) {
@@ -188,6 +195,12 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
     public static ArrayList<String> getCategories() {
         return categories;
+    }
+
+    public static int getCategoriesByName (String name) {
+        int target= categories.indexOf(name);
+        if (target==-1) throw new IllegalArgumentException("Ne postoji kategorija");
+        return target;
     }
 
 
