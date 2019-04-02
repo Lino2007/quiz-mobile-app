@@ -40,7 +40,6 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
         res = resLocal;
 
         // Layout inflator to call external xml layout ()
-        System.out.println(activity + " " +  data  +" " +  resLocal);
         inflater = ( LayoutInflater )activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -107,7 +106,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
             // Get each Model object from Arraylist
             tempValues=null;
             tempValues = ( Kviz ) data.get( position );
-            System.out.println(position);
+
             //  Set Model values in Holder elements
 
             //   holder.ime.setText( tempValues.getIme() + tempValues.getPrezime() );

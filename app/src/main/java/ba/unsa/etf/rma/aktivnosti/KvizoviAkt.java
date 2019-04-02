@@ -162,6 +162,8 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
     public void onItemClick(int mPosition) {
         if (mPosition==listaKvizova.size()-1) {
             Intent dodajIntent= new Intent( KvizoviAkt.this, DodajKvizAkt.class);
+            dodajIntent.putExtra ("poz_kviza",-1);
+            dodajIntent.putExtra ("poz_kategorije", 0);
             KvizoviAkt.this.startActivity(dodajIntent); }
        else {
              Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
@@ -174,11 +176,13 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                  System.out.println(e + "!!!!!!!!!!!!!!!!!!!!!");
                  return ;
             }
+            indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
             dodajIntent.putExtra ("poz_kategorije", indexKategorije);
-          //   dodajIntent.putExtra ("naziv_kviza", odabraniKvizovi.get(mPosition).getNaziv());
+            dodajIntent.putExtra ("naziv_kviza", odabraniKvizovi.get(mPosition).getNaziv());
              KvizoviAkt.this.startActivity(dodajIntent);
-       //     System.out.println(odabraniKvizovi.get(mPosition).toString());
-           System.out.println("Item clicked");
+           // if (odabraniKvizovi.get(mPosition).getPitanja().size()>0 ) odabraniKvizovi.get(mPosition).getPitanja().remove(odabraniKvizovi.get(mPosition).getPitanja().size()-1);
+
+
         }
     }
 

@@ -40,7 +40,7 @@ public class MogucaListAdapter extends BaseAdapter {
         res = resLocal;
 
         // Layout inflator to call external xml layout ()
-        System.out.println(activity + " " +  data  +" " +  resLocal);
+
         inflater = ( LayoutInflater )activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -107,7 +107,7 @@ public class MogucaListAdapter extends BaseAdapter {
             // Get each Model object from Arraylist
             tempValues=null;
             tempValues = ( Pitanje ) data.get( position );
-            System.out.println(position);
+
             //  Set Model values in Holder elements
 
             //  holder.ime.setText( tempValues.getIme() + tempValues.getPrezime() );

@@ -142,8 +142,8 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
 
         @Override
         public void onClick(View arg0) {
-            KvizoviAkt sct = (KvizoviAkt) activity;
-            sct.onItemClick(mPosition);
+          //  KvizoviAkt sct = (KvizoviAkt) activity;
+         //   sct.onItemClick(mPosition);
         }
     }
 
