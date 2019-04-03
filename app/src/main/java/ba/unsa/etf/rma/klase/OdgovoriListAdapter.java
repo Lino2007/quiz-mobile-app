@@ -3,6 +3,8 @@ package ba.unsa.etf.rma.klase;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +30,9 @@ public class OdgovoriListAdapter extends BaseAdapter implements View.OnClickList
     private ArrayList data;
     private static LayoutInflater inflater=null;
     public Resources res;
-    Pitanje tempValues=null;
+    String tempValues=null;
     int i=0;
-    boolean global=false;
+    public static boolean global=false;
 
     //  CustomAdapter Constructor
     public  OdgovoriListAdapter(Activity a, ArrayList d, Resources resLocal) {
@@ -67,8 +69,9 @@ public class OdgovoriListAdapter extends BaseAdapter implements View.OnClickList
     // Create a holder Class to contain inflated xml file elements
     public static class ViewHolder{
 
-        public TextView nazivPitanja;
+        public TextView nazivOdgovora;
         public ImageView dot;
+        public ViewHolder itemView;
 
     }
 
@@ -81,12 +84,12 @@ public class OdgovoriListAdapter extends BaseAdapter implements View.OnClickList
         if(convertView==null){
 
             // Inflate tabitem.xml file for each row ( Defined below )
-            vi = inflater.inflate(R.layout.pitanja_u_kvizu_item, null);
+            vi = inflater.inflate(R.layout.odgovor_item, null);
 
             //View Holder Object to contain tabitem.xml file elements
 
             holder = new ViewHolder();
-            holder.nazivPitanja= (TextView) vi.findViewById(R.id.nazivPitanja);
+            holder.nazivOdgovora= (TextView) vi.findViewById(R.id.nazivOdgovora);
             holder.dot= (ImageView) vi.findViewById(R.id.image);
 
 
@@ -99,29 +102,22 @@ public class OdgovoriListAdapter extends BaseAdapter implements View.OnClickList
 
         if(data.size()<=0)
         {
-            holder.nazivPitanja.setText("Dodaj Kviz");
-            holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
-            global=false;
+            holder.nazivOdgovora.setText("No data");
+
         }
         else
         {
             // Get each Model object from Arraylist
             tempValues=null;
-            tempValues = ( Pitanje ) data.get( position );
-
-            //  Set Model values in Holder elements
-
-            //   holder.ime.setText( tempValues.getIme() + tempValues.getPrezime() );
-       /*     if (position==data.size()-1){
-                holder.nazivPitanja.setText("Dodaj Kviz");
-                holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
+            tempValues = ( String) data.get( position );
+            if (global) {
+                vi.setBackgroundColor(Color.parseColor("#B2F8A5"));
+                global=false;
             }
-            else {
-                holder.nazivPitanja.setText(tempValues.getNaziv());
-                holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
-            }
-           */
-            //  vi.setOnClickListener(new OnItemClickListener( position ));
+            holder.nazivOdgovora.setText (tempValues);
+            holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
+
+              vi.setOnClickListener(new OnItemClickListener( position ));
         }
 
         return vi;

@@ -1,11 +1,16 @@
 package ba.unsa.etf.rma.aktivnosti;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
@@ -17,6 +22,8 @@ public class DodajPitanjeAkt extends AppCompatActivity {
   private EditText nazivPitanja, odgovor;
   private ListView lvOdgovori;
   ArrayList<String> listaOdgovora= new ArrayList<> ();
+  String tacan=null;
+  boolean valid=false;
   OdgovoriListAdapter odgovoriAdapter=null;
 
     @Override
@@ -31,12 +38,79 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         odgovor= (EditText) findViewById(R.id.etOdgovor);
         lvOdgovori= (ListView) findViewById(R.id.lvOdgovori);
 
-        //  mainListAdapter= new MainListAdapter (kvizoviAkt,listaKvizova, res);
         odgovoriAdapter= new OdgovoriListAdapter(this,listaOdgovora, getResources());
 
-        if (listaOdgovora==null)  lvOdgovori.setAdapter(odgovoriAdapter);
+        if (listaOdgovora==null)  lvOdgovori.setAdapter(null);
 
+
+        dodajTacan.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                if (tacan==null &&  odgovor.getText().toString().length()>0 && listaOdgovora.indexOf(odgovor.getText().toString())==-1) {
+                    OdgovoriListAdapter.global=true;
+                    tacan= odgovor.getText().toString();
+                    listaOdgovora.add(tacan);
+                    lvOdgovori.setAdapter(odgovoriAdapter);
+                }
+            }});
+
+
+        dodaj.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                if (listaOdgovora.indexOf(odgovor.getText().toString())==-1) {
+                    listaOdgovora.add(odgovor.getText().toString());
+                    lvOdgovori.setAdapter(odgovoriAdapter);
+                }
+            }});
+
+        dodaj.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                if (listaOdgovora.indexOf(odgovor.getText().toString())==-1) {
+                    listaOdgovora.add(odgovor.getText().toString());
+                    lvOdgovori.setAdapter(odgovoriAdapter);
+                }
+            }});
+
+        dodajPitanje.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                 validiraj();
+                 if(valid==true) {
+                     Intent vratiPitanje = getIntent();
+                     vratiPitanje.putExtra ("pitanje", listaOdgovora);
+                     vratiPitanje.putExtra("naziv", nazivPitanja.getText().toString());
+                     setResult(Activity.RESULT_OK, vratiPitanje);
+                     finish();
+                 }
+
+            }});
 
 
     }
+
+     void validiraj () {
+         if (nazivPitanja.getText().toString().isEmpty()) {
+             nazivPitanja.setBackgroundColor(Color.RED);
+         }
+         else  {
+             nazivPitanja.setBackgroundColor(Color.WHITE);
+
+         }
+
+         if (listaOdgovora.isEmpty() || tacan==null) {
+             lvOdgovori.setBackgroundColor(Color.RED);
+         }
+         else  {
+            lvOdgovori.setBackgroundColor(Color.WHITE);
+         }
+
+         if(!(listaOdgovora.isEmpty()) && !(nazivPitanja.getText().toString().isEmpty()) && tacan!=null) valid=true;
+
+     }
 }
