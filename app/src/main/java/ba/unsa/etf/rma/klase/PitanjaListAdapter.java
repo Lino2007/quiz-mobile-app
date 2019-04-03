@@ -108,7 +108,7 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
             // Get each Model object from Arraylist
             tempValues=null;
             tempValues = ( Pitanje ) data.get( position );
-            System.out.println(position);
+
             //  Set Model values in Holder elements
 
             //   holder.ime.setText( tempValues.getIme() + tempValues.getPrezime() );

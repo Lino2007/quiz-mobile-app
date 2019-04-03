@@ -64,8 +64,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
     }
 
-    /*Ideja: Trebalo bi ucitati sve elemente liste i manualno dodati jos jedan sa drugom slikom koji pokrece add activity (Rijeseno)
-     Skontati kako izvrsiti prenos kategorije za spiner u DodajKvizAkt (Zapravo treba odabrati kategoriju a ne prenositi)
+    /*
      */
     /*
     TODO
@@ -175,7 +174,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                 indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
              }
              catch (Exception e) {
-                 System.out.println(e + "!!!!!!!!!!!!!!!!!!!!!");
+                 System.out.println(e + "!!!!!!!!!!!!");
                  return ;
             }
             indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());

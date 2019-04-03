@@ -3,6 +3,8 @@ package ba.unsa.etf.rma.aktivnosti;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -39,12 +41,16 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      public int poz_kat=0;
      private ArrayList<Pitanje> pitanjaKviza= new ArrayList<> ();
      private ArrayList<Kviz>  listaKvizova= new ArrayList<>();
-     DodajKvizAkt dkaAkk=null;
+
+     private ArrayList<Pitanje> kopijaPitanjaKviza = new ArrayList<>();
+     private ArrayList<Pitanje> kopijaMogucihPitanja= new ArrayList<>();
+      DodajKvizAkt dkaAkk=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dodaj_kviz_akt);
+
          dkaAkk=this;
         pozicija= getIntent().getExtras().getInt("poz_kviza");
         poz_kat=getIntent().getExtras().getInt("poz_kategorije");
@@ -56,15 +62,26 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         dkaSpinner= (Spinner) findViewById(R.id.dkaSpinner);
 
         if (pozicija!=-1 && KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja()!=null) {
-            pitanjaKviza= KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja();
+            pitanjaKviza=  KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja();
             naziv_kviza=getIntent().getExtras().getString("naziv_kviza");
             editText.setText(naziv_kviza);
+            try {
+                ArrayList<Pitanje> x = new ArrayList<>();
+
+            }
+            catch (Exception e) {
+
+            }
         }
+
         if ((pitanjaKviza.size()>0 && pitanjaKviza.get(pitanjaKviza.size()-1).getNaziv()!="dummy") || pitanjaKviza.size()==0) {
             pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
         }
-          mogucaAdapter= new MogucaListAdapter(this, KvizoviAkt.mogPitanja , getResources());
-          pitanjaAdapter= new PitanjaListAdapter(this, pitanjaKviza, getResources());
+      kopijaPitanjaKviza=  kopirajPitanja(kopijaPitanjaKviza, pitanjaKviza);
+       kopijaMogucihPitanja= kopirajPitanja(kopijaMogucihPitanja, KvizoviAkt.mogPitanja);
+
+          mogucaAdapter= new MogucaListAdapter(this, kopijaMogucihPitanja , getResources());
+          pitanjaAdapter= new PitanjaListAdapter(this,kopijaPitanjaKviza, getResources());
 
         dkaSpinner.setOnItemSelectedListener(this);
        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, KvizoviAkt.getCategories());
@@ -73,7 +90,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         dkaSpinner.setSelection(poz_kat); //postavka pozicije
 
          listaPitanja.setAdapter(pitanjaAdapter);
-          if (KvizoviAkt.mogPitanja.size()==0)  listaMogucih.setAdapter(null);
+          if (kopijaMogucihPitanja.size()==0)  listaMogucih.setAdapter(null);
           else  listaMogucih.setAdapter(mogucaAdapter);
 
 
@@ -99,12 +116,12 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         listaMogucih.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                if (pitanjaKviza.size()>0) pitanjaKviza.remove(pitanjaKviza.size()-1);
-                  pitanjaKviza.add (KvizoviAkt.mogPitanja.get(position));
-                  KvizoviAkt.mogPitanja.remove(position);
+                if (kopijaPitanjaKviza.size()>0) kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size()-1);
+                kopijaPitanjaKviza.add (kopijaMogucihPitanja.get(position));
+                kopijaMogucihPitanja.remove(position);
                    refresh();
-                mogucaAdapter= new MogucaListAdapter(dkaAkk, KvizoviAkt.mogPitanja, getResources());
-               if (KvizoviAkt.mogPitanja.size()==0)  listaMogucih.setAdapter(null);
+                mogucaAdapter= new MogucaListAdapter(dkaAkk, kopijaMogucihPitanja, getResources());
+               if (kopijaMogucihPitanja.size()==0)  listaMogucih.setAdapter(null);
                 else listaMogucih.setAdapter(mogucaAdapter);
                 listaPitanja.setAdapter(pitanjaAdapter);
 
@@ -115,9 +132,9 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         listaPitanja.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-             if (position< pitanjaKviza.size()-1) {
-                 KvizoviAkt.mogPitanja.add(pitanjaKviza.get(position));
-                 pitanjaKviza.remove(position);
+             if (position< kopijaPitanjaKviza.size()-1) {
+                 kopijaMogucihPitanja.add(kopijaPitanjaKviza.get(position));
+                 kopijaPitanjaKviza.remove(position);
                  listaPitanja.setAdapter(pitanjaAdapter);
                  listaMogucih.setAdapter(mogucaAdapter);
              }
@@ -126,9 +143,22 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+           kopijaMogucihPitanja=KvizoviAkt.mogPitanja;
+            kopijaPitanjaKviza=pitanjaKviza;
+
+       /*     listaPitanja.setAdapter(pitanjaAdapter);
+            listaMogucih.setAdapter(mogucaAdapter); */
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     void validacija () {
-        System.out.println(pitanjaKviza.size()+ "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        if (pitanjaKviza.size()==1) listaPitanja.setBackgroundColor(Color.RED);
+
+        if (kopijaPitanjaKviza.size()==1) listaPitanja.setBackgroundColor(Color.RED);
         else {
             valid = true;
             listaPitanja.setBackgroundColor(Color.WHITE);
@@ -147,11 +177,11 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
     void refresh() {
-        pitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
+        kopijaPitanjaKviza.add(new Pitanje ("dummy", "dummy", "dummy", null));
     }
 
     void shut() {
-        pitanjaKviza.remove(pitanjaKviza.size()-1);
+        kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size()-1);
     }
 
     @Override
@@ -163,5 +193,12 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onNothingSelected (AdapterView < ? > parent){
 
+    }
+
+    public ArrayList<Pitanje> kopirajPitanja (ArrayList<Pitanje> a , ArrayList<Pitanje> b) {
+        for (Pitanje x: b) {
+            a.add(x);
+        }
+        return a;
     }
 }
