@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.aktivnosti;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
     public KvizoviAkt kvizoviAkt ;
     public static ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
     public static ArrayList<Kviz>  odabraniKvizovi= new ArrayList<> ();
+
 
 
     private String trenutnaKategorija= new String ();
@@ -64,18 +66,6 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
     }
 
-    /*
-     */
-    /*
-    TODO
-
-*/
-
-
-    public String getTrenutnaKategorija() {
-        return trenutnaKategorija;
-    }
-
     public void setTrenutnaKategorija(String trenutnaKategorija) {
         this.trenutnaKategorija = trenutnaKategorija;
     }
@@ -88,20 +78,13 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
             dajKvizoveKategorije(item);
 
         }
-
-
-        // Showing selected spinner item
-        Toast.makeText(parent.getContext(), item, Toast.LENGTH_LONG).show();
-
+       // Toast.makeText(parent.getContext(), item, Toast.LENGTH_LONG).show();
     }
-
-
 
     @Override
     public void onNothingSelected (AdapterView < ? > parent){
 
     }
-
 
     private void dajKvizoveKategorije(String item) {
         int i=0;
@@ -159,11 +142,12 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
     }
 
     public void onItemClick(int mPosition) {
-        if (mPosition==listaKvizova.size()-1) {
+        if (mPosition==odabraniKvizovi.size()-1) {
             Intent dodajIntent= new Intent( KvizoviAkt.this, DodajKvizAkt.class);
             dodajIntent.putExtra ("poz_kviza",-1);
             dodajIntent.putExtra ("poz_kategorije", 0);
-            KvizoviAkt.this.startActivity(dodajIntent);
+            KvizoviAkt.this.startActivityForResult(dodajIntent, 0 );
+
 
    }
        else {
@@ -180,9 +164,8 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
             indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
             dodajIntent.putExtra ("poz_kategorije", indexKategorije);
             dodajIntent.putExtra ("naziv_kviza", odabraniKvizovi.get(mPosition).getNaziv());
-             KvizoviAkt.this.startActivity(dodajIntent);
+            KvizoviAkt.this.startActivityForResult(dodajIntent, 0 );;
 
-           // if (odabraniKvizovi.get(mPosition).getPitanja().size()>0 ) odabraniKvizovi.get(mPosition).getPitanja().remove(odabraniKvizovi.get(mPosition).getPitanja().size()-1);
 
 
         }
@@ -209,5 +192,34 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         return target;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("USAO......****************...******************************");
+            if(resultCode == Activity.RESULT_OK){
+                Bundle bundleOb= data.getExtras();
+                  ArrayList<Pitanje> novaPitanja=  (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
+                  novaPitanja.remove (novaPitanja.size()-1);
+               listaKvizova.remove(listaKvizova.size()-1);
+               Kviz noviKviz=new Kviz (data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt ("kategorija")-1));
+               dodajKviz(noviKviz);
+                listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy")));
+                spinner.setSelection(0);
+                mainListAdapter=new MainListAdapter(kvizoviAkt,listaKvizova,getResources());
+                mainList.setAdapter(mainListAdapter);
+            }
+            else if (resultCode == Activity.RESULT_FIRST_USER) {
+                Bundle bundleOb= data.getExtras();
+                ArrayList<Pitanje> novaPitanja=  (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
+                System.out.println(novaPitanja.size());
+               novaPitanja.remove (novaPitanja.size()-1);
+                int pozicija=data.getExtras().getInt("pozicija");
+                odabraniKvizovi.get(pozicija).setPitanja(novaPitanja);
+                odabraniKvizovi.get(pozicija).setNaziv (data.getStringExtra("naziv"));
+                odabraniKvizovi.get(pozicija).setKategorija(listaKategorija.get(data.getExtras().getInt ("kategorija")-1));
+                spinner.setSelection(0);
+                mainListAdapter=new MainListAdapter(kvizoviAkt,listaKvizova,getResources());
+                mainList.setAdapter(mainListAdapter);
+            }
 
+    }
 }
