@@ -123,10 +123,12 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         }
 
         ArrayList<Pitanje> a = new ArrayList(), b =new ArrayList<>();
-        a.add(new Pitanje ("Pitanje 1", "Pitanje 1?", null, null));
-        a.add(new Pitanje ("Pitanje 2", "Pitanje 2?", null, null));
-        a.add(new Pitanje ("Pitanje 3", "Pitanje 3?", null, null));
-        a.add(new Pitanje ("Pitanje 4", "Pitanje 4?", null, null));
+        ArrayList<String> odgov=new ArrayList<>();  odgov.add("Prvi odgovor"); odgov.add("Drugi odgovor"); odgov.add("Neki odgov");
+        ArrayList<String> odgov2=new ArrayList<>();  odgov2.add("Garbage"); odgov2.add("Collector"); odgov2.add("Is the best");
+        a.add(new Pitanje ("Pitanje 1", "Pitanje 1?", null, odgov));
+        a.add(new Pitanje ("Pitanje 2", "Pitanje 2?", null, odgov2));
+        a.add(new Pitanje ("Pitanje 3", "Pitanje 3?", odgov.get(0), odgov));
+        a.add(new Pitanje ("Pitanje 4", "Pitanje 4?", odgov.get(1), odgov2));
         b.add(new Pitanje ("Pitanje 1", "BPitanje 1?", null, null));
         b.add(new Pitanje ("Pitanje 2", "BPitanje 2?", null, null));
         b.add(new Pitanje ("Pitanje 3", "BPitanje 3?", null, null));
@@ -136,7 +138,10 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         listaKvizova.add (new Kviz ("Toyota", b, prva));
         listaKvizova.add (new Kviz ("Kawasaki", a, druga));
         listaKvizova.add (new Kviz ("airbus", b, treca));
+
+        //provjeri zasto kad su pitanja null zeza
         listaKvizova.add (new Kviz ("krila", null, treca));
+        listaKvizova.add (new Kviz ("kril2a", null, treca));
         listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy")));
 
     }

@@ -156,6 +156,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                  listaPitanja.setAdapter(pitanjaAdapter);
                  listaMogucih.setAdapter(mogucaAdapter);
              }
+             else if (position== kopijaPitanjaKviza.size()-1) {
+                 Intent dodajPitanje = new Intent(DodajKvizAkt.this, DodajPitanjeAkt.class);
+                 DodajKvizAkt.this.startActivityForResult(dodajPitanje, 0 );
+             }
             }
 
         });
