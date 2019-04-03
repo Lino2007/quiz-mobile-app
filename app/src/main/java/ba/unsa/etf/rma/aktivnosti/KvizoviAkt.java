@@ -54,7 +54,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
       ListView mainList= (ListView) findViewById(R.id.lvKvizovi);
         mainListAdapter= new MainListAdapter (kvizoviAkt,listaKvizova, res);
-       ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+       ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
 
         mainList.setAdapter(mainListAdapter);
         // Drop down layout style - list view with radio button
