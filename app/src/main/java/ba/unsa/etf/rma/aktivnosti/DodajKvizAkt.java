@@ -233,4 +233,18 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
        }
         return a;
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode == Activity.RESULT_CANCELED){
+            kopijaPitanjaKviza.remove (kopijaPitanjaKviza.size()-1);
+              kopijaPitanjaKviza.add(new Pitanje(data.getStringExtra("naziv"), data.getStringExtra("naziv"), data.getStringExtra("tacan"), data.getStringArrayListExtra("pitanje")));
+              refresh();
+            listaPitanja.setAdapter(pitanjaAdapter);
+
+        }
+
+
+    }
 }

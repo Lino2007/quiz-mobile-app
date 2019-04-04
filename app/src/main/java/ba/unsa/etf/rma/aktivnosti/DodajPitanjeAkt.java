@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,13 +86,23 @@ public class DodajPitanjeAkt extends AppCompatActivity {
                      Intent vratiPitanje = getIntent();
                      vratiPitanje.putExtra ("pitanje", listaOdgovora);
                      vratiPitanje.putExtra("naziv", nazivPitanja.getText().toString());
-                     setResult(Activity.RESULT_OK, vratiPitanje);
+                     vratiPitanje.putExtra ("tacan", tacan);
+                     setResult(Activity.RESULT_CANCELED, vratiPitanje);
                      finish();
                  }
 
             }});
 
 
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+
+          setResult(Activity.CONTEXT_INCLUDE_CODE);
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
      void validiraj () {

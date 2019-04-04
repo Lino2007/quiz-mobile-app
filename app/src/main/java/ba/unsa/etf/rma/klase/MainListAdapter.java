@@ -140,6 +140,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
 
         @Override
         public void onClick(View arg0) {
+            System.out.println("--------------------------------------");
             KvizoviAkt sct = (KvizoviAkt) activity;
             sct.onItemClick(mPosition);
         }
