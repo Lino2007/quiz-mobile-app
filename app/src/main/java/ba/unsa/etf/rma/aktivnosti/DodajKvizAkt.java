@@ -45,7 +45,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      private ArrayList<Pitanje> pitanjaKviza= new ArrayList<> ();
      private ArrayList<Kviz>  listaKvizova= new ArrayList<>();
      ArrayList<Pitanje> x=new ArrayList<>();
-
+      private ArrayList<String> kategorije= new ArrayList<>();
      public  ArrayList<Pitanje> kopijaPitanjaKviza = new ArrayList<>();
      public  ArrayList<Pitanje> kopijaMogucihPitanja= new ArrayList<>();
       DodajKvizAkt dkaAkk=null;
@@ -86,7 +86,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
           pitanjaAdapter= new PitanjaListAdapter(this,kopijaPitanjaKviza, getResources());
 
         dkaSpinner.setOnItemSelectedListener(this);
-       ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modificirajSpiner(KvizoviAkt.getCategories()));
+        kategorije= modificirajSpiner(KvizoviAkt.getCategories());
+       ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, kategorije );
 
         dkaSpinner.setAdapter(dataAdapter);
         dkaSpinner.setSelection(poz_kat); //postavka pozicije
@@ -185,7 +186,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
     void validacija () {
-        System.out.println(kopijaPitanjaKviza.size());
+
         if (kopijaPitanjaKviza.size()<=1) listaPitanja.setBackgroundColor(Color.RED);
         else {
 
@@ -218,7 +219,11 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected (AdapterView< ? > parent, View view, int position, long id){
         String item = parent.getItemAtPosition(position).toString();
-        Toast.makeText(parent.getContext(), item, Toast.LENGTH_LONG).show();
+
+        if (parent.getSelectedItemPosition()== kategorije.size()-1) {
+            Intent katAkt= new Intent (DodajKvizAkt.this, DodajKategorijuAkt.class);
+            DodajKvizAkt.this.startActivity(katAkt);
+        }
     }
 
     @Override
