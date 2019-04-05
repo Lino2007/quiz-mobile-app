@@ -3,6 +3,7 @@ package ba.unsa.etf.rma.klase;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +16,6 @@ import com.maltaisn.icondialog.Icon;
 
 import com.maltaisn.icondialog.IconDialog;
 import com.maltaisn.icondialog.IconHelper;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
@@ -39,7 +34,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
     Kviz tempValues=null;
     int i=0;
     boolean global=false;
-
+     IconDialog icondialog=new IconDialog();
     //  CustomAdapter Constructor
     public MainListAdapter(Activity a, ArrayList d, Resources resLocal) {
 
@@ -88,7 +83,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View vi = convertView;
-        ViewHolder holder;
+        final ViewHolder holder;
 
         if(convertView==null){
 
@@ -128,15 +123,36 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
             holder.nazivKviza.setText("Dodaj Kviz");
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
             }
-           else {
+           else if (position!=data.size()-1){
                 holder.nazivKviza.setText(tempValues.getNaziv());
-             /*   if (!(tempValues.getKategorija().getId().isEmpty())) {
-                   // System.out.println(activity.getApplicationContext());
-                    IconHelper iconHelper = IconHelper.getInstance(activity.getApplicationContext());
-                  int value= Integer.parseInt(tempValues.getKategorija().getId());
-                    holder.dot.setImageDrawable(iconHelper.getIcon( value).getDrawable((activity.getApplicationContext())));
-                } */
-               holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
+
+                if (!(tempValues.getKategorija().getId().isEmpty()) && !(tempValues.getKategorija().getId().equals("dummy"))) {
+                    System.out.println(tempValues.getKategorija().getId());
+                  //  icondialog.setLoadIconDrawables(true);
+                       //  final Context aplikaci= this.activity;
+                         final IconHelper iconHelper= IconHelper.getInstance(activity.getApplicationContext());
+                    iconHelper.addLoadCallback(new IconHelper.LoadCallback() {
+                        @Override
+                        public void onDataLoaded() {
+                            int value=-1;
+                                  if (!(tempValues.getKategorija().getId().equals("dummy"))) value = Integer.parseInt(tempValues.getKategorija().getId());
+                            System.out.println(tempValues.getKategorija().getId());
+
+                               // System.out.println("xx");
+                            if (value!=-1) {
+                                holder.dot.setImageDrawable(iconHelper.getIcon(value).getDrawable(activity.getApplicationContext()));
+                            }
+                        }
+                    });
+              //     System.out.println(activity.getApplicationContext());
+
+                 //  IconHelper iconHelper = IconHelper.getInstance(activity.getApplicationContext());
+             //     int value= Integer.parseInt(tempValues.getKategorija().getId());
+
+             //   holder.dot.setImageDrawable( iconHelper.getIcon(1).getDrawable((activity.getApplicationContext())));
+                //   holder.dot.setImageIcon(iconHelper.getIcon(value));
+                }
+              //holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
             }
 
             vi.setOnClickListener(new OnItemClickListener( position ));

@@ -42,14 +42,16 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         nazivIkone.setEnabled(false);
         nazivIkone.setFocusable(false);
 
-        IconHelper iconHelper = IconHelper.getInstance(getApplicationContext());
-        debil.setImageDrawable(iconHelper.getIcon(232).getDrawable(getApplicationContext()));
-        dodajIkonu.setOnClickListener(new View.OnClickListener() {
+
+      dodajIkonu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 iconDialog.setSelectedIcons(selectedIcons);
                 iconDialog.show(getSupportFragmentManager(), "icon_dialog");
-              iconDialog.setLoadIconDrawables(true);
+           //   iconDialog.setLoadIconDrawables(true);
+           /*     System.out.println(getApplicationContext());
+                IconHelper iconHelper = IconHelper.getInstance(getApplicationContext());
+                debil.setImageDrawable(iconHelper.getIcon(selectedIcons[0].getId()).getDrawable(getApplicationContext())); */
             }
         });
 
@@ -97,7 +99,8 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
      nazivKategorije= naziv.getText().toString();
        if (nazivKategorije.isEmpty()) naziv.setBackgroundColor(Color.RED);
        else naziv.setBackgroundColor(Color.WHITE);
-        if (nazivKategorije.isEmpty()) nazivIkone.setBackgroundColor(Color.RED);
+
+        if (ikona.isEmpty()) nazivIkone.setBackgroundColor(Color.RED);
         else nazivIkone.setBackgroundColor(Color.WHITE);
         boolean naz=true, ik=true;
        if ((!(nazivKategorije.isEmpty())) && !(ikona.isEmpty()))

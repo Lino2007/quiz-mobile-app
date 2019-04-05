@@ -25,7 +25,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
    public static ArrayList<Kategorija> listaKategorija =new ArrayList<>();
     public static ArrayList<String> categories= new ArrayList<>();
     public KvizoviAkt kvizoviAkt ;
-    public static ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
+  //  public static ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
     public static ArrayList<Kviz>  odabraniKvizovi= new ArrayList<> ();
 
 
@@ -43,8 +43,8 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         trenutnaKategorija="Sve";
-        mogPitanja.add (new Pitanje ("moguce pitanje 1", "moguce pitanje 1?", null , null));
-        mogPitanja.add (new Pitanje ("moguce pitanje 2", "moguce pitanje 2?", null , null));
+     //   mogPitanja.add (new Pitanje ("moguce pitanje 1", "moguce pitanje 1?", null , null));
+   //     mogPitanja.add (new Pitanje ("moguce pitanje 2", "moguce pitanje 2?", null , null));
         popuni();
         kvizoviAkt=this;
         Resources res=getResources();
@@ -54,17 +54,19 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
       ListView mainList= (ListView) findViewById(R.id.lvKvizovi);
         mainListAdapter= new MainListAdapter (kvizoviAkt,listaKvizova, res);
-        System.out.println(categories.size()+ "!!!!!!!!!!!!!!!!!!!!!"+ categories.get(1));
+       // System.out.println(categories.size()+ "!!!!!!!!!!!!!!!!!!!!!"+ categories.get(1));
        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
 
         mainList.setAdapter(mainListAdapter);
+     //   mainList.setAdapter(mainListAdapter);
+     //   mainList.setAdapter(mainListAdapter);
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
-
+         spinner.setSelection(0);
     }
 
     public void setTrenutnaKategorija(String trenutnaKategorija) {
