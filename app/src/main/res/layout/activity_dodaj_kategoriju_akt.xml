@@ -13,8 +13,8 @@
         android:layout_marginStart="34dp"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Naziv Kategorije"
+        android:inputType="textPersonName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,8 +25,8 @@
         android:layout_marginStart="34dp"
         android:layout_marginTop="72dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Ikona"
+        android:inputType="textPersonName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,9 +36,9 @@
         android:layout_height="40dp"
         android:layout_marginStart="256dp"
         android:layout_marginTop="72dp"
+        android:background="#0263BD"
         android:text="Dodaj Ikonu"
         android:textColor="#FFFF"
-        android:background="#0263BD"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,9 +48,20 @@
         android:layout_height="46dp"
         android:layout_marginStart="34dp"
         android:layout_marginTop="132dp"
+        android:background="#0263BD"
         android:text="Spasi Kategoriju"
         android:textColor="#FFFF"
-        android:background="#0263BD"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+
+        android:layout_width="147dp"
+        android:layout_height="115dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="229dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/blue_dot" />
 </android.support.constraint.ConstraintLayout>

@@ -223,6 +223,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                listaKvizova.remove(listaKvizova.size()-1);
                Kviz noviKviz=new Kviz (data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt ("kategorija")-1));
                dodajKviz(noviKviz);
+               refreshCategories();
                 listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy")));
                 spinner.setSelection(0);
                 mainListAdapter=new MainListAdapter(kvizoviAkt,listaKvizova,getResources());
@@ -237,10 +238,26 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                 odabraniKvizovi.get(pozicija).setPitanja(novaPitanja);
                 odabraniKvizovi.get(pozicija).setNaziv (data.getStringExtra("naziv"));
                 odabraniKvizovi.get(pozicija).setKategorija(listaKategorija.get(data.getExtras().getInt ("kategorija")-1));
+                refreshCategories();
                 spinner.setSelection(0);
                 mainListAdapter=new MainListAdapter(kvizoviAkt,listaKvizova,getResources());
                 mainList.setAdapter(mainListAdapter);
             }
+             if (resultCode== 9000) {
+                 System.out.println("REFREEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+                 refreshCategories();
+             }
 
+    }
+
+    void refreshCategories () {
+        categories.clear();
+        categories.add ("Sve");
+        for (Kategorija k : listaKategorija) {
+
+            categories.add(k.getNaziv());
+        }
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
+        spinner.setAdapter(dataAdapter);
     }
 }

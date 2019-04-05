@@ -49,6 +49,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
      public  ArrayList<Pitanje> kopijaPitanjaKviza = new ArrayList<>();
      public  ArrayList<Pitanje> kopijaMogucihPitanja= new ArrayList<>();
       DodajKvizAkt dkaAkk=null;
+      private boolean refreshKat=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -177,16 +178,22 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-
+           Intent x=getIntent();
            kopijaMogucihPitanja=  KvizoviAkt.mogPitanja;
-
+            setResult(10000, x);
             kopijaPitanjaKviza=  pitanjaKviza;
+          if (refreshKat)  {
+              setResult(9000, x);
+              refreshKat=false;
+
+          }
+
         }
         return super.onKeyDown(keyCode, event);
     }
 
     void validacija () {
-
+        System.out.println(dkaSpinner.getSelectedItemPosition() + " " + KvizoviAkt.listaKategorija.size());
         if (kopijaPitanjaKviza.size()<=1) listaPitanja.setBackgroundColor(Color.RED);
         else {
 
@@ -199,13 +206,14 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             editText.setBackgroundColor(Color.WHITE);
 
         }
-        if (dkaSpinner.getSelectedItemPosition()==0 || dkaSpinner.getSelectedItemPosition()==KvizoviAkt.getCategories().size()) dkaSpinner.setBackgroundColor(Color.RED);
+        if (dkaSpinner.getSelectedItemPosition()==0 || dkaSpinner.getSelectedItemPosition()==kategorije.size()) dkaSpinner.setBackgroundColor(Color.RED);
         else {
 
             dkaSpinner.setBackgroundColor(Color.WHITE);
 
         }
-        if ( !(kopijaPitanjaKviza.size()<=1) && !(editText.getText().length()==0) && !(dkaSpinner.getSelectedItemPosition()==0 || dkaSpinner.getSelectedItemPosition()==KvizoviAkt.getCategories().size())) valid=true;
+
+        if ( !(kopijaPitanjaKviza.size()<=1) && !(editText.getText().length()==0) && !(dkaSpinner.getSelectedItemPosition()==0 || dkaSpinner.getSelectedItemPosition()==kategorije.size())) valid=true;
     }
 
     void refresh() {
@@ -222,7 +230,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         if (parent.getSelectedItemPosition()== kategorije.size()-1) {
             Intent katAkt= new Intent (DodajKvizAkt.this, DodajKategorijuAkt.class);
-            DodajKvizAkt.this.startActivity(katAkt);
+            DodajKvizAkt.this.startActivityForResult(katAkt, 12);
         }
     }
 
@@ -248,6 +256,19 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
               refresh();
             listaPitanja.setAdapter(pitanjaAdapter);
 
+        }
+        else if (resultCode==(-100)) {
+            kategorije.remove(kategorije.size()-1);
+            kategorije.add(KvizoviAkt.listaKategorija.get(KvizoviAkt.listaKategorija.size()-1).getNaziv());
+            kategorije.add ("Dodaj kategoriju");
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, kategorije );
+            dkaSpinner.setAdapter(dataAdapter);
+            dkaSpinner.setSelection(0);
+            refreshKat=true;
+        }
+        else if (resultCode==(-300)) {
+            //do nothing please
+            dkaSpinner.setSelection(0);
         }
 
 

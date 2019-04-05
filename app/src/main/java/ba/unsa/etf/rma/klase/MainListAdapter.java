@@ -11,7 +11,16 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.maltaisn.icondialog.Icon;
 
+import com.maltaisn.icondialog.IconDialog;
+import com.maltaisn.icondialog.IconHelper;
+import android.view.KeyEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
@@ -21,7 +30,7 @@ import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class MainListAdapter extends BaseAdapter implements View.OnClickListener  {
+public class MainListAdapter extends BaseAdapter implements View.OnClickListener , IconDialog.Callback {
     /*********** Declare Used Variables *********/
     private Activity activity= null;
     private ArrayList data;
@@ -60,6 +69,11 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
 
     public long getItemId(int position) {
         return position;
+    }
+
+    @Override
+    public void onIconDialogIconsSelected(Icon[] icons) {
+
     }
 
     // Create a holder Class to contain inflated xml file elements
@@ -116,7 +130,13 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
             }
            else {
                 holder.nazivKviza.setText(tempValues.getNaziv());
-                holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
+             /*   if (!(tempValues.getKategorija().getId().isEmpty())) {
+                   // System.out.println(activity.getApplicationContext());
+                    IconHelper iconHelper = IconHelper.getInstance(activity.getApplicationContext());
+                  int value= Integer.parseInt(tempValues.getKategorija().getId());
+                    holder.dot.setImageDrawable(iconHelper.getIcon( value).getDrawable((activity.getApplicationContext())));
+                } */
+               holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
             }
 
             vi.setOnClickListener(new OnItemClickListener( position ));
