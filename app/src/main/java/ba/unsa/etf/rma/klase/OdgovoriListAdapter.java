@@ -34,7 +34,7 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
     public Resources res;
     String tempValues=null;
     int i=0;
-    public static boolean global=false;
+    private int poz;
 
     //  CustomAdapter Constructor
     public  OdgovoriListAdapter(Activity a, ArrayList d, Resources resLocal) {
@@ -113,8 +113,9 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
             tempValues=null;
            // System.out.println(Doda);
             tempValues = ( String) data.get( position );
-
+            System.out.println(DodajPitanjeAkt.poz);
             if (position== DodajPitanjeAkt.poz) {
+
             //    View views= super.getView(position,convertView,parent);
                 vi.setBackgroundColor(Color.GREEN);
 
@@ -122,17 +123,19 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
                 vi.setBackgroundColor(Color.WHITE);
             }
 
-           // DodajPitanjeAkt.poz=-1;
+
 
             holder.nazivOdgovora.setText (tempValues);
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
 
               vi.setOnClickListener(new OnItemClickListener( position ));
         }
-
+     //   DodajPitanjeAkt.poz=-1;
         return vi;
     }
-
+     void setPoz (int poz) {
+        this.poz=poz;
+     }
     @Override
     public void onClick(View v) {
         Log.v("CustomAdapter", "=====Row button clicked=====");

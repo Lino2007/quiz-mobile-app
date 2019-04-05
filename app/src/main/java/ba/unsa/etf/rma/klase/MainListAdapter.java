@@ -126,7 +126,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
            else {
                 holder.nazivKviza.setText(tempValues.getNaziv());
 
-                if (!(tempValues.getKategorija().getId().isEmpty()) && !(tempValues.getKategorija().getId().equals("dummy"))) {
+                if ( !(tempValues.getKategorija()==null) && !(tempValues.getKategorija().getId().isEmpty()) && !(tempValues.getKategorija().getId().equals("dummy"))) {
                     System.out.println(tempValues.getKategorija().getId());
                   //  icondialog.setLoadIconDrawables(true);
                        //  final Context aplikaci= this.activity;

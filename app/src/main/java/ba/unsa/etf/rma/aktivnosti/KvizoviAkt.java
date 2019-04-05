@@ -99,7 +99,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         odabraniKvizovi.clear();
         if (item!="Sve") {
             for (Kviz x : listaKvizova) {
-                if (x.getKategorija().getNaziv() == item) {
+                if ( x.getKategorija()!=null && x.getKategorija().getNaziv() == item) {
                     odabraniKvizovi.add(x);
                 }
 
@@ -176,16 +176,20 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
              dodajIntent.putExtra ("poz_kviza", mPosition);
              int indexKategorije;
              try {
-                indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
+                 if (odabraniKvizovi.get(mPosition).getKategorija()!=null) {
+                indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv()); }
+                 else {
+                     indexKategorije=-2;
+                 }
              }
              catch (Exception e) {
                  System.out.println(e + "!!!!!!!!!!!!");
                  return ;
             }
-            indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
+//            indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
             dodajIntent.putExtra ("poz_kategorije", indexKategorije);
             dodajIntent.putExtra ("naziv_kviza", odabraniKvizovi.get(mPosition).getNaziv());
-            KvizoviAkt.this.startActivityForResult(dodajIntent, 0 );;
+            KvizoviAkt.this.startActivityForResult(dodajIntent, 0 );
 
 
 
@@ -223,8 +227,11 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                   ArrayList<Pitanje> novaPitanja=  (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
                   novaPitanja.remove (novaPitanja.size()-1);
                listaKvizova.remove(listaKvizova.size()-1);
-               Kviz noviKviz=new Kviz (data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt ("kategorija")-1));
-               dodajKviz(noviKviz);
+               Kviz noviKviz=null;
+               if ((data.getExtras().getInt ("kategorija")-1) != -1) {
+               noviKviz=new Kviz (data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt ("kategorija")-1)); }
+               else  noviKviz=new Kviz (data.getStringExtra("naziv"), novaPitanja, null);
+                dodajKviz(noviKviz);
                refreshCategories();
                 listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy")));
                 spinner.setSelection(0);
@@ -239,7 +246,12 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                 int pozicija=data.getExtras().getInt("pozicija");
                 odabraniKvizovi.get(pozicija).setPitanja(novaPitanja);
                 odabraniKvizovi.get(pozicija).setNaziv (data.getStringExtra("naziv"));
-                odabraniKvizovi.get(pozicija).setKategorija(listaKategorija.get(data.getExtras().getInt ("kategorija")-1));
+                if ((data.getExtras().getInt ("kategorija")-1) != -1){
+                    odabraniKvizovi.get(pozicija).setKategorija(listaKategorija.get(data.getExtras().getInt("kategorija") - 1));
+                }
+                else {
+                    odabraniKvizovi.get(pozicija).setKategorija(null);
+                }
                 refreshCategories();
                 spinner.setSelection(0);
                 mainListAdapter=new MainListAdapter(kvizoviAkt,listaKvizova,getResources());
