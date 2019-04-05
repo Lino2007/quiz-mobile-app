@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,12 +20,13 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 
+import ba.unsa.etf.rma.aktivnosti.DodajPitanjeAkt;
 import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class OdgovoriListAdapter extends BaseAdapter implements View.OnClickListener  {
+public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickListener  {
     /*********** Declare Used Variables *********/
     private Activity activity= null;
     private ArrayList data;
@@ -109,11 +111,19 @@ public class OdgovoriListAdapter extends BaseAdapter implements View.OnClickList
         {
             // Get each Model object from Arraylist
             tempValues=null;
+           // System.out.println(Doda);
             tempValues = ( String) data.get( position );
-            if (global) {
-                vi.setBackgroundColor(Color.parseColor("#B2F8A5"));
-                global=false;
+
+            if (position== DodajPitanjeAkt.poz) {
+            //    View views= super.getView(position,convertView,parent);
+                vi.setBackgroundColor(Color.GREEN);
+
+            } else {
+                vi.setBackgroundColor(Color.WHITE);
             }
+
+           // DodajPitanjeAkt.poz=-1;
+
             holder.nazivOdgovora.setText (tempValues);
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
 

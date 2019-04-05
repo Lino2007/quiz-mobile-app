@@ -26,12 +26,12 @@ public class DodajPitanjeAkt extends AppCompatActivity {
   String tacan=null;
   boolean valid=false;
   OdgovoriListAdapter odgovoriAdapter=null;
-
+  public static int poz=-1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dodaj_pitanje_akt);
-
+       // poz=-1;
         dodaj= (Button)  findViewById (R.id.btnDodajOdgovor);
         dodajTacan = (Button) findViewById(R.id.btnDodajTacan);
         dodajPitanje= (Button) findViewById(R.id.btnDodajPitanje);
@@ -39,7 +39,7 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         odgovor= (EditText) findViewById(R.id.etOdgovor);
         lvOdgovori= (ListView) findViewById(R.id.lvOdgovori);
 
-        odgovoriAdapter= new OdgovoriListAdapter(this,listaOdgovora, getResources());
+        odgovoriAdapter= new OdgovoriListAdapter(this,listaOdgovora,getResources());
 
         if (listaOdgovora==null)  lvOdgovori.setAdapter(null);
 
@@ -49,10 +49,11 @@ public class DodajPitanjeAkt extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (tacan==null &&  odgovor.getText().toString().length()>0 && listaOdgovora.indexOf(odgovor.getText().toString())==-1) {
-                    OdgovoriListAdapter.global=true;
+                    poz=listaOdgovora.size();
                     tacan= odgovor.getText().toString();
                     listaOdgovora.add(tacan);
                     lvOdgovori.setAdapter(odgovoriAdapter);
+                    //poz=-1;
                 }
             }});
 
@@ -61,13 +62,13 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         {
             @Override
             public void onClick(View v) {
-                if (listaOdgovora.indexOf(odgovor.getText().toString())==-1) {
+              //  if (listaOdgovora.indexOf(odgovor.getText().toString())==-1) { // U SLUCAJU AKO JE TRAZENO DA ODGOVORI MORAJU BITI RAZLICITI
                     listaOdgovora.add(odgovor.getText().toString());
                     lvOdgovori.setAdapter(odgovoriAdapter);
-                }
+               // }
             }});
 
-        dodaj.setOnClickListener(new View.OnClickListener()
+   /*     dodaj.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v) {
@@ -76,7 +77,7 @@ public class DodajPitanjeAkt extends AppCompatActivity {
                     lvOdgovori.setAdapter(odgovoriAdapter);
                 }
             }});
-
+ */
         dodajPitanje.setOnClickListener(new View.OnClickListener()
         {
             @Override

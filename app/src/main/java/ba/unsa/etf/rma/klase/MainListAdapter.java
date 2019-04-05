@@ -123,7 +123,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
             holder.nazivKviza.setText("Dodaj Kviz");
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
             }
-           else if (position!=data.size()-1){
+           else {
                 holder.nazivKviza.setText(tempValues.getNaziv());
 
                 if (!(tempValues.getKategorija().getId().isEmpty()) && !(tempValues.getKategorija().getId().equals("dummy"))) {
