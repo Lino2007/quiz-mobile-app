@@ -38,7 +38,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     private boolean valid = false;
     public PitanjaListAdapter pitanjaAdapter = null;
     public MogucaListAdapter mogucaAdapter = null;
-    public String naziv_kviza=null;
+    public String naziv_kviza = null;
     public int pozicija = -1;
     public int poz_kat = 0;
     private ArrayList<Pitanje> pitanjaKviza = new ArrayList<>();
@@ -74,9 +74,11 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         }
 
-        if ((pitanjaKviza.size() > 0 && pitanjaKviza.get(pitanjaKviza.size() - 1).getNaziv() != "dummy") || pitanjaKviza.size() == 0) {
+        if ((pitanjaKviza.size() > 0 && /* pitanjaKviza.get(pitanjaKviza.size() - 1).getNaziv() != "dummy"*/   pitanjaKviza.get(pitanjaKviza.size() - 1).getNaziv() != null) || pitanjaKviza.size() == 0) {
             kopijaPitanjaKviza.clear();
-            pitanjaKviza.add(new Pitanje("dummy", "dummy", "dummy", null));
+
+            //    pitanjaKviza.add(new Pitanje("dummy", "dummy", "dummy", null));
+            pitanjaKviza.add(new Pitanje(null, null, null, null));
             kopijaPitanjaKviza = kopirajPitanja(kopijaPitanjaKviza, pitanjaKviza);
         }
 
@@ -101,7 +103,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 validacija();
-                System.out.println(valid);
+
                 if (pozicija == -1 && valid == true) {
                     Bundle b = new Bundle();
                     Intent addKviz = getIntent();
@@ -111,7 +113,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                     addKviz.putExtra("kategorija", dkaSpinner.getSelectedItemPosition());
                     addKviz.putExtra("naziv", editText.getText().toString());
                     setResult(Activity.RESULT_OK, addKviz);
-                    System.out.println("aaaa");
+
                     finish();
                 } else if (pozicija != -1 && valid == true) {
                     Bundle b = new Bundle();
@@ -152,18 +154,17 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position < kopijaPitanjaKviza.size() - 1) {
-                    System.out.println(kopijaPitanjaKviza.get(position));
                     kopijaMogucihPitanja.add(kopijaPitanjaKviza.get(position));
                     kopijaPitanjaKviza.remove(position);
                     listaPitanja.setAdapter(pitanjaAdapter);
                     listaMogucih.setAdapter(mogucaAdapter);
                 } else if (position == kopijaPitanjaKviza.size() - 1) {
-                    ArrayList<String> zaValidaciju= new ArrayList<>();
+                    ArrayList<String> zaValidaciju = new ArrayList<>();
                     Intent dodajPitanje = new Intent(DodajKvizAkt.this, DodajPitanjeAkt.class);
-                    for (Pitanje x: kopijaMogucihPitanja) {
+                    for (Pitanje x : kopijaMogucihPitanja) {
                         zaValidaciju.add(x.getNaziv());
                     }
-                    for (Pitanje x: kopijaPitanjaKviza) {
+                    for (Pitanje x : kopijaPitanjaKviza) {
                         zaValidaciju.add(x.getNaziv());
                     }
                     dodajPitanje.putStringArrayListExtra("zaValidaciju", zaValidaciju);
@@ -202,62 +203,64 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
     void uloadujListuKvizova() {
         for (Kviz a : KvizoviAkt.listaKvizova) {
-            listaKvizova.add (a.getNaziv());
+            listaKvizova.add(a.getNaziv());
         }
 
     }
 
     void validacija() {
-        boolean aPoint=false, bPoint=false, cPoint=false;
-       if (naziv_kviza==null) {
+        boolean aPoint = false, bPoint = false, cPoint = false;
+        if (naziv_kviza == null) {
 
-           if (editText.getText().length() == 0) editText.setBackgroundColor(Color.RED);
-           else {
-               editText.setBackgroundColor(Color.WHITE);
-           }
+            if (editText.getText().length() == 0) editText.setBackgroundColor(Color.RED);
+            else {
+                editText.setBackgroundColor(Color.WHITE);
+            }
 
-           if ( editText.getText().length()==0 || !(listaKvizova.indexOf(editText.getText().toString())==-1) )  editText.setBackgroundColor(Color.RED);
-           else {
-               editText.setBackgroundColor(Color.WHITE);
-           }
+            if (editText.getText().length() == 0 || !(listaKvizova.indexOf(editText.getText().toString()) == -1))
+                editText.setBackgroundColor(Color.RED);
+            else {
+                editText.setBackgroundColor(Color.WHITE);
+            }
 
-           if ( dkaSpinner.getSelectedItemPosition() == kategorije.size())
-               dkaSpinner.setBackgroundColor(Color.RED);
-           else {
-               dkaSpinner.setBackgroundColor(Color.WHITE);
-           }
+            if (dkaSpinner.getSelectedItemPosition() == kategorije.size())
+                dkaSpinner.setBackgroundColor(Color.RED);
+            else {
+                dkaSpinner.setBackgroundColor(Color.WHITE);
+            }
 
-           if ( !(editText.getText().length() == 0) && !(dkaSpinner.getSelectedItemPosition() == kategorije.size()) && (listaKvizova.indexOf(editText.getText().toString())==-1))
-               valid = true;
-       }
-      else {
-           if (editText.getText().length() == 0) editText.setBackgroundColor(Color.RED);
-           else {
-               editText.setBackgroundColor(Color.WHITE);
-           }
+            if (!(editText.getText().length() == 0) && !(dkaSpinner.getSelectedItemPosition() == kategorije.size()) && (listaKvizova.indexOf(editText.getText().toString()) == -1))
+                valid = true;
+        } else {
+            if (editText.getText().length() == 0) editText.setBackgroundColor(Color.RED);
+            else {
+                editText.setBackgroundColor(Color.WHITE);
+            }
 
-           if ( editText.getText().length()==0 || ((!(naziv_kviza.equals(editText.getText().toString())) && listaKvizova.indexOf(editText.getText().toString())!=-1 )) )  editText.setBackgroundColor(Color.RED);
-           else {
-               editText.setBackgroundColor(Color.WHITE);
-               aPoint=true;
-           }
+            if (editText.getText().length() == 0 || ((!(naziv_kviza.equals(editText.getText().toString())) && listaKvizova.indexOf(editText.getText().toString()) != -1)))
+                editText.setBackgroundColor(Color.RED);
+            else {
+                editText.setBackgroundColor(Color.WHITE);
+                aPoint = true;
+            }
 
-           if ( dkaSpinner.getSelectedItemPosition() == kategorije.size())
-               dkaSpinner.setBackgroundColor(Color.RED);
-           else {
-               dkaSpinner.setBackgroundColor(Color.WHITE);
-           }
-           if ( !(editText.getText().length() == 0) && aPoint && !(dkaSpinner.getSelectedItemPosition() == kategorije.size())) {
-               valid = true;
-               aPoint=bPoint=cPoint=false;
-           }
+            if (dkaSpinner.getSelectedItemPosition() == kategorije.size())
+                dkaSpinner.setBackgroundColor(Color.RED);
+            else {
+                dkaSpinner.setBackgroundColor(Color.WHITE);
+            }
+            if (!(editText.getText().length() == 0) && aPoint && !(dkaSpinner.getSelectedItemPosition() == kategorije.size())) {
+                valid = true;
+                aPoint = bPoint = cPoint = false;
+            }
 
 
-       }
+        }
     }
 
     void refresh() {
-        kopijaPitanjaKviza.add(new Pitanje("dummy", "dummy", "dummy", null));
+        // kopijaPitanjaKviza.add(new Pitanje("dummy", "dummy", "dummy", null)); ++++++++++++++++++++++++++++++++++++++++++++++++++++
+        kopijaPitanjaKviza.add(new Pitanje(null, null, null, null));
     }
 
     void shut() {

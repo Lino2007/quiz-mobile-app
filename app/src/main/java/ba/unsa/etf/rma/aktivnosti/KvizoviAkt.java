@@ -42,7 +42,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        trenutnaKategorija="Sve";
+        trenutnaKategorija="Svi";
      //   mogPitanja.add (new Pitanje ("moguce pitanje 1", "moguce pitanje 1?", null , null));
    //     mogPitanja.add (new Pitanje ("moguce pitanje 2", "moguce pitanje 2?", null , null));
         popuni();
@@ -97,7 +97,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
     private void dajKvizoveKategorije(String item) {
         int i=0;
         odabraniKvizovi.clear();
-        if (item!="Sve") {
+        if (item!="Svi") {
             for (Kviz x : listaKvizova) {
                 if ( x.getKategorija()!=null && x.getKategorija().getNaziv() == item) {
                     odabraniKvizovi.add(x);
@@ -119,20 +119,20 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
     //
     public void popuni() {
-        categories.add ("Sve");
-        Kategorija prva= new Kategorija("automobili", "1");
+        categories.add ("Svi");
+     /*   Kategorija prva= new Kategorija("automobili", "1");
     Kategorija druga= new Kategorija("motori", "2");
         Kategorija treca= new Kategorija("avioni", "3");
 
         listaKategorija.add (prva);
       listaKategorija.add (druga);
        listaKategorija.add (treca);
-     //   System.out.println(listaKategorija.size());
+
         for (Kategorija k : listaKategorija) {
 
             categories.add(k.getNaziv());
         }
-      //  System.out.println(listaKategorija.size() + " NAKON");
+
 
       ArrayList<Pitanje> a = new ArrayList(), b =new ArrayList<>();
         ArrayList<String> odgov=new ArrayList<>();  odgov.add("Prvi odgovor"); odgov.add("Drugi odgovor"); odgov.add("Neki odgov");
@@ -149,19 +149,17 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
         listaKvizova.add (new Kviz ("Najpoznatiji motori", b, druga));
         listaKvizova.add (new Kviz ("Toyota", b, prva));
         listaKvizova.add (new Kviz ("Kawasaki", a, druga));
-        listaKvizova.add (new Kviz ("airbus", b, treca));
+        listaKvizova.add (new Kviz ("airbus", b, treca)); */
 
 
-        //provjeri zasto kad su pitanja null zeza
-  //     listaKvizova.add (new Kviz ("krila", null, treca));
-    //    listaKvizova.add (new Kviz ("kril2a", null, treca));
-        listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy")));
+        //listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy"))); +++++++++++++++++++++++++++++
+        if (listaKvizova.isEmpty()) {
+        listaKvizova.add (new Kviz (null, null,null )); }
          odabraniKvizovi= kopiraj(listaKvizova,odabraniKvizovi);
 
     }
 
     public void onItemClick(int mPosition) {
-    //   System.out.println(odabraniKvizovi.get(0) +" "+ odabraniKvizovi.get(1) );
         System.out.println(mPosition);
         if (mPosition==odabraniKvizovi.size()-1) {
             Intent dodajIntent= new Intent( KvizoviAkt.this, DodajKvizAkt.class);
@@ -183,7 +181,7 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                  }
              }
              catch (Exception e) {
-                 System.out.println(e + "!!!!!!!!!!!!");
+                 System.out.println(e);
                  return ;
             }
 //            indexKategorije=getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
@@ -213,7 +211,6 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
     }
 
     public static int getCategoriesByName (String name) {
-        System.out.println(name + "NAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         int target= categories.indexOf(name);
         if (target==-1) throw new IllegalArgumentException("Ne postoji kategorija");
         return target;
@@ -221,7 +218,6 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("USAO......****************...******************************");
             if(resultCode == Activity.RESULT_OK){
                 Bundle bundleOb= data.getExtras();
                   ArrayList<Pitanje> novaPitanja=  (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
@@ -233,7 +229,8 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                else  noviKviz=new Kviz (data.getStringExtra("naziv"), novaPitanja, null);
                 dodajKviz(noviKviz);
                refreshCategories();
-                listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy")));
+               // listaKvizova.add (new Kviz (null, null , new Kategorija ("dummy", "dummy"))); ++++++++++++++++++++++++++++++
+                listaKvizova.add (new Kviz (null, null , null));
                 spinner.setSelection(0);
                 mainListAdapter=new MainListAdapter(kvizoviAkt,listaKvizova,getResources());
                 mainList.setAdapter(mainListAdapter);
@@ -265,9 +262,9 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
 
     void refreshCategories () {
         categories.clear();
-        categories.add ("Sve");
+        categories.add ("Svi");
         for (Kategorija k : listaKategorija) {
-
+           if (k==null) continue; //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             categories.add(k.getNaziv());
         }
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);

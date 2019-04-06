@@ -126,7 +126,7 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
            else {
                 holder.nazivKviza.setText(tempValues.getNaziv());
 
-                if ( !(tempValues.getKategorija()==null) && !(tempValues.getKategorija().getId().isEmpty()) && !(tempValues.getKategorija().getId().equals("dummy"))) {
+                if ( !(tempValues.getKategorija()==null) && !(tempValues.getKategorija().getId().isEmpty()) /*&& !(tempValues.getKategorija().getId().equals("dummy"))*/) {
                     System.out.println(tempValues.getKategorija().getId());
                   //  icondialog.setLoadIconDrawables(true);
                        //  final Context aplikaci= this.activity;
@@ -135,8 +135,9 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
                         @Override
                         public void onDataLoaded() {
                             int value=-1;
-                                  if (!(tempValues.getKategorija().getId().equals("dummy"))) value = Integer.parseInt(tempValues.getKategorija().getId());
-                            System.out.println(tempValues.getKategorija().getId());
+                                //  if (!(tempValues.getKategorija().getId().equals("dummy"))) value = Integer.parseInt(tempValues.getKategorija().getId());
+                             if (!(tempValues.getKategorija()==null)) value = Integer.parseInt(tempValues.getKategorija().getId());
+                       //     System.out.println(tempValues.getKategorija().getId());
 
                                // System.out.println("xx");
                             if (value!=-1) {
@@ -176,7 +177,6 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
 
         @Override
         public void onClick(View arg0) {
-            System.out.println("--------------------------------------");
             KvizoviAkt sct = (KvizoviAkt) activity;
             sct.onItemClick(mPosition);
         }

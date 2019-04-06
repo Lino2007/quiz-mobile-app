@@ -99,7 +99,7 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
 
         if(data.size()<=0)
         {
-            holder.nazivPitanja.setText("Dodaj Kviz");
+            holder.nazivPitanja.setText("Dodaj Pitanje");
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
             global=false;
         }
@@ -113,7 +113,7 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
 
             //   holder.ime.setText( tempValues.getIme() + tempValues.getPrezime() );
             if (position==data.size()-1){
-                holder.nazivPitanja.setText("Dodaj Kviz");
+                holder.nazivPitanja.setText("Dodaj Pitanje");
                 holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
             }
             else {
