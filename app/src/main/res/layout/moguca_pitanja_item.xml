@@ -7,19 +7,21 @@
     >
 
     <TableRow
-        android:layout_height="100dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/image"
             android:layout_width="16dp"
             android:layout_height="match_parent"
-             />
+            app:srcCompat="@drawable/blue_dot"/>
 
         <TextView
             android:id="@+id/nazivPitanja"
-            android:layout_width="184dp"
-            android:layout_height="25dp"
-            android:gravity="center"
+            android:layout_width="194dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="13dp"
+            android:gravity="center|left"
             android:text="Kviz" />
     </TableRow>
 </TableLayout>

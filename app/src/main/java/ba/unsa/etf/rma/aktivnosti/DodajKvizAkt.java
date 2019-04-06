@@ -64,7 +64,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         editText = (EditText) findViewById(R.id.editText);
         listaMogucih = (ListView) findViewById(R.id.lvMogucaPitanja);
         listaPitanja = (ListView) findViewById(R.id.lvDodanaPitanja);
-        dkaSpinner = (Spinner) findViewById(R.id.dkaSpinner);
+        dkaSpinner = (Spinner) findViewById(R.id.spKategorije);
 
         if (pozicija != -1 && KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja() != null) {
             pitanjaKviza = KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja();
