@@ -258,7 +258,6 @@ public class KvizoviAkt extends AppCompatActivity  implements OnItemSelectedList
                 mainList.setAdapter(mainListAdapter);
             }
              if (resultCode== 9000) {
-                 System.out.println("REFREEEEEEEEEEEEEEEEEEEEEEEEEEEE");
                  refreshCategories();
              }
 
