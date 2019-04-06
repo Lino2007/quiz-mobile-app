@@ -105,13 +105,10 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
         }
         else
         {
-            // Get each Model object from Arraylist
+
             tempValues=null;
             tempValues = ( Pitanje ) data.get( position );
 
-            //  Set Model values in Holder elements
-
-            //   holder.ime.setText( tempValues.getIme() + tempValues.getPrezime() );
             if (position==data.size()-1){
                 holder.nazivPitanja.setText("Dodaj Pitanje");
                 holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button" ,null,null));
@@ -121,7 +118,6 @@ public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListe
                 holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
             }
 
-          //  vi.setOnClickListener(new OnItemClickListener( position ));
         }
 
         return vi;

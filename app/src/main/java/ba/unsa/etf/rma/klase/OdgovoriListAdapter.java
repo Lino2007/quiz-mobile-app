@@ -117,7 +117,7 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
             if (position== DodajPitanjeAkt.poz) {
 
             //    View views= super.getView(position,convertView,parent);
-                vi.setBackgroundColor(Color.GREEN);
+                vi.setBackgroundColor(Color.parseColor("#A2FA59"));
 
             } else {
                 vi.setBackgroundColor(Color.WHITE);
@@ -128,7 +128,7 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
             holder.nazivOdgovora.setText (tempValues);
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
 
-              vi.setOnClickListener(new OnItemClickListener( position ));
+           //   vi.setOnClickListener(new OnItemClickListener( position ));
         }
      //   DodajPitanjeAkt.poz=-1;
         return vi;
@@ -142,7 +142,7 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
     }
 
 
-    private class OnItemClickListener  implements View.OnClickListener {
+  /*  private class OnItemClickListener  implements View.OnClickListener {
         private int mPosition;
 
         OnItemClickListener(int position){
@@ -155,5 +155,5 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
             //   sct.onItemClick(mPosition);
         }
     }
-
+ */
 }

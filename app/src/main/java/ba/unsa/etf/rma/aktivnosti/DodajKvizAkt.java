@@ -60,8 +60,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         pozicija = getIntent().getExtras().getInt("poz_kviza");
         poz_kat = getIntent().getExtras().getInt("poz_kategorije");
         //  pitanjaKviza.clear();
-        dodaj = (Button) findViewById(R.id.button);
-        editText = (EditText) findViewById(R.id.editText);
+        dodaj = (Button) findViewById(R.id.btnDodajKviz);
+        editText = (EditText) findViewById(R.id.etNaziv);
         listaMogucih = (ListView) findViewById(R.id.lvMogucaPitanja);
         listaPitanja = (ListView) findViewById(R.id.lvDodanaPitanja);
         dkaSpinner = (Spinner) findViewById(R.id.spKategorije);
@@ -74,15 +74,15 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         }
 
-        if ((pitanjaKviza.size() > 0 && /* pitanjaKviza.get(pitanjaKviza.size() - 1).getNaziv() != "dummy"*/   pitanjaKviza.get(pitanjaKviza.size() - 1).getNaziv() != null) || pitanjaKviza.size() == 0) {
+        if ((pitanjaKviza.size() > 0 &&   pitanjaKviza.get(pitanjaKviza.size() - 1).getNaziv() != null) || pitanjaKviza.size() == 0) {
             kopijaPitanjaKviza.clear();
 
-            //    pitanjaKviza.add(new Pitanje("dummy", "dummy", "dummy", null));
+
             pitanjaKviza.add(new Pitanje(null, null, null, null));
             kopijaPitanjaKviza = kopirajPitanja(kopijaPitanjaKviza, pitanjaKviza);
         }
 
-        //    kopijaMogucihPitanja= kopirajPitanja(x, null);
+
 
         mogucaAdapter = new MogucaListAdapter(this, kopijaMogucihPitanja, getResources());
         pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
@@ -212,19 +212,19 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         boolean aPoint = false, bPoint = false, cPoint = false;
         if (naziv_kviza == null) {
 
-            if (editText.getText().length() == 0) editText.setBackgroundColor(Color.RED);
+            if (editText.getText().length() == 0) editText.setBackgroundColor(Color.parseColor("#E85F41"));
             else {
                 editText.setBackgroundColor(Color.WHITE);
             }
 
             if (editText.getText().length() == 0 || !(listaKvizova.indexOf(editText.getText().toString()) == -1))
-                editText.setBackgroundColor(Color.RED);
+                editText.setBackgroundColor(Color.parseColor("#E85F41"));
             else {
                 editText.setBackgroundColor(Color.WHITE);
             }
 
             if (dkaSpinner.getSelectedItemPosition() == kategorije.size())
-                dkaSpinner.setBackgroundColor(Color.RED);
+                dkaSpinner.setBackgroundColor(Color.parseColor("#E85F41"));
             else {
                 dkaSpinner.setBackgroundColor(Color.WHITE);
             }
@@ -232,20 +232,20 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             if (!(editText.getText().length() == 0) && !(dkaSpinner.getSelectedItemPosition() == kategorije.size()) && (listaKvizova.indexOf(editText.getText().toString()) == -1))
                 valid = true;
         } else {
-            if (editText.getText().length() == 0) editText.setBackgroundColor(Color.RED);
+            if (editText.getText().length() == 0) editText.setBackgroundColor(Color.parseColor("#E85F41"));
             else {
                 editText.setBackgroundColor(Color.WHITE);
             }
 
             if (editText.getText().length() == 0 || ((!(naziv_kviza.equals(editText.getText().toString())) && listaKvizova.indexOf(editText.getText().toString()) != -1)))
-                editText.setBackgroundColor(Color.RED);
+                editText.setBackgroundColor(Color.parseColor("#E85F41"));
             else {
                 editText.setBackgroundColor(Color.WHITE);
                 aPoint = true;
             }
 
             if (dkaSpinner.getSelectedItemPosition() == kategorije.size())
-                dkaSpinner.setBackgroundColor(Color.RED);
+                dkaSpinner.setBackgroundColor(Color.parseColor("#E85F41"));
             else {
                 dkaSpinner.setBackgroundColor(Color.WHITE);
             }
@@ -305,7 +305,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             kategorije.add("Dodaj kategoriju");
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, kategorije);
             dkaSpinner.setAdapter(dataAdapter);
-            dkaSpinner.setSelection(0);
+            dkaSpinner.setSelection(kategorije.size()-2);
             refreshKat = true;
         } else if (resultCode == (-300)) {
             //do nothing please

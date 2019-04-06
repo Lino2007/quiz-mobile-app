@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,6 +27,7 @@ public class DodajPitanjeAkt extends AppCompatActivity {
     String tacan = null;
     boolean valid = false;
     OdgovoriListAdapter odgovoriAdapter = null;
+    int pozicijaTacnog=-1;
     public static int poz = -1;
     ArrayList<String> zaValidaciju= new ArrayList<>();
 
@@ -49,23 +51,34 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         dodajTacan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (tacan == null && odgovor.getText().toString().length() > 0 && listaOdgovora.indexOf(odgovor.getText().toString()) == -1) {
+             System.out.println(tacan + " " +  listaOdgovora.indexOf(odgovor.getText().toString()) + " "+  listaOdgovora.isEmpty()  );
+                if (tacan == null && odgovor.getText().toString().length() > 0 && (listaOdgovora.indexOf(odgovor.getText().toString()) == -1 || listaOdgovora.isEmpty())) {
                     poz = listaOdgovora.size();
+                    pozicijaTacnog= listaOdgovora.size();
                     tacan = odgovor.getText().toString();
                     listaOdgovora.add(tacan);
                     lvOdgovori.setAdapter(odgovoriAdapter);
+                    lvOdgovori.setBackgroundColor(Color.WHITE);
 
                 }
             }
         });
 
 
+        nazivPitanja.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nazivPitanja.setBackgroundColor(Color.WHITE);
+            }
+        });
+
         dodaj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 if (listaOdgovora.indexOf(odgovor.getText().toString())==-1) { // U SLUCAJU AKO JE TRAZENO DA ODGOVORI MORAJU BITI RAZLICITI
+                 if (listaOdgovora.indexOf(odgovor.getText().toString())==-1 && odgovor.getText().toString().length() > 0) { // U SLUCAJU AKO JE TRAZENO DA ODGOVORI MORAJU BITI RAZLICITI
                 listaOdgovora.add(odgovor.getText().toString());
                 lvOdgovori.setAdapter(odgovoriAdapter);
+                     lvOdgovori.setBackgroundColor(Color.WHITE);
                  }
             }
         });
@@ -87,6 +100,27 @@ public class DodajPitanjeAkt extends AppCompatActivity {
             }
         });
 
+        lvOdgovori.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (!(listaOdgovora.isEmpty())) {
+                    listaOdgovora.remove(position);
+                    if (position==pozicijaTacnog) {
+                        tacan=null;
+                        poz=-1;
+                    }
+                  if(listaOdgovora.isEmpty())   {
+                      lvOdgovori.setAdapter(null);
+                      tacan=null;
+                  }
+                  else lvOdgovori.setAdapter(odgovoriAdapter);
+                    lvOdgovori.setBackgroundColor(Color.WHITE);
+
+                }
+            }
+
+        });
+
 
     }
 
@@ -98,17 +132,17 @@ public class DodajPitanjeAkt extends AppCompatActivity {
 
     void validiraj() {
         if (nazivPitanja.getText().toString().isEmpty()) {
-            nazivPitanja.setBackgroundColor(Color.RED);
+            nazivPitanja.setBackgroundColor(Color.parseColor("#E85F41"));
         } else {
             nazivPitanja.setBackgroundColor(Color.WHITE);
         }
         if (  nazivPitanja.getText().toString().isEmpty() || zaValidaciju.indexOf(nazivPitanja.getText().toString())!=-1 ) {
-            nazivPitanja.setBackgroundColor(Color.RED);
+            nazivPitanja.setBackgroundColor(Color.parseColor("#E85F41"));
         } else {
             nazivPitanja.setBackgroundColor(Color.WHITE);
         }
         if (listaOdgovora.isEmpty() || tacan == null) {
-            lvOdgovori.setBackgroundColor(Color.RED);
+            lvOdgovori.setBackgroundColor(Color.parseColor("#E85F41"));
         } else {
             lvOdgovori.setBackgroundColor(Color.WHITE);
         }

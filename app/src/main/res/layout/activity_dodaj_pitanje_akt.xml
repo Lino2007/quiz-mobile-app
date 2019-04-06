@@ -6,81 +6,105 @@
     android:layout_height="match_parent"
     tools:context=".aktivnosti.DodajPitanjeAkt">
 
-    <EditText
-        android:id="@+id/etNaziv"
-        android:layout_width="296dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="57dp"
-        android:layout_marginTop="58dp"
-        android:ems="10"
-        android:hint="Naziv pitanja- INPUT"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="108dp"
-        android:layout_height="31dp"
-        android:layout_marginStart="132dp"
-        android:layout_marginTop="152dp"
-        android:text="Odgovori"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ListView
-        android:id="@+id/lvOdgovori"
-        android:layout_width="395dp"
-        android:layout_height="199dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="191dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/etOdgovor"
-        android:layout_width="322dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="400dp"
-        android:ems="10"
-        android:hint="Odgovor"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btnDodajOdgovor"
-        android:layout_width="292dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="448dp"
-        android:background="#FFFF"
-        android:text="Dodaj"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btnDodajTacan"
-        android:layout_width="288dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="504dp"
-        android:background="#FFFF"
-        android:text="Dodaj tacan"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10">
 
 
-    <Button
-        android:id="@+id/btnDodajPitanje"
-        android:layout_width="248dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="556dp"
-        android:background="#0263BD"
-        android:text="Dodaj pitanje"
-        android:textColor="#FFFF"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <EditText
+            android:id="@+id/etNaziv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="40dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:inputType="textPersonName"
+            android:hint=" Naziv pitanja"
+            android:textSize="18dp"
+            android:background="@drawable/edit_text_border"/>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="95dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="140dp"
+            android:layout_marginTop="20dp"
+            android:text="Odgovori"
+            android:textColor="#09711F"
+            android:textSize="17dp" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
+            android:background="?android:attr/listDivider" />
+
+        <ListView
+            android:id="@+id/lvOdgovori"
+            android:layout_width="match_parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
+            android:layout_height="0dp"
+            android:layout_weight="9"/>
+
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
+            android:background="?android:attr/listDivider" />
+
+        <EditText
+            android:id="@+id/etOdgovor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:hint=" Odgovor"
+            android:background="@drawable/edit_text_border"/>
+
+        <Button
+            android:id="@+id/btnDodajOdgovor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit_text_border"
+            android:text="Dodaj" />
+
+        <Button
+            android:id="@+id/btnDodajTacan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginTop="4dp"
+            android:text="Dodaj tacan"
+            android:background="@drawable/edit_text_border"
+             />
+
+        <Button
+            android:id="@+id/btnDodajPitanje"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="80dp"
+            android:background="#0263BD"
+            android:text="Dodaj pitanje"
+            android:textColor="#FFFF"/>
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

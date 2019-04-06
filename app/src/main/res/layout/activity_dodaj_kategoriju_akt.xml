@@ -6,61 +6,68 @@
     android:layout_height="match_parent"
     tools:context=".aktivnosti.DodajKategorijuAkt">
 
-    <EditText
-        android:id="@+id/etNaziv"
-        android:layout_width="338dp"
-        android:layout_height="41dp"
-        android:layout_marginStart="34dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="Naziv Kategorije"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/etIkona"
-        android:layout_width="wrap_content"
-        android:layout_height="42dp"
-        android:layout_marginStart="34dp"
-        android:layout_marginTop="72dp"
-        android:ems="10"
-        android:hint="Ikona"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10"
+        tools:layout_editor_absoluteX="276dp"
+        tools:layout_editor_absoluteY="0dp">
 
-    <Button
-        android:id="@+id/btnDodajIkonu"
-        android:layout_width="139dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="256dp"
-        android:layout_marginTop="72dp"
-        android:background="#0263BD"
-        android:text="Dodaj Ikonu"
-        android:textColor="#FFFF"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <EditText
+            android:id="@+id/etNaziv"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="35dp"
+            android:layout_marginEnd="25dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:background="@drawable/button_round_corners"
+            android:hint="Naziv Kategorije" />
 
-    <Button
-        android:id="@+id/btnDodajKategoriju"
-        android:layout_width="356dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="34dp"
-        android:layout_marginTop="132dp"
-        android:background="#0263BD"
-        android:text="Spasi Kategoriju"
-        android:textColor="#FFFF"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:weightSum="5">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="147dp"
-        android:layout_height="115dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="229dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/blue_dot" />
+            <EditText
+                android:id="@+id/etIkona"
+                android:layout_width="197dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_round_corners"
+                android:ems="10"
+                android:hint=" Ikona"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/btnDodajIkonu"
+                android:layout_width="162dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="25dp"
+                android:layout_weight="1"
+                android:background="#0263BD"
+                android:text="Dodaj Ikonu"
+                android:textColor="#FFFF" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnDodajKategoriju"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="17dp"
+            android:background="#0263BD"
+            android:text="Spasi Kategoriju"
+            android:textColor="#FFFF"/>
+
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

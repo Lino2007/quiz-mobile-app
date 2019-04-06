@@ -20,7 +20,7 @@ import ba.unsa.etf.rma.klase.Kategorija;
 public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.Callback {
     EditText naziv, nazivIkone;
     Button dodajIkonu, dodajKategoriju;
-    ImageView debil;
+
     private boolean valid = false;
     public static Icon[] selectedIcons;
     String ikona, nazivKategorije;
@@ -35,7 +35,7 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         nazivIkone = (EditText) findViewById(R.id.etIkona);
         dodajIkonu = (Button) findViewById(R.id.btnDodajIkonu);
         dodajKategoriju = (Button) findViewById(R.id.btnDodajKategoriju);
-        debil = (ImageView) findViewById(R.id.imageView);
+
         nazivIkone.setEnabled(false);
         nazivIkone.setFocusable(false);
 
@@ -78,10 +78,10 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
     private void validiraj() {
         ikona = nazivIkone.getText().toString();
         nazivKategorije = naziv.getText().toString();
-        if (nazivKategorije.isEmpty()) naziv.setBackgroundColor(Color.RED);
+        if (nazivKategorije.isEmpty()) naziv.setBackgroundColor(Color.parseColor("#E85F41"));
         else naziv.setBackgroundColor(Color.WHITE);
 
-        if (ikona.isEmpty()) nazivIkone.setBackgroundColor(Color.RED);
+        if (ikona.isEmpty()) nazivIkone.setBackgroundColor(Color.parseColor("#E85F41"));
         else nazivIkone.setBackgroundColor(Color.WHITE);
         boolean naz = true, ik = true;
         if ((!(nazivKategorije.isEmpty())) && !(ikona.isEmpty())) {
@@ -90,10 +90,10 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
 
                 if (test.getNaziv().equals(nazivKategorije) || test.getNaziv().equals("Dodaj kategoriju")) {
 
-                    naziv.setBackgroundColor(Color.RED);
+                    naziv.setBackgroundColor(Color.parseColor("#E85F41"));
                     naz = false;
                 } else if (test.getId().equals(ikona)) {
-                    nazivIkone.setBackgroundColor(Color.RED);
+                    nazivIkone.setBackgroundColor(Color.parseColor("#E85F41"));
                     ik = false;
 
                 }
