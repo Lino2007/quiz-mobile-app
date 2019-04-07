@@ -139,7 +139,6 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
                 }
 
             }
-
             vi.setOnClickListener(new OnItemClickListener(position));
         }
 

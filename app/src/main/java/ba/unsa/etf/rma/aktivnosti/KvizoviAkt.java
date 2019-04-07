@@ -25,13 +25,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
     public KvizoviAkt kvizoviAkt;
-    //  public static ArrayList<Pitanje> mogPitanja= new ArrayList<> ();
     public static ArrayList<Kviz> odabraniKvizovi = new ArrayList<>();
-
-
     private String trenutnaKategorija = new String();
-
-    //Za listu
     private ListView mainList;
     public MainListAdapter mainListAdapter = null;
     public static ArrayList<Kviz> listaKvizova = new ArrayList<>();
@@ -42,24 +37,19 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         trenutnaKategorija = "Svi";
-
         popuni();
+
         kvizoviAkt = this;
         Resources res = getResources();
         spinner = (Spinner) findViewById(R.id.spPostojeceKategorije);
         mainList = (ListView) findViewById(R.id.lvKvizovi);
-        spinner.setOnItemSelectedListener(this);
 
+        spinner.setOnItemSelectedListener(this);
         ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
         mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, res);
-
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
-
         mainList.setAdapter(mainListAdapter);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-
-        // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
         spinner.setSelection(0);
     }
@@ -78,14 +68,11 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             } else {
                 odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
             }
-
         }
-
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     private void dajKvizoveKategorije(String item) {
@@ -96,7 +83,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 if (x.getKategorija() != null && x.getKategorija().getNaziv() == item) {
                     odabraniKvizovi.add(x);
                 }
-
             }
             setTrenutnaKategorija(item);
             System.out.println(listaKvizova.size());
@@ -113,7 +99,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     public void popuni() {
         categories.add("Svi");
-    /*     Kategorija prva= new Kategorija("automobili", "1");  Ako zelite eksperimentirati sa vec unesenim podatcima
+    /*       Ako zelite eksperimentirati sa vec unesenim podatcima
+        Kategorija prva= new Kategorija("automobili", "1");
     Kategorija druga= new Kategorija("motori", "2");
         Kategorija treca= new Kategorija("avioni", "3");
 
@@ -125,9 +112,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
             categories.add(k.getNaziv());
         }
-
-
-      ArrayList<Pitanje> a = new ArrayList(), b =new ArrayList<>();
+ ArrayList<Pitanje> a = new ArrayList(), b =new ArrayList<>();
         ArrayList<String> odgov=new ArrayList<>();  odgov.add("Prvi odgovor"); odgov.add("Drugi odgovor"); odgov.add("Neki odgov");
         ArrayList<String> odgov2=new ArrayList<>();  odgov2.add("Garbage"); odgov2.add("Collector"); odgov2.add("Is the best");
         a.add(new Pitanje ("Pitanje 1", "Pitanje 1?", null, odgov));
@@ -153,14 +138,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     }
 
     public void onItemClick(int mPosition) {
-        System.out.println(mPosition);
+        //Utvrdjivanje da li je kliknuto na dodaj ili na kviz
         if (mPosition == odabraniKvizovi.size() - 1) {
             Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
             dodajIntent.putExtra("poz_kviza", -1);
             dodajIntent.putExtra("poz_kategorije", 0);
             KvizoviAkt.this.startActivityForResult(dodajIntent, 0);
-
-
         } else {
             Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
             dodajIntent.putExtra("poz_kviza", mPosition);
@@ -175,12 +158,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 System.out.println(e);
                 return;
             }
-
             dodajIntent.putExtra("poz_kategorije", indexKategorije);
             dodajIntent.putExtra("naziv_kviza", odabraniKvizovi.get(mPosition).getNaziv());
             KvizoviAkt.this.startActivityForResult(dodajIntent, 0);
-
-
         }
     }
 
@@ -189,7 +169,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         for (Kviz x : a) {
             b.add(x);
         }
-
         return b;
     }
 
@@ -209,6 +188,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Result_OK oznacava dodavanje novog kviza, dok FIRST_USER azuriranje
+        //Result kod 9000 oznacava izlazak na back dugme
         if (resultCode == Activity.RESULT_OK) {
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
@@ -227,7 +208,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         } else if (resultCode == Activity.RESULT_FIRST_USER) {
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
-            System.out.println(novaPitanja.size());
             novaPitanja.remove(novaPitanja.size() - 1);
             int pozicija = data.getExtras().getInt("pozicija");
             odabraniKvizovi.get(pozicija).setPitanja(novaPitanja);
