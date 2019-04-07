@@ -14,6 +14,9 @@ public class Kviz implements Serializable {
         this.kategorija = kategorija;
     }
 
+    public Kviz() {
+    }
+
     public String getNaziv() {
         return naziv;
     }

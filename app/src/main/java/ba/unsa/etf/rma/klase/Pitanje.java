@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Pitanje implements Serializable ,Cloneable  {
+public class Pitanje implements Serializable  {
     String naziv, tekstPitanja, tacan;
     ArrayList<String> odgovori=  new ArrayList<>();
 
@@ -13,6 +13,9 @@ public class Pitanje implements Serializable ,Cloneable  {
         this.tekstPitanja = tekstPitanja;
         this.tacan = tacan;
         this.odgovori = odgovori;
+    }
+
+    public Pitanje() {
     }
 
     public String getNaziv() {
@@ -52,9 +55,6 @@ public class Pitanje implements Serializable ,Cloneable  {
         Collections.shuffle(odgovori);
         return odgovori;
     }
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return (Pitanje) super.clone();
-    }
+
 
 }

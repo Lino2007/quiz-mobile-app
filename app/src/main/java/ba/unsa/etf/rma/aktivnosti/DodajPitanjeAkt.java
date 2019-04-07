@@ -92,7 +92,7 @@ public class DodajPitanjeAkt extends AppCompatActivity {
                     vratiPitanje.putExtra("pitanje", listaOdgovora);
                     vratiPitanje.putExtra("naziv", nazivPitanja.getText().toString());
                     vratiPitanje.putExtra("tacan", tacan);
-                    setResult(Activity.RESULT_CANCELED, vratiPitanje);
+                    setResult(-200, vratiPitanje);
                     poz=-1;
                     finish();
                 }

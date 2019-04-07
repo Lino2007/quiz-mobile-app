@@ -8,6 +8,9 @@ public class Kategorija {
         this.id = id;
     }
 
+    public Kategorija() {
+    }
+
     public String getNaziv() {
         return naziv;
     }
