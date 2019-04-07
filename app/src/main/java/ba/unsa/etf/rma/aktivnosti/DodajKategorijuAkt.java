@@ -67,7 +67,7 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         if ((keyCode == KeyEvent.KEYCODE_BACK)) setResult(-300);
         return super.onKeyDown(keyCode, event);
     }
-
+  //
     @Override
     public void onIconDialogIconsSelected(Icon[] icons) {
         selectedIcons = icons;
