@@ -92,13 +92,13 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
 
                     naziv.setBackgroundColor(Color.parseColor("#E85F41"));
                     naz = false;
-                } else if (test.getId().equals(ikona)) {
+                } /*else if (test.getId().equals(ikona)) {
                     nazivIkone.setBackgroundColor(Color.parseColor("#E85F41"));
                     ik = false;
 
-                }
+                } */
             }
-            if (!(ik) || !(naz)) return;
+            if (/*!(ik) ||*/ !(naz)) return;
             naziv.setBackgroundColor(Color.WHITE);
             nazivIkone.setBackgroundColor(Color.WHITE);
             valid = true;
