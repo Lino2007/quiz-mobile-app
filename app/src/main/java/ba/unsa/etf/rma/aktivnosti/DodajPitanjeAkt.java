@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -51,7 +52,6 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         dodajTacan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             System.out.println(tacan + " " +  listaOdgovora.indexOf(odgovor.getText().toString()) + " "+  listaOdgovora.isEmpty()  );
                 if (tacan == null && odgovor.getText().toString().length() > 0 && (listaOdgovora.indexOf(odgovor.getText().toString()) == -1 || listaOdgovora.isEmpty())) {
                     poz = listaOdgovora.size();
                     pozicijaTacnog= listaOdgovora.size();
@@ -59,10 +59,20 @@ public class DodajPitanjeAkt extends AppCompatActivity {
                     listaOdgovora.add(tacan);
                     lvOdgovori.setAdapter(odgovoriAdapter);
                     lvOdgovori.setBackgroundColor(Color.WHITE);
-
+                    odgovor.setBackgroundColor(Color.WHITE);
+                }
+                else {
+                    odgovor.setBackgroundColor(Color.parseColor("#E85F41"));
                 }
             }
         });
+
+       odgovor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               odgovor.setBackgroundColor(Color.WHITE);
+            }
+            });
 
 
         nazivPitanja.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +89,10 @@ public class DodajPitanjeAkt extends AppCompatActivity {
                 listaOdgovora.add(odgovor.getText().toString());
                 lvOdgovori.setAdapter(odgovoriAdapter);
                      lvOdgovori.setBackgroundColor(Color.WHITE);
+                     odgovor.setBackgroundColor(Color.WHITE);
+                 }
+                 else {
+                      odgovor.setBackgroundColor(Color.parseColor("#E85F41"));
                  }
             }
         });

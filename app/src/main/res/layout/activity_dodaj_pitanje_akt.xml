@@ -82,6 +82,7 @@
             android:layout_marginStart="17dp"
             android:layout_marginEnd="17dp"
             android:layout_marginTop="10dp"
+            android:textColor="#0263BD"
             android:background="@drawable/edit_text_border"
             android:text="Dodaj" />
 
@@ -93,6 +94,7 @@
             android:layout_marginEnd="17dp"
             android:layout_marginTop="4dp"
             android:text="Dodaj tacan"
+            android:textColor="#419F07"
             android:background="@drawable/edit_text_border"
              />
 
@@ -104,7 +106,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="80dp"
             android:background="#0263BD"
-            android:text="Dodaj pitanje"
+            android:text="Spasi pitanje"
             android:textColor="#FFFF"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

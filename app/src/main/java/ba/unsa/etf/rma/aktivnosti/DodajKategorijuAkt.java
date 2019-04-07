@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+
 import com.maltaisn.icondialog.Icon;
 import com.maltaisn.icondialog.IconDialog;
 import com.maltaisn.icondialog.IconHelper;
@@ -38,7 +39,6 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
 
         nazivIkone.setEnabled(false);
         nazivIkone.setFocusable(false);
-
 
         dodajIkonu.setOnClickListener(new View.OnClickListener() {
             @Override

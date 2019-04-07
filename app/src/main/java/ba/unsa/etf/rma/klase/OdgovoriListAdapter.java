@@ -109,14 +109,10 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
         }
         else
         {
-            // Get each Model object from Arraylist
             tempValues=null;
-           // System.out.println(Doda);
             tempValues = ( String) data.get( position );
             System.out.println(DodajPitanjeAkt.poz);
             if (position== DodajPitanjeAkt.poz) {
-
-            //    View views= super.getView(position,convertView,parent);
                 vi.setBackgroundColor(Color.parseColor("#A2FA59"));
 
             } else {
@@ -124,13 +120,12 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
             }
 
 
-
             holder.nazivOdgovora.setText (tempValues);
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
 
-           //   vi.setOnClickListener(new OnItemClickListener( position ));
+
         }
-     //   DodajPitanjeAkt.poz=-1;
+
         return vi;
     }
      void setPoz (int poz) {
@@ -141,19 +136,4 @@ public class OdgovoriListAdapter extends  BaseAdapter implements View.OnClickLis
         Log.v("CustomAdapter", "=====Row button clicked=====");
     }
 
-
-  /*  private class OnItemClickListener  implements View.OnClickListener {
-        private int mPosition;
-
-        OnItemClickListener(int position){
-            mPosition = position;
-        }
-
-        @Override
-        public void onClick(View arg0) {
-            //  KvizoviAkt sct = (KvizoviAkt) activity;
-            //   sct.onItemClick(mPosition);
-        }
-    }
- */
 }
