@@ -1,8 +1,11 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -33,7 +37,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     private EditText editText;
     private ListView listaPitanja, listaMogucih;
     private Spinner dkaSpinner;
-    private Button dodaj;
+    private Button dodaj,importKviz;
     private boolean valid = false;
     public PitanjaListAdapter pitanjaAdapter = null;
     public MogucaListAdapter mogucaAdapter = null;
@@ -49,6 +53,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     DodajKvizAkt dkaAkk = null;
     private boolean refreshKat = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -59,11 +64,15 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         pozicija = getIntent().getExtras().getInt("poz_kviza");
         poz_kat = getIntent().getExtras().getInt("poz_kategorije");
 
+        File file = new File (Environment.getExternalStorageDirectory(), "test.csv");
+
+
         dodaj = (Button) findViewById(R.id.btnDodajKviz);
         editText = (EditText) findViewById(R.id.etNaziv);
         listaMogucih = (ListView) findViewById(R.id.lvMogucaPitanja);
         listaPitanja = (ListView) findViewById(R.id.lvDodanaPitanja);
         dkaSpinner = (Spinner) findViewById(R.id.spKategorije);
+        importKviz= (Button) findViewById(R.id.btnImportKviz);
 
         if (pozicija != -1 && KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja() != null) {
             pitanjaKviza = KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja();
@@ -160,6 +169,16 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
 
+        });
+
+        importKviz.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent importIntent = new Intent (Intent.ACTION_OPEN_DOCUMENT);
+                importIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                importIntent.setType("downloads/csv");
+                startActivityForResult(importIntent, 1999);
+            }
         });
     }
 
@@ -294,5 +313,36 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         } else if (resultCode == (-300)) {
             dkaSpinner.setSelection(0);
         }
+        else if (requestCode==1999 && resultCode == Activity.RESULT_OK) {
+            Uri uri= null;
+            if (data!=null) {
+                uri= data.getData();
+                parsirajCSV(uri);
+            }
+
+        }
+    }
+
+
+    private void parsirajCSV (Uri uri) {
+               if (uri==null) return ;
+               String strUri= uri.toString();
+               String[] values= strUri.split(",");
+               int i=0;
+               if (values.length>0) {
+            while (i < values.length) {
+                if (i == 0) {
+                    String nazivKviza = values[0];
+                   int index= listaKvizova.indexOf(values[0]);
+                    if (index!=-1 || nazivKviza.length()<1) {
+                        new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kviz vec postoji ili je naziv neispravan!");
+                    }
+                }
+                else if (i==1) {
+                    int index;
+                }
+            }
+        }
+
     }
 }

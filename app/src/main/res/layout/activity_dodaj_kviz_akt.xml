@@ -109,17 +109,28 @@
             android:layout_marginEnd="17dp"
             android:background="?android:attr/listDivider" />
 
+
         <Button
             android:id="@+id/btnDodajKviz"
-            android:layout_width="match_parent"
+            android:layout_width="269dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="55dp"
-            android:text="DODAJ KVIZ"
-            android:textColor="#025AA0"
             android:background="@drawable/edit_text_border"
-           />
+            android:text="DODAJ KVIZ"
+            android:textColor="#025AA0" />
+
+        <Button
+            android:id="@+id/btnImportKviz"
+            android:layout_width="131dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="120dp"
+            android:layout_marginTop="10dp"
+            android:text="Importujte kviz"
+            android:background="@drawable/edit_text_border"
+            android:textColor="#012FFF"/>
+
 
     </LinearLayout>
 

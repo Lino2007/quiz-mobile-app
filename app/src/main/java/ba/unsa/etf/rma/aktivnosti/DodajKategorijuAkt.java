@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.aktivnosti;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +38,7 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         dodajIkonu = (Button) findViewById(R.id.btnDodajIkonu);
         dodajKategoriju = (Button) findViewById(R.id.btnDodajKategoriju);
 
+
         nazivIkone.setEnabled(false);
         nazivIkone.setFocusable(false);
 
@@ -59,6 +61,8 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
                 }
             }
         });
+
+
 
     }
 
