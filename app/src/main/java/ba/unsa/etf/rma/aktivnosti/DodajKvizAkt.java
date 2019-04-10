@@ -176,7 +176,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View v) {
                 Intent importIntent = new Intent (Intent.ACTION_OPEN_DOCUMENT);
                 importIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                importIntent.setType("downloads/csv");
+                importIntent.setType("text/csv");
                 startActivityForResult(importIntent, 1999);
             }
         });
@@ -314,11 +314,12 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             dkaSpinner.setSelection(0);
         }
         else if (requestCode==1999 && resultCode == Activity.RESULT_OK) {
+            System.out.println("USAO");
             Uri uri= null;
-            if (data!=null) {
+        /*    if (data!=null) {
                 uri= data.getData();
                 parsirajCSV(uri);
-            }
+            } */
 
         }
     }
@@ -329,17 +330,42 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                String strUri= uri.toString();
                String[] values= strUri.split(",");
                int i=0;
-               if (values.length>0) {
+               String nazivKviza, kategorija;
+               int brOdgovora=-1, inx=-1;
+               boolean ispravan=true;
+               if (values.length>=5) {
             while (i < values.length) {
                 if (i == 0) {
-                    String nazivKviza = values[0];
+                   nazivKviza = values[0];
                    int index= listaKvizova.indexOf(values[0]);
                     if (index!=-1 || nazivKviza.length()<1) {
                         new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kviz vec postoji ili je naziv neispravan!");
+                        ispravan=false; break;
                     }
                 }
                 else if (i==1) {
-                    int index;
+                     kategorija= values[1];
+                     if (KvizoviAkt.categories.indexOf(values[1])!=-1) {
+                         new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kategorija nepoznata!");
+                         ispravan=false; break;
+                     }
+
+                }
+                else if (i==2) {
+                    try {
+                        brOdgovora=Integer.parseInt(values[2]);
+                        if (brOdgovora<1 || brOdgovora> values.length-i+1) {
+                            new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kviz kojeg importujete ima neispravan broj odgovora!");
+                            ispravan=false; break;
+                        }
+                    }
+                    catch (Exception e) {
+                        System.out.println(e);
+                        ispravan=false; break;
+                    }
+                }
+                else if (i==3) {
+
                 }
             }
         }
