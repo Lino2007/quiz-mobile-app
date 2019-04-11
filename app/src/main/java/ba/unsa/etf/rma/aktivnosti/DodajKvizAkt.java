@@ -20,8 +20,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
@@ -176,7 +181,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View v) {
                 Intent importIntent = new Intent (Intent.ACTION_OPEN_DOCUMENT);
                 importIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                importIntent.setType("text/csv");
+                importIntent.setType("text/*");
                 startActivityForResult(importIntent, 1999);
             }
         });
@@ -316,46 +321,165 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         else if (requestCode==1999 && resultCode == Activity.RESULT_OK) {
             System.out.println("USAO");
             Uri uri= null;
-        /*    if (data!=null) {
+          if (data!=null) {
                 uri= data.getData();
                 parsirajCSV(uri);
-            } */
+            }
 
         }
     }
 
+    private String getTextFromUri (Uri uri) throws IOException {
+        InputStream inputStream = getContentResolver().openInputStream(uri);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                inputStream));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            stringBuilder.append(line + "\n");
+        }
+        inputStream.close();
+        stringBuilder.setLength(stringBuilder.length()-1);
+        return stringBuilder.toString();
+
+    }
+
+    private int dajBrojLinija (String str) {
+        String[] brLinija= str.split("\r\n|\r|\n");
+        return brLinija.length;
+    }
+
 
     private void parsirajCSV (Uri uri) {
-               if (uri==null) return ;
-               String strUri= uri.toString();
-               String[] values= strUri.split(",");
-               int i=0;
+        if (uri==null) return ;
+        if (true) return; //-----------------------------------
+         String parsedString= new String();
+        try {
+            parsedString = getTextFromUri(uri);
+        }
+        catch (Exception e) {
+            System.out.println("Nesto nije uredu sa fajlom");
+        }
+
+        if (parsedString.isEmpty())  return ;
+        String testStr= new String (parsedString);
+         int brojPitanja= dajBrojLinija(testStr)-1;
+
+
+
+        System.out.println(parsedString);
+        String [] parsedList= parsedString.split(System.lineSeparator());
+        System.out.println(parsedList.length);
+
+
+        //Parsiranje prvog reda
+        if (parsedList==null || parsedList.length==0) return ;
+        String [] prviRed= parsedList[0].split(",");
+        if (prviRed.length!=3) {
+            System.out.println("Nesto nije uredu");
+            return ;
+        }
+        String nazivKviza, kategorija;
+        nazivKviza = parsedList[0];    kategorija= parsedList[1];
+        int brPitanja=-1;
+        try {
+            brPitanja=Integer.parseInt(parsedList[2]);
+        }
+        catch (Exception e){
+            System.out.println("Nesto nije uredu sa prvim redom");
+            return ;
+        }
+        int index= listaKvizova.indexOf(parsedList[0]);
+        if (index!=-1 || nazivKviza.length()<1) {
+            System.out.println("nesto nije uredu sa kvizom");
+            return ;
+        }
+        if (KvizoviAkt.categories.indexOf(kategorija)!=-1) {
+            System.out.println("Nesto nije uredu sa kategorijom");
+            return ;
+        }
+        if (brojPitanja!= parsedList.length-1) {
+            System.out.println("Nesto nije uredu sa brojem pitanja");
+            return ;
+        }
+        int i=1;
+        boolean isItOkay=true, tacanPostoji=true;
+        ArrayList<String> zaOdgovore= new ArrayList<>();
+        ArrayList<String> validPitanja= new ArrayList<>();
+        ArrayList<Pitanje> zaPitanja= new ArrayList<>();
+        String tacan= new String();
+        int brojOdgovora=-1;
+        while (i<parsedList.length) {
+            String[] ostali= parsedList[i].split(",");
+            if (ostali.length<4) {
+                System.out.println("Nesto nije uredu sa odgovorima");
+                isItOkay=false;
+                break;
+            }
+            if (validPitanja!=null && validPitanja.indexOf(ostali[0])!=-1) {
+                System.out.println("Pitanja nisu jedinstvena!");
+                isItOkay=false;
+                break;
+            }
+            try {
+                brojOdgovora= Integer.parseInt(ostali[1]);
+            }
+            catch (Exception e) {
+                System.out.println("Nije data ispravna vrijednost broja odgovora");
+                isItOkay=false;
+                break;
+            }
+              if (brojOdgovora<1 || brojOdgovora!= ostali.length-3) {
+                  System.out.println("Nije data ispravna vrijednost broja odgovora");
+                  isItOkay=false;
+                  break;
+              }
+              tacan= ostali[2];
+              for (int j=3; j<brojOdgovora; j++ ) {
+                  zaOdgovore.add (ostali[j]);
+              }
+
+              if (zaOdgovore.indexOf(tacan)==-1) {
+                  System.out.println("Nije dat tacan odgovor");
+                  isItOkay=false;
+                  break;
+
+              }
+              validPitanja.add (ostali[0]);
+              zaPitanja.add (new Pitanje (ostali[0], ostali[0], tacan, zaOdgovore));
+              zaOdgovore.clear();
+              tacan=null;
+            i++;
+        }
+
+          return ;
+      /*        int i=0;
                String nazivKviza, kategorija;
-               int brOdgovora=-1, inx=-1;
+               int brPitanja=-1, inx=-1;
                boolean ispravan=true;
-               if (values.length>=5) {
-            while (i < values.length) {
+               if (parsedList.length>=5) {
+            while (i < parsedList.length) {
                 if (i == 0) {
-                   nazivKviza = values[0];
-                   int index= listaKvizova.indexOf(values[0]);
+                   nazivKviza = parsedList[0];
+                   int index= listaKvizova.indexOf(parsedList[0]);
                     if (index!=-1 || nazivKviza.length()<1) {
-                        new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kviz vec postoji ili je naziv neispravan!");
+                       // new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kviz vec postoji ili je naziv neispravan!");
                         ispravan=false; break;
                     }
                 }
                 else if (i==1) {
-                     kategorija= values[1];
-                     if (KvizoviAkt.categories.indexOf(values[1])!=-1) {
-                         new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kategorija nepoznata!");
+                     kategorija= parsedList[1];
+                     if (KvizoviAkt.categories.indexOf(parsedList[1])!=-1) {
+                        // new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kategorija nepoznata!");
                          ispravan=false; break;
                      }
 
                 }
                 else if (i==2) {
                     try {
-                        brOdgovora=Integer.parseInt(values[2]);
-                        if (brOdgovora<1 || brOdgovora> values.length-i+1) {
-                            new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kviz kojeg importujete ima neispravan broj odgovora!");
+                        brPitanja=Integer.parseInt(parsedList[2]);
+                        if (brPitanja<0) {
+                          //  new AlertDialog.Builder(getApplicationContext()).setTitle("Greska pri importu").setMessage("Kviz kojeg importujete ima neispravan broj odgovora!");
                             ispravan=false; break;
                         }
                     }
@@ -368,7 +492,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
                 }
             }
-        }
+        } */
 
     }
 }
