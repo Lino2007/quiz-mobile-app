@@ -292,6 +292,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public ArrayList<Pitanje> kopirajPitanja(ArrayList<Pitanje> a, ArrayList<Pitanje> b) {
+
         if (b == null) return null;
         for (Pitanje x : b) {
             a.add(x);
@@ -319,7 +320,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             dkaSpinner.setSelection(0);
         }
         else if (requestCode==1999 && resultCode == Activity.RESULT_OK) {
-            System.out.println("USAO");
             Uri uri= null;
           if (data!=null) {
                 uri= data.getData();
@@ -352,7 +352,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
     private void parsirajCSV (Uri uri) {
         if (uri==null) return ;
-        if (true) return; //-----------------------------------
+
+
          String parsedString= new String();
         try {
             parsedString = getTextFromUri(uri);
@@ -367,9 +368,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
 
 
-        System.out.println(parsedString);
         String [] parsedList= parsedString.split(System.lineSeparator());
-        System.out.println(parsedList.length);
+
 
 
         //Parsiranje prvog reda
@@ -380,21 +380,22 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             return ;
         }
         String nazivKviza, kategorija;
-        nazivKviza = parsedList[0];    kategorija= parsedList[1];
+        nazivKviza = prviRed[0];    kategorija= prviRed[1];
+        System.out.println(kategorija + ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
         int brPitanja=-1;
         try {
-            brPitanja=Integer.parseInt(parsedList[2]);
+            brPitanja=Integer.parseInt(prviRed[2]);
         }
         catch (Exception e){
             System.out.println("Nesto nije uredu sa prvim redom");
             return ;
         }
-        int index= listaKvizova.indexOf(parsedList[0]);
+        int index= listaKvizova.indexOf(prviRed[0]);
         if (index!=-1 || nazivKviza.length()<1) {
             System.out.println("nesto nije uredu sa kvizom");
             return ;
         }
-        if (KvizoviAkt.categories.indexOf(kategorija)!=-1) {
+        if (KvizoviAkt.categories.indexOf(kategorija)==-1) {
             System.out.println("Nesto nije uredu sa kategorijom");
             return ;
         }
@@ -410,6 +411,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         String tacan= new String();
         int brojOdgovora=-1;
         while (i<parsedList.length) {
+            System.out.println(i + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             String[] ostali= parsedList[i].split(",");
             if (ostali.length<4) {
                 System.out.println("Nesto nije uredu sa odgovorima");
@@ -435,7 +437,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                   break;
               }
               tacan= ostali[2];
-              for (int j=3; j<brojOdgovora; j++ ) {
+              for (int j=3; j<brojOdgovora+3; j++ ) {
                   zaOdgovore.add (ostali[j]);
               }
 
@@ -451,7 +453,19 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
               tacan=null;
             i++;
         }
+        int indKat= kategorije.indexOf(kategorija);
 
+        System.out.println( zaPitanja.size() + ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
+            if (isItOkay) {
+                dkaSpinner.setSelection(indKat);
+               kopijaPitanjaKviza= zaPitanja;
+               kopijaPitanjaKviza.add (null);
+                System.out.println( kopijaPitanjaKviza.size()+ ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
+                pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
+                listaPitanja.setAdapter(pitanjaAdapter);
+                listaMogucih.setAdapter(null);
+                editText.setText(nazivKviza);
+            }
           return ;
       /*        int i=0;
                String nazivKviza, kategorija;
