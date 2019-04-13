@@ -8,6 +8,7 @@
 
     <TableRow
         android:layout_width="110dp"
+        android:longClickable="true"
       >
 
         <ImageView

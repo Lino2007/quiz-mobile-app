@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -52,6 +53,25 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
         spinner.setSelection(0);
+
+        mainList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+                dugiKlik(pos);
+                return true;
+            }
+        });
+
+      mainList.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+              @Override
+        public void onItemClick(AdapterView<?> parent, View view,
+        int position, long id) {
+
+               //Poziv igrajkvizakt
+              }
+
+        });
+
     }
 
     public void setTrenutnaKategorija(String trenutnaKategorija) {
@@ -99,7 +119,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     public void popuni() {
         categories.add("Svi");
-    /*       Ako zelite eksperimentirati sa vec unesenim podatcima
+  //    Ako zelite eksperimentirati sa vec unesenim podatcima
         Kategorija prva= new Kategorija("automobili", "1");
     Kategorija druga= new Kategorija("motori", "2");
         Kategorija treca= new Kategorija("avioni", "3");
@@ -127,7 +147,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         listaKvizova.add (new Kviz ("Najpoznatiji motori", b, druga));
         listaKvizova.add (new Kviz ("Toyota", b, prva));
         listaKvizova.add (new Kviz ("Kawasaki", a, druga));
-        listaKvizova.add (new Kviz ("airbus", b, treca)); */
+        listaKvizova.add (new Kviz ("airbus", b, treca));
 
 
         if (listaKvizova.isEmpty()) {
@@ -135,6 +155,32 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         }
         odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
 
+    }
+
+    private  void dugiKlik (int mPosition) {
+        if (mPosition == odabraniKvizovi.size() - 1) {
+            Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
+            dodajIntent.putExtra("poz_kviza", -1);
+            dodajIntent.putExtra("poz_kategorije", 0);
+            KvizoviAkt.this.startActivityForResult(dodajIntent, 0);
+        } else {
+            Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
+            dodajIntent.putExtra("poz_kviza", mPosition);
+            int indexKategorije;
+            try {
+                if (odabraniKvizovi.get(mPosition).getKategorija() != null) {
+                    indexKategorije = getCategoriesByName(odabraniKvizovi.get(mPosition).getKategorija().getNaziv());
+                } else {
+                    indexKategorije = -2;
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+                return;
+            }
+            dodajIntent.putExtra("poz_kategorije", indexKategorije);
+            dodajIntent.putExtra("naziv_kviza", odabraniKvizovi.get(mPosition).getNaziv());
+            KvizoviAkt.this.startActivityForResult(dodajIntent, 0);
+        }
     }
 
     public void onItemClick(int mPosition) {

@@ -25,7 +25,7 @@ import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class MainListAdapter extends BaseAdapter implements View.OnClickListener, IconDialog.Callback {
+public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListener,*/ IconDialog.Callback {
     /*********** Declare Used Variables *********/
     private Activity activity = null;
     private ArrayList data;
@@ -139,13 +139,13 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
                 }
 
             }
-            vi.setOnClickListener(new OnItemClickListener(position));
+         //   vi.setOnClickListener(new OnItemClickListener(position));
         }
 
         return vi;
     }
 
-    @Override
+   /* @Override
     public void onClick(View v) {
         Log.v("CustomAdapter", "=====Row button clicked=====");
     }
@@ -163,6 +163,6 @@ public class MainListAdapter extends BaseAdapter implements View.OnClickListener
             KvizoviAkt sct = (KvizoviAkt) activity;
             sct.onItemClick(mPosition);
         }
-    }
+    } */
 
 }
