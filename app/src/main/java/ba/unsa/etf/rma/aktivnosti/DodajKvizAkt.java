@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,8 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,15 +24,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
-import ba.unsa.etf.rma.klase.MainListAdapter;
-import ba.unsa.etf.rma.klase.MogucaListAdapter;
-import ba.unsa.etf.rma.klase.PitanjaListAdapter;
+import ba.unsa.etf.rma.adapteri.MogucaListAdapter;
+import ba.unsa.etf.rma.adapteri.PitanjaListAdapter;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 

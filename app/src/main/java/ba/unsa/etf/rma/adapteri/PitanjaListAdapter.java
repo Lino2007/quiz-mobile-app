@@ -1,9 +1,8 @@
-package ba.unsa.etf.rma.klase;
+package ba.unsa.etf.rma.adapteri;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,32 +11,28 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.maltaisn.icondialog.Icon;
-
-import com.maltaisn.icondialog.IconDialog;
-import com.maltaisn.icondialog.IconHelper;
 
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
+
 import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
-import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
+import ba.unsa.etf.rma.klase.Pitanje;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListener,*/ IconDialog.Callback {
+public class PitanjaListAdapter extends BaseAdapter implements View.OnClickListener {
     /*********** Declare Used Variables *********/
     private Activity activity = null;
     private ArrayList data;
     private static LayoutInflater inflater = null;
     public Resources res;
-    Kviz tempValues = null;
+    Pitanje tempValues = null;
     int i = 0;
     boolean global = false;
-    IconDialog icondialog = new IconDialog();
 
     //  CustomAdapter Constructor
-    public MainListAdapter(Activity a, ArrayList d, Resources resLocal) {
+    public PitanjaListAdapter(Activity a, ArrayList d, Resources resLocal) {
 
         // Take passed values
         activity = a;
@@ -45,6 +40,7 @@ public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListe
         res = resLocal;
 
         // Layout inflator to call external xml layout ()
+        System.out.println(activity + " " + data + " " + resLocal);
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -66,15 +62,10 @@ public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListe
         return position;
     }
 
-    @Override
-    public void onIconDialogIconsSelected(Icon[] icons) {
-
-    }
-
     // Create a holder Class to contain inflated xml file elements
     public static class ViewHolder {
 
-        public TextView nazivKviza;
+        public TextView nazivPitanja;
         public ImageView dot;
 
     }
@@ -83,69 +74,49 @@ public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListe
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View vi = convertView;
-        final ViewHolder holder;
+        ViewHolder holder;
 
         if (convertView == null) {
 
             // Inflate tabitem.xml file for each row ( Defined below )
-            vi = inflater.inflate(R.layout.main_table_item, null);
+            vi = inflater.inflate(R.layout.pitanja_u_kvizu_item, null);
 
+            //View Holder Object to contain tabitem.xml file elements
 
             holder = new ViewHolder();
-            holder.nazivKviza = (TextView) vi.findViewById(R.id.nazivKviza);
+            holder.nazivPitanja = (TextView) vi.findViewById(R.id.nazivPitanja);
             holder.dot = (ImageView) vi.findViewById(R.id.image);
 
 
-
+            //***********  Set holder with LayoutInflater
             vi.setTag(holder);
         } else
             holder = (ViewHolder) vi.getTag();
 
 
         if (data.size() <= 0) {
-            holder.nazivKviza.setText("Dodaj Kviz");
+            holder.nazivPitanja.setText("Dodaj Pitanje");
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button", null, null));
             global = false;
         } else {
 
             tempValues = null;
-            tempValues = (Kviz) data.get(position);
-
+            tempValues = (Pitanje) data.get(position);
 
             if (position == data.size() - 1) {
-                holder.nazivKviza.setText("Dodaj Kviz");
+                holder.nazivPitanja.setText("Dodaj Pitanje");
                 holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/add_button", null, null));
             } else {
-                holder.nazivKviza.setText(tempValues.getNaziv());
-
-                if (!(tempValues.getKategorija() == null) && !(tempValues.getKategorija().getId().isEmpty())) {
-
-
-                    final IconHelper iconHelper = IconHelper.getInstance(activity.getApplicationContext());
-                    iconHelper.addLoadCallback(new IconHelper.LoadCallback() {
-                        @Override
-                        public void onDataLoaded() {
-                            int value = -1;
-
-                            if (!(tempValues.getKategorija() == null))
-                                value = Integer.parseInt(tempValues.getKategorija().getId());
-
-                            if (value != -1) {
-                                holder.dot.setImageDrawable(iconHelper.getIcon(value).getDrawable(activity.getApplicationContext()));
-                            }
-                        }
-                    });
-
-                }
-
+                holder.nazivPitanja.setText(tempValues.getNaziv());
+                holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));
             }
-         //   vi.setOnClickListener(new OnItemClickListener(position));
+
         }
 
         return vi;
     }
 
-   /* @Override
+    @Override
     public void onClick(View v) {
         Log.v("CustomAdapter", "=====Row button clicked=====");
     }
@@ -160,9 +131,9 @@ public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListe
 
         @Override
         public void onClick(View arg0) {
-            KvizoviAkt sct = (KvizoviAkt) activity;
-            sct.onItemClick(mPosition);
+            //  KvizoviAkt sct = (KvizoviAkt) activity;
+            //   sct.onItemClick(mPosition);
         }
-    } */
+    }
 
 }
