@@ -6,4 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".aktivnosti.IgrajKvizAkt">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10"
+      >
+
+        <FrameLayout
+            android:id="@+id/pitanjePlace"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/informacijePlace"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+        </FrameLayout>
+    </LinearLayout>
+
+
 </android.support.constraint.ConstraintLayout>

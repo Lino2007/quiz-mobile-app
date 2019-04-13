@@ -63,7 +63,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
               @Override
         public void onItemClick(AdapterView<?> parent, View view,
         int position, long id) {
-
+                Intent newIntent= new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
+                  System.out.println("-_______________________________________________________");
+                KvizoviAkt.this.startActivity(newIntent);
                //Poziv igrajkvizakt
               }
 
