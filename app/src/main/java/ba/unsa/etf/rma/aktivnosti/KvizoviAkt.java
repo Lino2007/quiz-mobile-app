@@ -190,7 +190,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Result_OK oznacava dodavanje novog kviza, dok FIRST_USER azuriranje
         //Result kod 9000 oznacava izlazak na back dugme
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == -32) {
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
             novaPitanja.remove(novaPitanja.size() - 1);
@@ -205,7 +205,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             spinner.setSelection(0);
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
             mainList.setAdapter(mainListAdapter);
-        } else if (resultCode == Activity.RESULT_FIRST_USER) {
+        } else if (resultCode == -133) {
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
             novaPitanja.remove(novaPitanja.size() - 1);
@@ -224,6 +224,11 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         }
         if (resultCode == 9000) {
             refreshCategories();
+        }
+
+        if (categories.size()>1) {
+            spinner.setSelection(1);
+            spinner.setSelection(0);
         }
 
     }
