@@ -5,10 +5,73 @@
     android:layout_height="match_parent"
     tools:context=".fragmenti.InformacijeFrag">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/labelNazivKviza"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:text="Naziv kviza: " />
+
+    <TextView
+        android:id="@+id/labelBrojTacnihPitanja"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:text="Broj tacnih pitanja: " />
+
+    <TextView
+        android:id="@+id/labelBrojPreostalihPitanja"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:text="Broj preostalih pitanja: " />
+
+    <TextView
+        android:id="@+id/labelProcenatTacni"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"
+        android:text="Procenat tacno odgovorenih: " />
+
+
+
+    <TextView
+        android:id="@+id/infNazivKviza"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="150dp"
+        android:text="blank" />
+
+    <TextView
+        android:id="@+id/infBrojTacnihPitanja"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="150dp"
+        android:text="blank" />
+
+    <TextView
+        android:id="@+id/infBrojPreostalihPitanja"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:layout_marginStart="150dp"
+        android:text="blank" />
+
+    <TextView
+        android:id="@+id/infProcenatTacni"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="200dp"
+        android:text="blank" />
+
+    <Button
+        android:id="@+id/btnKraj"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="150dp"
+        android:text="Zavrsi kviz" />
+
 
 </FrameLayout>
