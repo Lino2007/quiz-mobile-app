@@ -77,7 +77,7 @@ public class PitanjeFrag extends Fragment {
         nazivPitanja= (TextView) getView().findViewById(R.id.tekstPitanja);
         ArrayList<String> som= new ArrayList<>();
         PitanjeFragAdapter odgAdapter = new  PitanjeFragAdapter(getActivity(),  som,getResources());
-        listaOdgovora.setAdapter(odgAdapter);
+        listaOdgovora.setAdapter(null);
 
     }
 

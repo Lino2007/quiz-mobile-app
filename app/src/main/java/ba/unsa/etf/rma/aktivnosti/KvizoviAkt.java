@@ -2,6 +2,7 @@ package ba.unsa.etf.rma.aktivnosti;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -42,6 +43,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         spinner = (Spinner) findViewById(R.id.spPostojeceKategorije);
         mainList = (ListView) findViewById(R.id.lvKvizovi);
 
+
+
         spinner.setOnItemSelectedListener(this);
         ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
         mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, res);
@@ -64,7 +67,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         public void onItemClick(AdapterView<?> parent, View view,
         int position, long id) {
                 Intent newIntent= new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
-                  System.out.println("-_______________________________________________________");
+
                 KvizoviAkt.this.startActivity(newIntent);
                //Poziv igrajkvizakt
               }
