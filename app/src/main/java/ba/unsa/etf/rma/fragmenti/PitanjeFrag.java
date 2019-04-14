@@ -7,8 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
+import ba.unsa.etf.rma.adapteri.PitanjeFragAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +33,8 @@ public class PitanjeFrag extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    ListView listaOdgovora;
+    TextView nazivPitanja;
 
     private OnFragmentInteractionListener mListener;
 
@@ -61,6 +69,18 @@ public class PitanjeFrag extends Fragment {
         }
     }
 
+
+    @Override
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        listaOdgovora= (ListView) getView().findViewById(R.id.odgovoriPitanja);
+        nazivPitanja= (TextView) getView().findViewById(R.id.tekstPitanja);
+        ArrayList<String> som= new ArrayList<>();
+        PitanjeFragAdapter odgAdapter = new  PitanjeFragAdapter(getActivity(),  som,getResources());
+        listaOdgovora.setAdapter(odgAdapter);
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -88,6 +108,8 @@ public class PitanjeFrag extends Fragment {
 
     @Override
     public void onDetach() {
+
+
         super.onDetach();
         mListener = null;
     }

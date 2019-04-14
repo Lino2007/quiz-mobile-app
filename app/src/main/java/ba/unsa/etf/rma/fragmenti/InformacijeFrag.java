@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ public class InformacijeFrag extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     TextView nazivKviza, brTacnih, brPreostalih, procenat;
+    Button kraj;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -33,6 +35,16 @@ public class InformacijeFrag extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+
+    @Override
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        nazivKviza= (TextView) getView().findViewById(R.id.infNazivKviza);
+        brTacnih=   (TextView) getView().findViewById(R.id.infBrojTacnihPitanja);
+        brPreostalih=  (TextView) getView().findViewById(R.id.infBrojPreostalihPitanja);
+        procenat=  (TextView) getView().findViewById(R.id.infProcenatTacni);
+        kraj = (Button) getView().findViewById(R.id.btnKraj);
+     }
     public InformacijeFrag() {
         // Required empty public constructor
     }
