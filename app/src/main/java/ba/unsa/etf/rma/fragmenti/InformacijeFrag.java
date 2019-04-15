@@ -29,12 +29,19 @@ public class InformacijeFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Bundle newData= new Bundle();
            View iv=inflater.inflate(R.layout.fragment_informacije, container, false);
         nazivKviza= (TextView) iv.findViewById(R.id.infNazivKviza);
         brTacnih=   (TextView) iv.findViewById(R.id.infBrojTacnihPitanja);
         brPreostalih=  (TextView) iv.findViewById(R.id.infBrojPreostalihPitanja);
         procenat=  (TextView) iv.findViewById(R.id.infProcenatTacni);
         kraj = (Button) iv.findViewById(R.id.btnKraj);
+         newData= this.getArguments();
+          String x= newData.getString("naziv_kviza");
+          String y=  Integer.toString( newData.getInt("broj_preostalih"));
+        System.out.println(x + "---------------");
+        nazivKviza.setText(x);
+        brPreostalih.setText (y);
 
         return iv;
     }
