@@ -1,5 +1,8 @@
 package ba.unsa.etf.rma.klase;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -50,4 +53,6 @@ public class Kviz implements Serializable {
     public String toString() {
         return  "Naziv: "+ getNaziv()+ "Id: " + getKategorija().getNaziv();
     }
+
+
 }

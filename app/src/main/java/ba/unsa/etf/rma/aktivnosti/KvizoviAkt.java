@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
@@ -46,7 +47,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
         spinner.setOnItemSelectedListener(this);
-        ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
+        final ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
         mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, res);
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
         mainList.setAdapter(mainListAdapter);
@@ -66,10 +67,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
               @Override
         public void onItemClick(AdapterView<?> parent, View view,
         int position, long id) {
-                Intent newIntent= new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
-
-                KvizoviAkt.this.startActivity(newIntent);
-               //Poziv igrajkvizakt
+                  if (position!= odabraniKvizovi.size()-1) {
+                      Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
+                      newIntent.putExtra ("kviz", (Serializable) odabraniKvizovi.get(position));
+                      KvizoviAkt.this.startActivity(newIntent);
+                      //Poziv igrajkvizakt
+                  }
               }
 
         });
