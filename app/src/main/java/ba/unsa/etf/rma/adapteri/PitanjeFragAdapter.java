@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,8 @@ import ba.unsa.etf.rma.R;
 
 import ba.unsa.etf.rma.aktivnosti.DodajPitanjeAkt;
 import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
+import ba.unsa.etf.rma.fragmenti.InformacijeFrag;
+import ba.unsa.etf.rma.fragmenti.PitanjeFrag;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
@@ -34,16 +37,17 @@ public class PitanjeFragAdapter extends  BaseAdapter implements View.OnClickList
     public Resources res;
     String tempValues=null;
     int i=0;
-    private int poz;
+    private int poz, clickpoz;
 
     //  CustomAdapter Constructor
-    public   PitanjeFragAdapter(Activity a, ArrayList d, Resources resLocal) {
+    public   PitanjeFragAdapter(Activity a, ArrayList d, Resources resLocal, int someint, int another) {
 
         // Take passed values
         activity = a;
         data=d;
         res = resLocal;
-
+        poz=someint;
+        clickpoz=another;
         // Layout inflator to call external xml layout ()
 
         inflater = ( LayoutInflater )activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -109,16 +113,21 @@ public class PitanjeFragAdapter extends  BaseAdapter implements View.OnClickList
         }
         else
         {
+
             tempValues=null;
             tempValues = ( String) data.get( position );
-           /*
-            if (position== DodajPitanjeAkt.poz) {
-                vi.setBackgroundColor(Color.parseColor("#A2FA59"));
+            System.out.println(PitanjeFrag.pozicijaTacnog + "-----------ADADADA");
+           if (poz!=-1) {
+              // int zelena= ContextCompat.getColor()
+               if (poz==position) vi.setBackgroundColor(Color.parseColor("#7FFF00"));
+               if (poz== clickpoz && clickpoz==position) {
+                   vi.setBackgroundColor(Color.parseColor("#7FFF00"));
 
-            } else {
-                vi.setBackgroundColor(Color.WHITE);
-            }
-             */
+               } else if (poz!=clickpoz && poz!=position && clickpoz==position) {
+                   vi.setBackgroundColor(Color.parseColor("#FF3030"));
+               }
+           }
+
 
             holder.nazivOdgovora.setText (tempValues);
             holder.dot.setImageResource(res.getIdentifier("ba.unsa.etf.rma:drawable/blue_dot", null, null));

@@ -3,6 +3,7 @@ package ba.unsa.etf.rma.fragmenti;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,8 @@ public class InformacijeFrag extends Fragment {
         System.out.println(x + "---------------");
         nazivKviza.setText(x);
         brPreostalih.setText (y);
+
+
 
         return iv;
     }

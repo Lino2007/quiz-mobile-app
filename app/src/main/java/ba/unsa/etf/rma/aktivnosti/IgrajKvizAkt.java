@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.fragmenti.InformacijeFrag;
@@ -14,12 +15,12 @@ import ba.unsa.etf.rma.fragmenti.PitanjeFrag;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
-public class IgrajKvizAkt extends AppCompatActivity {
+public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.UpdateListener {
     FrameLayout zaPit, zaInfo;
 
     Kviz kviz;
-    ArrayList<Pitanje> preostala = new ArrayList<>();
-    ArrayList<Pitanje> odgovorena= new ArrayList<>();
+     ArrayList<Pitanje> preostalaPitanja= new ArrayList<>();
+     ArrayList<Pitanje> odgovorenaPitanja= new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +34,22 @@ public class IgrajKvizAkt extends AppCompatActivity {
         PitanjeFrag pitFrag= new PitanjeFrag();
 
          kviz= (Kviz) getIntent().getSerializableExtra("kviz");
-         prekopirajPitanja(kviz.getPitanja());
-        System.out.println(kviz.toString());
+         //prekopirajPitanja(kviz.getPitanja());
+          preostalaPitanja= prekopirajPitanja(kviz.getPitanja());
+          int a=-1;
+          if (!preostalaPitanja.isEmpty()) {
+              a = getRandomIndex(preostalaPitanja.size());
+          }
+          else finish ();
+
 
         Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
         zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
-        zaFragInfo.putInt ("broj_preostalih", preostala.size());
+        zaFragPit.putSerializable("pitanja", kviz.getPitanja().get(a));
+
+     zaFragInfo.putInt ("broj_preostalih", preostalaPitanja.size());
         infoFrag.setArguments(zaFragInfo);
+        pitFrag.setArguments(zaFragPit);
 
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -49,9 +59,23 @@ public class IgrajKvizAkt extends AppCompatActivity {
 
     }
 
-    private void prekopirajPitanja (ArrayList<Pitanje> x) {
-        for (Pitanje a: x) {
-            preostala.add(a);
+    private ArrayList<Pitanje> prekopirajPitanja (ArrayList<Pitanje> a ) {
+        ArrayList<Pitanje> v= new ArrayList<>();
+        if (a.isEmpty()) return null;
+        for (Pitanje x : a) {
+            v.add(x);
         }
+        return v;
+    }
+
+    int getRandomIndex (int x) {
+        Random rand= new Random();
+        return rand.nextInt(x);
+    }
+
+
+    @Override
+    public void updateByAction(boolean tacno) {
+        System.out.println("SOMETHING HAPPENED");
     }
 }
