@@ -40,7 +40,11 @@ public class InformacijeFrag extends Fragment {
          newData= this.getArguments();
           String x= newData.getString("naziv_kviza");
           String y=  Integer.toString( newData.getInt("broj_preostalih"));
-        System.out.println(x + "---------------");
+          int brojTacnih = newData.getInt("broj_tacnih");
+          double procenatTacnih= newData.getDouble("procenat_tacnih") * 100;
+
+          brTacnih.setText (Integer.toString(brojTacnih));
+          procenat.setText( Double.toString(procenatTacnih) + " %");
         nazivKviza.setText(x);
         brPreostalih.setText (y);
 

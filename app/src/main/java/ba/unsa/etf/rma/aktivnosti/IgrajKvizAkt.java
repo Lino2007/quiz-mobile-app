@@ -1,6 +1,7 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,9 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
     Kviz kviz;
      ArrayList<Pitanje> preostalaPitanja= new ArrayList<>();
      ArrayList<Pitanje> odgovorenaPitanja= new ArrayList<>();
+     int brojTacnih=0;
+     double procenatTacnih=0;
+     int inx=-1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +43,16 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
           int a=-1;
           if (!preostalaPitanja.isEmpty()) {
               a = getRandomIndex(preostalaPitanja.size());
+              inx=a;
           }
           else finish ();
 
 
         Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
         zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
-        zaFragPit.putSerializable("pitanja", kviz.getPitanja().get(a));
+        zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
+        zaFragInfo.putInt("broj_tacnih", brojTacnih);
+        zaFragPit.putSerializable("pitanja", preostalaPitanja.get(a));
 
      zaFragInfo.putInt ("broj_preostalih", preostalaPitanja.size());
         infoFrag.setArguments(zaFragInfo);
@@ -76,6 +83,42 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
 
     @Override
     public void updateByAction(boolean tacno) {
-        System.out.println("SOMETHING HAPPENED");
+      odgovorenaPitanja.add(preostalaPitanja.get(inx));
+      preostalaPitanja.remove(inx);
+      if (tacno) brojTacnih++;
+      procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
+
+        int a=-1;
+        if (!preostalaPitanja.isEmpty()) {
+            a = getRandomIndex(preostalaPitanja.size());
+            inx=a;
+        }
+        else finish ();
+
+        InformacijeFrag infoFrag= new InformacijeFrag();
+        PitanjeFrag pitFrag= new PitanjeFrag();
+
+        Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
+        zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
+        zaFragInfo.putInt("broj_tacnih", brojTacnih);
+        //if (preostalaPitanja.size()==0) finish();
+        System.out.println(preostalaPitanja.size() + "-------------------------------------------------------------------" +  a);
+        if (preostalaPitanja.size()==0) {
+            System.out.println("AHA ! UHVATIO SAM TE!!");
+            Intent x= new Intent(IgrajKvizAkt.this, KvizoviAkt.class);
+            finish();
+            startActivity(x);
+        }
+        else {
+            zaFragPit.putSerializable("pitanja", preostalaPitanja.get(a));
+            zaFragInfo.putInt("broj_preostalih", preostalaPitanja.size());
+
+            infoFrag.setArguments(zaFragInfo);
+            pitFrag.setArguments(zaFragPit);
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag, infoFrag.getTag()).commit();
+            fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag, infoFrag.getTag()).commit();
+        }
     }
 }

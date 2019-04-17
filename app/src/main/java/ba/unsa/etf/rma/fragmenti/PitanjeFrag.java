@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -68,8 +69,28 @@ public class PitanjeFrag extends Fragment {
                 kliknutaPozicija=position;
                 odgAdapter = new PitanjeFragAdapter(getActivity(),  som,getResources(), pozicijaTacnog , kliknutaPozicija);
                 listaOdgovora.setAdapter(odgAdapter);
-                     instanca.updateByAction(true);
-                   pozicijaTacnog=kliknutaPozicija=-1;
+
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        instanca.updateByAction(pozicijaTacnog==kliknutaPozicija);
+                        pozicijaTacnog=kliknutaPozicija=-1;
+                    }
+                }, 2000);
+                final Thread r = new Thread() {
+                    public void run() {
+                        // DO WORK
+
+                        // Call function.
+                        handler.postDelayed(this, 2000);
+
+
+                    }
+                };
+                r.start(); // THIS IS DIFFERENT
+
             }
         });
 
