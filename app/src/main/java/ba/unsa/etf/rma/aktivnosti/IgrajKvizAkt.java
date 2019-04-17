@@ -85,7 +85,10 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
     public void updateByAction(boolean tacno) {
       odgovorenaPitanja.add(preostalaPitanja.get(inx));
       preostalaPitanja.remove(inx);
-      if (tacno) brojTacnih++;
+      if (tacno) {
+          brojTacnih++;
+          System.out.println("!!!!!!");
+      }
       procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
 
         int a=-1;
@@ -102,9 +105,8 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
         zaFragInfo.putInt("broj_tacnih", brojTacnih);
         //if (preostalaPitanja.size()==0) finish();
-        System.out.println(preostalaPitanja.size() + "-------------------------------------------------------------------" +  a);
         if (preostalaPitanja.size()==0) {
-            System.out.println("AHA ! UHVATIO SAM TE!!");
+
             Intent x= new Intent(IgrajKvizAkt.this, KvizoviAkt.class);
             finish();
             startActivity(x);
