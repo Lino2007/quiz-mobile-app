@@ -70,7 +70,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                   if (position!= odabraniKvizovi.size()-1) {
                       Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
                       newIntent.putExtra ("kviz", (Serializable) odabraniKvizovi.get(position));
-                      KvizoviAkt.this.startActivity(newIntent);
+                      KvizoviAkt.this.startActivityForResult(newIntent, 32000);
                       //Poziv igrajkvizakt
                   }
               }
@@ -273,9 +273,13 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
             mainList.setAdapter(mainListAdapter);
         }
-        if (resultCode == 9000) {
+       else if (resultCode == 9000) {
             refreshCategories();
         }
+        else if (resultCode == 32000) {
+            return ;
+        }
+
 
         if (categories.size()>1) {
             spinner.setSelection(1);

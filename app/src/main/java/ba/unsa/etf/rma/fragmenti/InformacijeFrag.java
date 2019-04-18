@@ -1,6 +1,8 @@
 package ba.unsa.etf.rma.fragmenti;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -19,7 +21,8 @@ public class InformacijeFrag extends Fragment {
 
     TextView nazivKviza, brTacnih, brPreostalih, procenat;
     Button kraj;
-
+    Activity activity;
+    UpdateListener instanca;
 
     public InformacijeFrag() {
         // Required empty public constructor
@@ -45,12 +48,37 @@ public class InformacijeFrag extends Fragment {
 
           brTacnih.setText (Integer.toString(brojTacnih));
           procenat.setText( Double.toString(procenatTacnih) + " %");
-        nazivKviza.setText(x);
+         nazivKviza.setText(x);
         brPreostalih.setText (y);
+
+        kraj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                instanca.buttonClick();
+            }
+        });
 
 
 
         return iv;
     }
+
+    public interface UpdateListener {
+        public void buttonClick();
+
+    }
+
+    @Override
+    public void onAttach (Context context) {
+        super.onAttach(context);
+        activity=(Activity)context;
+        try {
+            instanca = (InformacijeFrag.UpdateListener) activity;
+        }
+        catch (Exception e) {
+            //
+        }
+    }
+
 
 }

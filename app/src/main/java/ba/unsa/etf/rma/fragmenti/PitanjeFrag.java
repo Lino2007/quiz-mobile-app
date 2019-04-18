@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.PitanjeFragAdapter;
+import ba.unsa.etf.rma.aktivnosti.IgrajKvizAkt;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 /**
@@ -53,13 +54,17 @@ public class PitanjeFrag extends Fragment {
         nazivPitanja= (TextView) iv.findViewById(R.id.tekstPitanja);
         Bundle bundleObj= this.getArguments();
         pitanja=  (Pitanje) bundleObj.getSerializable("pitanja");
-
-        som= pitanja.dajRandomOdgovore();
-
-
-         odgAdapter = new PitanjeFragAdapter(getActivity(),  som,getResources(), -1 , -1);
-        nazivPitanja.setText(pitanja.getNaziv());
-        listaOdgovora.setAdapter(odgAdapter);
+        listaOdgovora.setEnabled(true);
+        if (pitanja==null) {
+            listaOdgovora.setAdapter(null);
+            nazivPitanja.setText("Kviz je zavrsen");
+        }
+        else {
+            som = pitanja.dajRandomOdgovore();
+            odgAdapter = new PitanjeFragAdapter(getActivity(), som, getResources(), -1, -1);
+            nazivPitanja.setText(pitanja.getNaziv());
+            listaOdgovora.setAdapter(odgAdapter);
+        }
 
         listaOdgovora.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -75,8 +80,11 @@ public class PitanjeFrag extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        instanca.updateByAction(pozicijaTacnog==kliknutaPozicija);
+
+                        listaOdgovora.setEnabled(false);
+                     /*  if(!(nazivPitanja.getText().equals("Kviz je zavrsen")))  */ instanca.updateByAction( pozicijaTacnog==kliknutaPozicija);
                         pozicijaTacnog=kliknutaPozicija=-1;
+
                     }
                 }, 2000);
                 final Thread r = new Thread() {

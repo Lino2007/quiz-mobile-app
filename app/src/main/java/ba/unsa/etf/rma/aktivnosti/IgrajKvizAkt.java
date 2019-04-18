@@ -16,7 +16,7 @@ import ba.unsa.etf.rma.fragmenti.PitanjeFrag;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
-public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.UpdateListener {
+public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.UpdateListener, InformacijeFrag.UpdateListener {
     FrameLayout zaPit, zaInfo;
 
     Kviz kviz;
@@ -25,6 +25,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
      int brojTacnih=0;
      double procenatTacnih=0;
      int inx=-1;
+     String nazivKv = new String();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
 
 
         Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
+        nazivKv=kviz.getNaziv();
         zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
         zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
         zaFragInfo.putInt("broj_tacnih", brojTacnih);
@@ -83,44 +85,56 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
 
     @Override
     public void updateByAction(boolean tacno) {
-      odgovorenaPitanja.add(preostalaPitanja.get(inx));
-      preostalaPitanja.remove(inx);
-      if (tacno) {
-          brojTacnih++;
-          System.out.println("!!!!!!");
-      }
-      procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
-
-        int a=-1;
-        if (!preostalaPitanja.isEmpty()) {
-            a = getRandomIndex(preostalaPitanja.size());
-            inx=a;
-        }
-        else finish ();
-
         InformacijeFrag infoFrag= new InformacijeFrag();
         PitanjeFrag pitFrag= new PitanjeFrag();
-
         Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
-        zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
-        zaFragInfo.putInt("broj_tacnih", brojTacnih);
-        //if (preostalaPitanja.size()==0) finish();
-        if (preostalaPitanja.size()==0) {
+        zaFragInfo.putString("naziv_kviza", nazivKv);
 
-            Intent x= new Intent(IgrajKvizAkt.this, KvizoviAkt.class);
-            finish();
-            startActivity(x);
+        if (preostalaPitanja.size()>1) {
+            odgovorenaPitanja.add(preostalaPitanja.get(inx));
+            preostalaPitanja.remove(inx);
+            inx = getRandomIndex(preostalaPitanja.size());
         }
-        else {
-            zaFragPit.putSerializable("pitanja", preostalaPitanja.get(a));
+        else if (preostalaPitanja.size()==1) {
+            odgovorenaPitanja.add(preostalaPitanja.get(0));
+            preostalaPitanja.remove(0);
+            inx =0;
+        }
+        if (preostalaPitanja.size()>=1) {
+            if (tacno) brojTacnih++;
+            procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
+
+            zaFragPit.putSerializable("pitanja", preostalaPitanja.get(inx));
+
+            zaFragInfo.putInt("broj_tacnih", brojTacnih);
             zaFragInfo.putInt("broj_preostalih", preostalaPitanja.size());
+            zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
+            zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
 
-            infoFrag.setArguments(zaFragInfo);
-            pitFrag.setArguments(zaFragPit);
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag, infoFrag.getTag()).commit();
-            fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag, infoFrag.getTag()).commit();
         }
+       else if (preostalaPitanja.size()==0) {
+
+            zaFragPit.putSerializable("pitanja", null);
+            procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
+            zaFragInfo.putInt("broj_preostalih",0);
+            if (tacno) brojTacnih++;
+            zaFragInfo.putInt("broj_tacnih", brojTacnih);
+            zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
+        }
+        infoFrag.setArguments(zaFragInfo);
+        pitFrag.setArguments(zaFragPit);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag, infoFrag.getTag()).commit();
+        fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag, infoFrag.getTag()).commit();
+    }
+
+    @Override
+    public void buttonClick ( ) {
+        Intent zavrsi = getIntent();
+        setResult(32000, zavrsi);
+        finish();
+
     }
 }

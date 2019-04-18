@@ -116,7 +116,7 @@ public class PitanjeFragAdapter extends  BaseAdapter implements View.OnClickList
 
             tempValues=null;
             tempValues = ( String) data.get( position );
-            System.out.println(PitanjeFrag.pozicijaTacnog + "-----------ADADADA");
+
            if (poz!=-1) {
               // int zelena= ContextCompat.getColor()
                if (poz==position) vi.setBackgroundColor(Color.parseColor("#7FFF00"));
