@@ -42,7 +42,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
          //prekopirajPitanja(kviz.getPitanja());
           preostalaPitanja= prekopirajPitanja(kviz.getPitanja());
           int a=-1;
-          if (!preostalaPitanja.isEmpty()) {
+          if ( preostalaPitanja!= null && !preostalaPitanja.isEmpty()) {
               a = getRandomIndex(preostalaPitanja.size());
               inx=a;
           }
