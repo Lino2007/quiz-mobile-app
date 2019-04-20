@@ -1,7 +1,9 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 
@@ -17,6 +20,8 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.MainListAdapter;
+import ba.unsa.etf.rma.fragmenti.DetailFrag;
+import ba.unsa.etf.rma.fragmenti.ListaFrag;
 import ba.unsa.etf.rma.klase.*;
 
 
@@ -31,53 +36,74 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     public MainListAdapter mainListAdapter = null;
     public static ArrayList<Kviz> listaKvizova = new ArrayList<>();
     private Spinner spinner;
+    public static int jedinica=1;
+    private FrameLayout detail, lista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         trenutnaKategorija = "Svi";
-        popuni();
+      if(jedinica==1)  popuni();
+          jedinica--;
+
 
         kvizoviAkt = this;
         Resources res = getResources();
         spinner = (Spinner) findViewById(R.id.spPostojeceKategorije);
         mainList = (ListView) findViewById(R.id.lvKvizovi);
+        Configuration config= getResources().getConfiguration();
 
+        FragmentManager fragment=getSupportFragmentManager();
+        detail= (FrameLayout) findViewById(R.id.detailPlace);
+        lista= (FrameLayout) findViewById(R.id.listPlace);
 
+        if (config.orientation== Configuration.ORIENTATION_PORTRAIT) {
 
-        spinner.setOnItemSelectedListener(this);
-        final ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
-        mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, res);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
-        mainList.setAdapter(mainListAdapter);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(dataAdapter);
-        spinner.setSelection(0);
+            spinner.setOnItemSelectedListener(this);
+            final ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
+            mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, res);
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
+            mainList.setAdapter(mainListAdapter);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(dataAdapter);
+            spinner.setSelection(0);
 
-        mainList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-                dugiKlik(pos);
-                return true;
-            }
-        });
+            mainList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+                    dugiKlik(pos);
+                    return true;
+                }
+            });
 
-      mainList.setOnItemClickListener( new AdapterView.OnItemClickListener() {
-              @Override
-        public void onItemClick(AdapterView<?> parent, View view,
-        int position, long id) {
-                  if (position!= odabraniKvizovi.size()-1) {
-                      Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
-                      newIntent.putExtra ("kviz", (Serializable) odabraniKvizovi.get(position));
-                      KvizoviAkt.this.startActivityForResult(newIntent, 32000);
-                      //Poziv igrajkvizakt
-                  }
-              }
+            mainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    if (position != odabraniKvizovi.size() - 1) {
+                        Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
+                        newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(position));
+                        KvizoviAkt.this.startActivityForResult(newIntent, 32000);
+                        //Poziv igrajkvizakt
+                    }
+                }
 
-        });
+            });
+
+        }
+        else {
+     //       fragment.
+            ListaFrag lf= new ListaFrag();
+            DetailFrag df= new DetailFrag();
+
+            fragment.beginTransaction().replace(R.id.listPlace, lf, lf.getTag()).commit();
+           fragment.beginTransaction().replace(R.id.detailPlace , df , df.getTag()).commit();
+        }
 
     }
+
+
 
     public void setTrenutnaKategorija(String trenutnaKategorija) {
         this.trenutnaKategorija = trenutnaKategorija;
@@ -150,7 +176,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         b.add(new Pitanje ("Pitanje 4", "BPitanje 4?", null, null));
         listaKvizova.add (new Kviz ("Poznavanje dijelova", a, prva));
         listaKvizova.add (new Kviz ("Najpoznatiji motori", b, druga));
-        listaKvizova.add (new Kviz ("Toyota", b, prva));
+        listaKvizova.add (new Kviz ("Toyota", a, prva));
         listaKvizova.add (new Kviz ("Kawasaki", a, druga));
         listaKvizova.add (new Kviz ("airbus", b, treca));
 
