@@ -178,20 +178,21 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         a.add(new Pitanje ("Pitanje 2", "Pitanje 2?", odgov2.get(0), odgov2));
         a.add(new Pitanje ("Pitanje 3", "Pitanje 3?", odgov.get(0), odgov));
         a.add(new Pitanje ("Pitanje 4", "Pitanje 4?", odgov2.get(0), odgov2));
-      b.add(new Pitanje ("Pitanje 1", "BPitanje 1?", null, null));
-        b.add(new Pitanje ("Pitanje 2", "BPitanje 2?", null, null));
-        b.add(new Pitanje ("Pitanje 3", "BPitanje 3?", null, null));
-        b.add(new Pitanje ("Pitanje 4", "BPitanje 4?", null, null));
+      b.add(new Pitanje ("Pitanje 1", "BPitanje 1?", odgov2.get(0), odgov2));
+        b.add(new Pitanje ("Pitanje 2", "BPitanje 2?", odgov2.get(0), odgov2));
+        b.add(new Pitanje ("Pitanje 3", "BPitanje 3?", odgov2.get(0), odgov2));
+        b.add(new Pitanje ("Pitanje 4", "BPitanje 4?", odgov2.get(0), odgov2));
         listaKvizova.add (new Kviz ("Poznavanje dijelova", a, prva));
         listaKvizova.add (new Kviz ("Najpoznatiji motori", b, druga));
         listaKvizova.add (new Kviz ("Toyota", a, prva));
         listaKvizova.add (new Kviz ("Kawasaki", a, druga));
         listaKvizova.add (new Kviz ("airbus", b, treca));
+        listaKvizova.add (new Kviz ("airbusss", b, druga));
 
 
-        if (listaKvizova.isEmpty()) {
+      //  if (listaKvizova.isEmpty()) {
             listaKvizova.add(new Kviz(null, null, null));
-        }
+      //  }
         odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
 
     }
@@ -283,6 +284,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         if (resultCode == -32) {
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
+            System.out.println(novaPitanja.size() +"-----------------------------------------------------------------------------"); //////////////////////
             novaPitanja.remove(novaPitanja.size() - 1);
             listaKvizova.remove(listaKvizova.size() - 1);
             Kviz noviKviz = null;
@@ -332,7 +334,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             }
         }
 
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
     }
 
@@ -389,8 +390,8 @@ if (isItPortrait())     spinner.setAdapter(dataAdapter);
     }
 
     @Override
-    public void editKviz(int i) {
-
+    public void editKviz() {
+          filterList(0);
     }
 
     @Override

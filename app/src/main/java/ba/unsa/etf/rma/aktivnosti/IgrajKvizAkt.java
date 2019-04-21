@@ -38,25 +38,33 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         InformacijeFrag infoFrag= new InformacijeFrag();
         PitanjeFrag pitFrag= new PitanjeFrag();
 
+        Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
          kviz= (Kviz) getIntent().getSerializableExtra("kviz");
          //prekopirajPitanja(kviz.getPitanja());
           preostalaPitanja= prekopirajPitanja(kviz.getPitanja());
+
           int a=-1;
           if ( preostalaPitanja!= null && !preostalaPitanja.isEmpty()) {
               a = getRandomIndex(preostalaPitanja.size());
               inx=a;
           }
-          else finish ();
+          else {
+
+          }
 
 
-        Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
         nazivKv=kviz.getNaziv();
         zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
         zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
         zaFragInfo.putInt("broj_tacnih", brojTacnih);
-        zaFragPit.putSerializable("pitanja", preostalaPitanja.get(a));
+        if (preostalaPitanja==null) {  zaFragPit.putSerializable("pitanja", null);
+            zaFragInfo.putInt ("broj_preostalih", 0);}
+      else {
+            zaFragPit.putSerializable("pitanja", preostalaPitanja.get(a));
+            zaFragInfo.putInt ("broj_preostalih", preostalaPitanja.size());
+        }
 
-     zaFragInfo.putInt ("broj_preostalih", preostalaPitanja.size());
+
         infoFrag.setArguments(zaFragInfo);
         pitFrag.setArguments(zaFragPit);
 
@@ -114,11 +122,11 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
 
         }
        else if (preostalaPitanja.size()==0) {
-
+            if (tacno) brojTacnih++;
             zaFragPit.putSerializable("pitanja", null);
             procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
             zaFragInfo.putInt("broj_preostalih",0);
-            if (tacno) brojTacnih++;
+
             zaFragInfo.putInt("broj_tacnih", brojTacnih);
             zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
         }

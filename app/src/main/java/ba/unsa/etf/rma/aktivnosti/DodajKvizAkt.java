@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
@@ -372,7 +373,9 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         catch (Exception e) {
             System.out.println("Nesto nije uredu sa fajlom");
             System.out.println("Podaci o problemu: "  +  e);
+
         }
+
 
         if (parsedString.isEmpty())  return ;
         String testStr= new String (parsedString);
@@ -401,7 +404,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             brPitanja=Integer.parseInt(prviRed[2]);
         }
         catch (Exception e){
-            System.out.println("Nesto nije uredu sa prvim redom");
+            pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!" );
             return ;
         }
         int index= listaKvizova.indexOf(prviRed[0]);
@@ -429,12 +432,12 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
             String[] ostali= parsedList[i].split(",");
             if (ostali.length<4) {
-                System.out.println("Nesto nije uredu sa odgovorima");
+                pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!" );
                 isItOkay=false;
                 break;
             }
             if (validPitanja!=null && validPitanja.indexOf(ostali[0])!=-1) {
-                System.out.println("Pitanja nisu jedinstvena!");
+                pozoviAlert("Greska pri importu", "Kviz nije ispravan postoje dva pitanja sa istim nazivom!" );
                 isItOkay=false;
                 break;
             }
@@ -442,7 +445,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 brojOdgovora= Integer.parseInt(ostali[1]);
             }
             catch (Exception e) {
-                pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan index tačnog odgovora!");
+                pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan broj odgovora!");
                 isItOkay=false;
                 break;
             }
@@ -455,7 +458,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                   tacan = Integer.parseInt(ostali[2]);
               }
               catch (Exception e) {
-                  System.out.println("Broj tacnih je neispravan!");
                   pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan index tačnog odgovora!");
                   isItOkay=false;
                   break;
@@ -470,7 +472,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
               }
 
               validPitanja.add (ostali[0]);
-              zaPitanja.add (new Pitanje (ostali[0], ostali[0], tacanOdgovor, zaOdgovore));
+              zaPitanja.add (new Pitanje (ostali[0], ostali[0], tacanOdgovor, copy(zaOdgovore)));
+            System.out.println(zaOdgovore.size() + "----------------------------------------------------------------------------------------------------"); ////////////////////////////
               zaOdgovore.clear();
               tacan=-1;
               tacanOdgovor=null;
@@ -490,8 +493,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         if (isItOkay) {
                 dkaSpinner.setSelection(indKat);
-               kopijaPitanjaKviza= zaPitanja;
+                kopijaPitanjaKviza.clear();
+               kopijaPitanjaKviza= kopirajPitanja(kopijaPitanjaKviza,zaPitanja);
                kopijaPitanjaKviza.add (null);
+            System.out.println(kopijaPitanjaKviza.size());
                 pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
                 listaPitanja.setAdapter(pitanjaAdapter);
                 listaMogucih.setAdapter(null);
@@ -500,5 +505,14 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
 
 
+    }
+
+    private ArrayList<String> copy (ArrayList<String> base) {
+        if (base.size()==0) return null;
+        ArrayList<String> izlaz= new ArrayList<>();
+        for (String x: base) {
+            izlaz.add (x);
+        }
+        return izlaz;
     }
 }

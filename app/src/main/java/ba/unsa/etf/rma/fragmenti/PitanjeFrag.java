@@ -55,7 +55,7 @@ public class PitanjeFrag extends Fragment {
         Bundle bundleObj= this.getArguments();
         pitanja=  (Pitanje) bundleObj.getSerializable("pitanja");
         listaOdgovora.setEnabled(true);
-        pitanja=null;
+
         if (pitanja==null ) {
             listaOdgovora.setAdapter(null);
             nazivPitanja.setText("Kviz je zavrsen");

@@ -14,6 +14,7 @@ import android.widget.GridView;
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.GridViewAdapter;
 import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
+import ba.unsa.etf.rma.klase.Kviz;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +26,7 @@ public class DetailFrag extends Fragment  {
 
     private Activity activity;
     ListFunction instanca;
+    static boolean x= false;
 
     public DetailFrag() {
         // Required empty public constructor
@@ -37,9 +39,10 @@ public class DetailFrag extends Fragment  {
 
         View iv=inflater.inflate(R.layout.fragment_detail, container, false);
         grid= (GridView) iv.findViewById(R.id.gridKvizovi);
+        System.out.println(KvizoviAkt.listaKvizova.size() + "--------------------");
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
         grid.setAdapter(gridViewAdapter);
-        System.out.println("xxxxxxxxxxxxxx");
+
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -53,10 +56,8 @@ public class DetailFrag extends Fragment  {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
                 instanca.addKviz(pos);
-
-                gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
-                grid.setAdapter(gridViewAdapter);
-
+                if (pos== KvizoviAkt.odabraniKvizovi.size()-1) x=true;
+                instanca.editKviz();
                 return true;
             }
         });
@@ -67,14 +68,16 @@ public class DetailFrag extends Fragment  {
 
     @Override
     public void onResume() {
+        if (x) instanca.editKviz();
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
         grid.setAdapter(gridViewAdapter);
+        x=false;
         super.onResume();
     }
 
     public interface ListFunction {
         public void addKviz (int i);
-        public void editKviz (int i);
+        public void editKviz ();
         public void playKviz (int i);
     }
 
