@@ -136,8 +136,13 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
 
         FragmentManager fragmentManager = getSupportFragmentManager();
    //finalpush
+        try {
             fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag, infoFrag.getTag()).commit();
             fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag, infoFrag.getTag()).commit();
+        }
+        catch (Exception e) {
+            buttonClick();
+        }
 
 
     }

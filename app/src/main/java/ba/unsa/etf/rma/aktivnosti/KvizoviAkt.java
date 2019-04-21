@@ -159,7 +159,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     public void popuni() {
         categories.add("Svi");
   //    Ako zelite eksperimentirati sa vec unesenim podatcima
-   /*   Kategorija prva= new Kategorija("automobili", "1");
+  /*   Kategorija prva= new Kategorija("automobili", "1");
     Kategorija druga= new Kategorija("motori", "2");
         Kategorija treca= new Kategorija("avioni", "3");
 
@@ -187,10 +187,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         listaKvizova.add (new Kviz ("Toyota", a, prva));
         listaKvizova.add (new Kviz ("Kawasaki", a, druga));
         listaKvizova.add (new Kviz ("airbus", b, treca));
-        listaKvizova.add (new Kviz ("airbusss", b, druga));
-  */
+        listaKvizova.add (new Kviz ("airbusss", b, druga)); */
 
-     if (listaKvizova.isEmpty()) {
+    if (listaKvizova.isEmpty()) {
             listaKvizova.add(new Kviz(null, null, null));
       }
         odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
@@ -321,7 +320,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         }
        else if (resultCode == 9000) {
-            System.out.println("-------------------------------------------");
+
              refreshCategories();
         }
         else if (resultCode == 32000) {
