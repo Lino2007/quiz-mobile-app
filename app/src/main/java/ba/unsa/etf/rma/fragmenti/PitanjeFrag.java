@@ -75,16 +75,17 @@ public class PitanjeFrag extends Fragment {
                 kliknutaPozicija=position;
                 odgAdapter = new PitanjeFragAdapter(getActivity(),  som,getResources(), pozicijaTacnog , kliknutaPozicija);
                 listaOdgovora.setAdapter(odgAdapter);
-
+                listaOdgovora.setEnabled(false);
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+     // nazivIkone.setEnabled(false);
 
-                        listaOdgovora.setEnabled(false);
                      /*  if(!(nazivPitanja.getText().equals("Kviz je zavrsen")))  */ instanca.updateByAction( pozicijaTacnog==kliknutaPozicija);
                         pozicijaTacnog=kliknutaPozicija=-1;
+                        listaOdgovora.setEnabled(true);
 
                     }
                 }, 2000);

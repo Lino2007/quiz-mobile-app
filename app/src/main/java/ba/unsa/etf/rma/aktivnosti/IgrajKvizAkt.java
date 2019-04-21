@@ -111,7 +111,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         if (preostalaPitanja.size()>=1) {
             if (tacno) brojTacnih++;
             procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
-
+            procenatTacnih=Math.round(procenatTacnih*10000.0)/10000.0;
             zaFragPit.putSerializable("pitanja", preostalaPitanja.get(inx));
 
             zaFragInfo.putInt("broj_tacnih", brojTacnih);
@@ -125,6 +125,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
             if (tacno) brojTacnih++;
             zaFragPit.putSerializable("pitanja", null);
             procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
+            procenatTacnih=Math.round(procenatTacnih*10000.0)/10000.0;
             zaFragInfo.putInt("broj_preostalih",0);
 
             zaFragInfo.putInt("broj_tacnih", brojTacnih);

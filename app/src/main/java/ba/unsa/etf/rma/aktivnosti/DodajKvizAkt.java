@@ -163,6 +163,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 } else if (position == kopijaPitanjaKviza.size() - 1) {
                     ArrayList<String> zaValidaciju = new ArrayList<>();
                     Intent dodajPitanje = new Intent(DodajKvizAkt.this, DodajPitanjeAkt.class);
+                    System.out.println(kopijaPitanjaKviza.size()+ "_____________________________");
                     for (Pitanje x : kopijaMogucihPitanja) {
                         zaValidaciju.add(x.getNaziv());
                     }
@@ -495,7 +496,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 dkaSpinner.setSelection(indKat);
                 kopijaPitanjaKviza.clear();
                kopijaPitanjaKviza= kopirajPitanja(kopijaPitanjaKviza,zaPitanja);
-               kopijaPitanjaKviza.add (null);
+               kopijaPitanjaKviza.add (new Pitanje (null, null, null, null));
                 pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
                 listaPitanja.setAdapter(pitanjaAdapter);
                 listaMogucih.setAdapter(null);
