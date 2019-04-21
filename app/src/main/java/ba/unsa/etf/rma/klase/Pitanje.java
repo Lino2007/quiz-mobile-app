@@ -51,6 +51,7 @@ public class Pitanje implements Serializable  {
     }
 
     public ArrayList<String> dajRandomOdgovore() {
+        if (getOdgovori()==null) return null;
         if (getOdgovori().size()==0) return null;
         else if (getOdgovori().size()==1) return odgovori;
         Collections.shuffle(odgovori);
