@@ -9,6 +9,11 @@
         android:id="@+id/labelNazivKviza"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:textSize="13dp"
+        android:textStyle="bold"
+        android:textColor= "#0655C0"
         android:text="Naziv kviza: " />
 
     <TextView
@@ -16,6 +21,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="50dp"
+        android:layout_marginStart="5dp"
+        android:textSize="13dp"
+        android:textStyle="bold"
+        android:textColor= "#0655C0"
         android:text="Broj tacnih pitanja: " />
 
     <TextView
@@ -23,6 +32,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="70dp"
+        android:layout_marginStart="5dp"
+        android:textSize="13dp"
+        android:textStyle="bold"
+        android:textColor= "#0655C0"
         android:text="Broj preostalih pitanja: " />
 
     <TextView
@@ -30,7 +43,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="30dp"
-        android:text="Procenat tacno odgovorenih: " />
+        android:layout_marginStart="5dp"
+        android:textSize="13dp"
+        android:textStyle="bold"
+        android:textColor= "#0655C0"
+        android:text="Procenat tacno odgovorenih: "
+   />
 
 
 
@@ -39,6 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="150dp"
+        android:layout_marginTop="10dp"
         android:text="blank" />
 
     <TextView
@@ -69,9 +88,11 @@
         android:id="@+id/btnKraj"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="110dp"
         android:layout_marginStart="150dp"
-        android:text="Zavrsi kviz" />
+        android:text="Zavrsi kviz"
+        android:textColor="#176F03"
+        android:background="@drawable/edit_text_border"/>
 
 
 </FrameLayout>

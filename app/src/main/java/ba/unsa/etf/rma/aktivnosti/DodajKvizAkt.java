@@ -473,7 +473,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
               validPitanja.add (ostali[0]);
               zaPitanja.add (new Pitanje (ostali[0], ostali[0], tacanOdgovor, copy(zaOdgovore)));
-            System.out.println(zaOdgovore.size() + "----------------------------------------------------------------------------------------------------"); ////////////////////////////
+
               zaOdgovore.clear();
               tacan=-1;
               tacanOdgovor=null;
@@ -496,7 +496,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 kopijaPitanjaKviza.clear();
                kopijaPitanjaKviza= kopirajPitanja(kopijaPitanjaKviza,zaPitanja);
                kopijaPitanjaKviza.add (null);
-            System.out.println(kopijaPitanjaKviza.size());
                 pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
                 listaPitanja.setAdapter(pitanjaAdapter);
                 listaMogucih.setAdapter(null);

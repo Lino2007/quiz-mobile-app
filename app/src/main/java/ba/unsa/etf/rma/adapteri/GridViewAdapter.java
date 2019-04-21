@@ -142,6 +142,7 @@ public class GridViewAdapter extends BaseAdapter  implements /*View.OnClickListe
                             if (value != -1) {
                                 holder.dot.setImageDrawable(iconHelper.getIcon(value).getDrawable(activity.getApplicationContext()));
                             }
+
                         }
                     });
 

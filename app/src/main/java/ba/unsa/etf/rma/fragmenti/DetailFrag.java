@@ -4,6 +4,7 @@ package ba.unsa.etf.rma.fragmenti;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ public class DetailFrag extends Fragment  {
     private Activity activity;
     ListFunction instanca;
     static boolean x= false;
+    static boolean refresh=false;
 
     public DetailFrag() {
         // Required empty public constructor
@@ -39,7 +41,7 @@ public class DetailFrag extends Fragment  {
 
         View iv=inflater.inflate(R.layout.fragment_detail, container, false);
         grid= (GridView) iv.findViewById(R.id.gridKvizovi);
-        System.out.println(KvizoviAkt.listaKvizova.size() + "--------------------");
+
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
         grid.setAdapter(gridViewAdapter);
 
@@ -56,7 +58,10 @@ public class DetailFrag extends Fragment  {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
                 instanca.addKviz(pos);
-                if (pos== KvizoviAkt.odabraniKvizovi.size()-1) x=true;
+                if (pos== KvizoviAkt.odabraniKvizovi.size()-1) {
+                    x = true;
+                    refresh=true;
+                }
                 instanca.editKviz();
                 return true;
             }
@@ -72,8 +77,11 @@ public class DetailFrag extends Fragment  {
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
         grid.setAdapter(gridViewAdapter);
         x=false;
+        refresh=false;
         super.onResume();
+
     }
+
 
     public interface ListFunction {
         public void addKviz (int i);

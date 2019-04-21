@@ -159,7 +159,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     public void popuni() {
         categories.add("Svi");
   //    Ako zelite eksperimentirati sa vec unesenim podatcima
-        Kategorija prva= new Kategorija("automobili", "1");
+  /*      Kategorija prva= new Kategorija("automobili", "1");
     Kategorija druga= new Kategorija("motori", "2");
         Kategorija treca= new Kategorija("avioni", "3");
 
@@ -189,10 +189,10 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         listaKvizova.add (new Kviz ("airbus", b, treca));
         listaKvizova.add (new Kviz ("airbusss", b, druga));
 
-
-      //  if (listaKvizova.isEmpty()) {
+     */
+      if (listaKvizova.isEmpty()) {
             listaKvizova.add(new Kviz(null, null, null));
-      //  }
+       }
         odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
 
     }
@@ -284,7 +284,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         if (resultCode == -32) {
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
-            System.out.println(novaPitanja.size() +"-----------------------------------------------------------------------------"); //////////////////////
+
             novaPitanja.remove(novaPitanja.size() - 1);
             listaKvizova.remove(listaKvizova.size() - 1);
             Kviz noviKviz = null;
