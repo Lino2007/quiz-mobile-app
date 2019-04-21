@@ -392,7 +392,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         if (parsedList==null || parsedList.length==0) return ;
         String [] prviRed= parsedList[0].split(",");
         if (prviRed.length!=3) {
-            System.out.println("Nesto nije uredu");
+            pozoviAlert("Greska pri importu", "Datoteka kviza kojeg importujete nema ispravan format!" );
             return ;
         }
         String nazivKviza, kategorija;

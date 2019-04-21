@@ -58,7 +58,7 @@ public class PitanjeFrag extends Fragment {
 
         if (pitanja==null ) {
             listaOdgovora.setAdapter(null);
-            nazivPitanja.setText("Kviz je zavrsen");
+            nazivPitanja.setText("Kviz je zavrsen!");
         }
         else {
             som = pitanja.dajRandomOdgovore();
