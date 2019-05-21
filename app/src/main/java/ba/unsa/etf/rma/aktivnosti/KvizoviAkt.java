@@ -1,13 +1,15 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.support.v4.app.Fragment;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -16,17 +18,36 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential.*;
+import com.google.common.collect.Lists;
+
+
+//import com.google.api.services.sqladmin.SQLAdminScopes;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.MainListAdapter;
 import ba.unsa.etf.rma.fragmenti.DetailFrag;
 import ba.unsa.etf.rma.fragmenti.ListaFrag;
-import ba.unsa.etf.rma.klase.*;
+import ba.unsa.etf.rma.klase.Firebase;
+import ba.unsa.etf.rma.klase.Kategorija;
+import ba.unsa.etf.rma.klase.Kviz;
+import ba.unsa.etf.rma.klase.Pitanje;
 
 
 public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction {
+
+
+
+
+
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
@@ -41,11 +62,26 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     private FrameLayout detail, lista;
     Activity refreshActivity= null;
     TestRefresh instanca;
+  public static String TOKEN=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        try {
+          ugrabiToken();
+
+        //    credential = ugrabiToken();
+
+        }
+        catch (Exception e) {
+
+        }
+
+        System.out.println(TOKEN  + "!!!!!!!!!!!!!!!!!!!!");
+
         trenutnaKategorija = "Svi";
       if(jedinica==1)  popuni();
           jedinica--;
@@ -105,6 +141,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         }
 
     }
+
 
 
 
@@ -395,6 +432,11 @@ if (isItPortrait())     spinner.setAdapter(dataAdapter);
             //Poziv igrajkvizakt
         }
 
+    }
+
+
+    private void ugrabiToken() throws Exception {
+        new Firebase(this).execute(null,null);
     }
 
     public interface TestRefresh {
