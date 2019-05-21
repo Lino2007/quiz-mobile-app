@@ -31,7 +31,6 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_igraj_kviz_akt);
-
         zaPit= (FrameLayout) findViewById(R.id.pitanjePlace);
         zaInfo= (FrameLayout) findViewById(R.id.informacijePlace);
         //init frags

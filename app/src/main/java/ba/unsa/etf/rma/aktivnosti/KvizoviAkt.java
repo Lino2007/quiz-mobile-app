@@ -73,14 +73,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         try {
           ugrabiToken();
 
-        //    credential = ugrabiToken();
-
         }
         catch (Exception e) {
-
+            System.out.println("Nesto nije uredu sa pristupom tokenu!");
         }
 
-        System.out.println(TOKEN  + "!!!!!!!!!!!!!!!!!!!!");
+
 
         trenutnaKategorija = "Svi";
       if(jedinica==1)  popuni();

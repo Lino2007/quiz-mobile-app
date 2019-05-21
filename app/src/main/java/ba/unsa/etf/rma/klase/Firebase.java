@@ -28,7 +28,6 @@ public class Firebase extends AsyncTask {
         GoogleCredential credentials=null;
 
 
-        System.out.println(context.getResources() + "+++++++++++++");
 
         try
 
@@ -50,7 +49,7 @@ public class Firebase extends AsyncTask {
             System.out.println(e + "Nesto nije uredu sa tokenom.");
         }
         KvizoviAkt.TOKEN= credentials.getAccessToken();
-        System.out.println("USAO!!!");
+
         return null;
     }
 
