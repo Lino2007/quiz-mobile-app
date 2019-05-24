@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.OdgovoriListAdapter;
+import ba.unsa.etf.rma.klase.TestFirebaseKlasa;
 
 public class DodajPitanjeAkt extends AppCompatActivity {
 
@@ -45,6 +46,8 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         odgovoriAdapter = new OdgovoriListAdapter(this, listaOdgovora, getResources());
 
         if (listaOdgovora == null) lvOdgovori.setAdapter(null);
+
+        new TestFirebaseKlasa().execute(null, null);
 
 
         dodajTacan.setOnClickListener(new View.OnClickListener() {

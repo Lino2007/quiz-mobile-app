@@ -47,7 +47,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
 
-
+   public enum OCstatus {UNDEFINED ,ADDPITANJE, ADDKVIZ, EDIT}
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
@@ -175,7 +175,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 }
             }
             setTrenutnaKategorija(item);
-            System.out.println(listaKvizova.size());
+
             odabraniKvizovi.add(listaKvizova.get(listaKvizova.size() - 1));
         if (config.orientation== Configuration.ORIENTATION_PORTRAIT) {
             mainListAdapter = new MainListAdapter(kvizoviAkt, odabraniKvizovi, getResources());
@@ -325,13 +325,18 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             if ((data.getExtras().getInt("kategorija") - 1) != -1) {
                 noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt("kategorija") - 1));
             } else noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, null);
+
+            new Firebase(this).execute(OCstatus.ADDKVIZ, noviKviz); ///////////////////////////
+
             dodajKviz(noviKviz);
             refreshCategories();
             listaKvizova.add(new Kviz(null, null, null));
             if (isItPortrait()) {
                 spinner.setSelection(0);
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
-            mainList.setAdapter(mainListAdapter); }
+            mainList.setAdapter(mainListAdapter);
+
+            }
 
         } else if (resultCode == -133) {
             Bundle bundleOb = data.getExtras();
@@ -434,7 +439,7 @@ if (isItPortrait())     spinner.setAdapter(dataAdapter);
 
 
     private void ugrabiToken() throws Exception {
-        new Firebase(this).execute(null,null);
+        new Firebase(this).execute(OCstatus.UNDEFINED,-1);
     }
 
     public interface TestRefresh {
