@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
+import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.adapteri.MogucaListAdapter;
@@ -35,7 +35,7 @@ import ba.unsa.etf.rma.adapteri.PitanjaListAdapter;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 
-public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Firebase.UgrabiMoguca {
     private EditText editText;
     private ListView listaPitanja, listaMogucih;
     private Spinner dkaSpinner;
@@ -91,6 +91,12 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             pitanjaKviza.add(new Pitanje(null, null, null, null));
             kopijaPitanjaKviza = kopirajPitanja(kopijaPitanjaKviza, pitanjaKviza);
         }
+        //new Firebase(this).execute(KvizoviAkt.OCstatus.GET_MOGUCA);
+
+        System.out.println( Firebase.listaMogucih.size() + "*****************************UWOT*********************************************"  + kopijaMogucihPitanja.size());
+        kopijaMogucihPitanja = kopirajPitanja(kopijaMogucihPitanja, Firebase.listaMogucih);
+
+
 
         mogucaAdapter = new MogucaListAdapter(this, kopijaMogucihPitanja, getResources());
         pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
@@ -117,6 +123,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                     addKviz.putExtra("kategorija", dkaSpinner.getSelectedItemPosition());
                     addKviz.putExtra("naziv", editText.getText().toString());
                     setResult(-32, addKviz);
+
                     finish();
                 } else if (pozicija != -1 && valid == true) {
                     Bundle b = new Bundle();
@@ -142,6 +149,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                     kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size() - 1);
                 kopijaPitanjaKviza.add(kopijaMogucihPitanja.get(position));
                 kopijaMogucihPitanja.remove(position);
+
                 refresh();
                 mogucaAdapter = new MogucaListAdapter(dkaAkk, kopijaMogucihPitanja, getResources());
                 if (kopijaMogucihPitanja.size() == 0) listaMogucih.setAdapter(null);
@@ -163,7 +171,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 } else if (position == kopijaPitanjaKviza.size() - 1) {
                     ArrayList<String> zaValidaciju = new ArrayList<>();
                     Intent dodajPitanje = new Intent(DodajKvizAkt.this, DodajPitanjeAkt.class);
-                    System.out.println(kopijaPitanjaKviza.size()+ "_____________________________");
+
                     for (Pitanje x : kopijaMogucihPitanja) {
                         zaValidaciju.add(x.getNaziv());
                     }
@@ -221,6 +229,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
     void validacija() {
+
         boolean aPoint = false, bPoint = false, cPoint = false;
         if (naziv_kviza == null) {
             if (editText.getText().length() == 0)
@@ -268,6 +277,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             }
 
         }
+
     }
 
     void refresh() {
@@ -307,6 +317,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         if (resultCode == (-200)) {
             kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size() - 1);
             kopijaPitanjaKviza.add(new Pitanje(data.getStringExtra("naziv"), data.getStringExtra("naziv"), data.getStringExtra("tacan"), data.getStringArrayListExtra("pitanje")));
+            new Firebase(this).execute(KvizoviAkt.OCstatus.ADD_PITANJE, kopijaPitanjaKviza.get(kopijaPitanjaKviza.size()-1));
+
             refresh();
             listaPitanja.setAdapter(pitanjaAdapter);
         } else if (resultCode == (-100)) {
@@ -514,5 +526,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             izlaz.add (x);
         }
         return izlaz;
+    }
+
+    @Override
+    public void poziv() {
+
     }
 }

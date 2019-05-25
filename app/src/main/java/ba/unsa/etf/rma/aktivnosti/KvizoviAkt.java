@@ -1,15 +1,12 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -18,16 +15,8 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential.*;
-import com.google.common.collect.Lists;
 
 
 //import com.google.api.services.sqladmin.SQLAdminScopes;
@@ -47,7 +36,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
 
-   public enum OCstatus {UNDEFINED ,ADDPITANJE, ADDKVIZ, EDIT}
+   public enum OCstatus {UNDEFINED , ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA}
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
@@ -105,10 +94,11 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(dataAdapter);
             spinner.setSelection(0);
-
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
             mainList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+
                     dugiKlik(pos);
                     return true;
                 }
@@ -118,12 +108,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                    if (position != odabraniKvizovi.size() - 1) {
+                  /*  if (position != odabraniKvizovi.size() - 1) {
                         Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
                         newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(position));
                         KvizoviAkt.this.startActivityForResult(newIntent, 32000);
                         //Poziv igrajkvizakt
-                    }
+                    } */
                 }
 
             });
@@ -137,6 +127,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             fragment.beginTransaction().replace(R.id.listPlace, lf, lf.getTag()).commit();
            fragment.beginTransaction().replace(R.id.detailPlace , df , df.getTag()).commit();
         }
+
 
     }
 
@@ -232,6 +223,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     }
 
     private  void dugiKlik (int mPosition) {
+
         if (mPosition == odabraniKvizovi.size() - 1) {
             Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
             dodajIntent.putExtra("poz_kviza", -1);
@@ -313,7 +305,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //Result_OK oznacava dodavanje novog kviza, dok FIRST_USER azuriranje
+        //-32 oznacava dodavanje novog kviza, dok -133 azuriranje
         //Result kod 9000 oznacava izlazak na back dugme
         if (resultCode == -32) {
             Bundle bundleOb = data.getExtras();
@@ -326,7 +318,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt("kategorija") - 1));
             } else noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, null);
 
-            new Firebase(this).execute(OCstatus.ADDKVIZ, noviKviz); ///////////////////////////
+            new Firebase(this).execute(OCstatus.ADD_KVIZ, noviKviz); ///////////////////////////
 
             dodajKviz(noviKviz);
             refreshCategories();
@@ -337,19 +329,24 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             mainList.setAdapter(mainListAdapter);
 
             }
-
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
         } else if (resultCode == -133) {
+
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
             novaPitanja.remove(novaPitanja.size() - 1);
             int pozicija = data.getExtras().getInt("pozicija");
+            //Stari naziv za azuriranje u bazi
+            String stariNaziv =  odabraniKvizovi.get(pozicija).getNaziv();
             odabraniKvizovi.get(pozicija).setPitanja(novaPitanja);
             odabraniKvizovi.get(pozicija).setNaziv(data.getStringExtra("naziv"));
+
             if ((data.getExtras().getInt("kategorija") - 1) != -1) {
                 odabraniKvizovi.get(pozicija).setKategorija(listaKategorija.get(data.getExtras().getInt("kategorija") - 1));
             } else {
                 odabraniKvizovi.get(pozicija).setKategorija(null);
             }
+            new Firebase(this).execute(OCstatus.EDIT_KVIZ, odabraniKvizovi.get(pozicija), stariNaziv);
             refreshCategories();
 
             if (isItPortrait()) {
@@ -357,8 +354,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
                 mainList.setAdapter(mainListAdapter);
             }
-
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
         }
+
        else if (resultCode == 9000) {
 
              refreshCategories();
