@@ -1,5 +1,7 @@
 package ba.unsa.etf.rma.aktivnosti;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
@@ -17,6 +19,7 @@ import com.maltaisn.icondialog.IconDialog;
 import com.maltaisn.icondialog.IconHelper;
 
 import ba.unsa.etf.rma.R;
+import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kategorija;
 
 public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.Callback {
@@ -56,6 +59,7 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
                 validiraj();
                 if (valid) {
                     KvizoviAkt.listaKategorija.add(new Kategorija(nazivKategorije, ikona));
+                    new Firebase(DodajKategorijuAkt.this.getApplicationContext()).execute (KvizoviAkt.OCstatus.ADD_KAT, new Kategorija(nazivKategorije,ikona));
                     setResult(-100);
                     finish();
                 }
@@ -96,13 +100,20 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
 
                     naziv.setBackgroundColor(Color.parseColor("#E85F41"));
                     naz = false;
-                } /*else if (test.getId().equals(ikona)) {
-                    nazivIkone.setBackgroundColor(Color.parseColor("#E85F41"));
-                    ik = false;
-
-                } */
+                }
             }
-            if (/*!(ik) ||*/ !(naz)) return;
+            if ( !(naz)) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                        .setTitle("Greska pri unosu kategorije")
+                        .setMessage("Unesena kategorija vec postoji!")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert);
+                alertDialogBuilder.show();
+                return;
+            }
             naziv.setBackgroundColor(Color.WHITE);
             nazivIkone.setBackgroundColor(Color.WHITE);
             valid = true;

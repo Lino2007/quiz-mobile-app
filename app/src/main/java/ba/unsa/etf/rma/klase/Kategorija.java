@@ -34,3 +34,4 @@ public class Kategorija implements Serializable {
         return  "Naziv: "+ getNaziv()+ "Id: " + getId();
     }
 }
+

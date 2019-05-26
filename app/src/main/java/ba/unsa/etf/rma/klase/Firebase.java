@@ -18,8 +18,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
@@ -34,11 +37,13 @@ public class Firebase extends AsyncTask {
     private Context context;
     private static final String urlLink ="https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/" ;
     public static ArrayList<Pitanje> listaMogucih = new ArrayList<>();
+    private ArrayList<Kategorija> ucitaneKategorije = new ArrayList<>();
+    private KvizoviAkt.OCstatus globalniStatus = KvizoviAkt.OCstatus.UNDEFINED;
+    public interface ProvjeriStatus{
 
-    public interface UgrabiMoguca{
-        public void poziv();
+        public void dobaviKategorije (ArrayList<Kategorija> kat);
     }
-    private UgrabiMoguca pozivatelj;
+    private ProvjeriStatus pozivatelj;
   /*  public Firebase (UgrabiMoguca poz) {
         pozivatelj=poz;
     } */
@@ -46,6 +51,12 @@ public class Firebase extends AsyncTask {
 
     public Firebase(Context context) {
         this.context = context;
+    }
+
+    public Firebase (KvizoviAkt.OCstatus stat, Context context, ProvjeriStatus pozivatelj) {
+           this.globalniStatus= stat;
+        this.context = context;
+        this.pozivatelj=pozivatelj;
     }
 
     @Override
@@ -78,7 +89,12 @@ public class Firebase extends AsyncTask {
         else if (opcode == KvizoviAkt.OCstatus.EDIT_KVIZ) editKviz(objects);
         else if (opcode == KvizoviAkt.OCstatus.ADD_PITANJE) dodajPitanje(objects);
         else if (opcode == KvizoviAkt.OCstatus.GET_MOGUCA) kreirajListuMogucih();
-
+        else if (opcode == KvizoviAkt.OCstatus.GET_KATEGORIJE) ucitajKategorije();
+        else if (opcode == KvizoviAkt.OCstatus.ADD_KAT)  dodajKategoriju(objects);
+        else if (opcode == KvizoviAkt.OCstatus.GET_DB_CONTENT)  {
+            ucitajKategorije();
+            ucitajKvizove((String) objects[1]);
+        }
 
 
 
@@ -88,11 +104,189 @@ public class Firebase extends AsyncTask {
         return null;
     }
 
+    private void ucitajKvizove (String katStr) {
+        boolean t_signal = false;
+        if (katStr.equals("Svi") )  t_signal=true;
+
+     try {
+            ArrayList<Pitanje> listaPitanjaKviza = new ArrayList<>();
+            URL url = new URL(urlLink +  "Pitanja?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+            System.out.println(url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept","application/json");
+            String content= streamToString( new BufferedReader(new InputStreamReader(connection.getInputStream())));
+            connection.disconnect();
+            JSONObject pitanja = new JSONObject(content);
+            url = new URL(urlLink +  "Kvizovi?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept","application/json");
+            content= streamToString( new BufferedReader(new InputStreamReader(connection.getInputStream())));
+            connection.disconnect();
+            JSONObject kvizovi = new JSONObject(content);
+            JSONArray listaPitanja = pitanja.getJSONArray("documents");
+
+            ArrayList<Pitanje> listaSvihPitanja = new ArrayList<>();
+
+            //grabimo pitanja moguca
+            for (int i =0; i<listaPitanja.length(); i++) {
+                JSONObject jsonPitanje = listaPitanja.getJSONObject(i);
+                jsonPitanje= jsonPitanje.getJSONObject("fields");
+                JSONObject jsonNaziv = jsonPitanje.getJSONObject("naziv");
+                String naziv=jsonNaziv.getString("stringValue");
+
+                JSONObject pozT =  jsonPitanje.getJSONObject("indexTacnog");
+
+                int pozicijaTacnog = pozT.getInt("integerValue");
+                JSONObject pit =   jsonPitanje.getJSONObject("odgovori");
+                JSONObject pit2 = pit.getJSONObject("arrayValue");
+
+
+                JSONArray lista = pit2.getJSONArray("values");
+
+                ArrayList<String> odgovori = new ArrayList<>();
+                for (int j=0 ; j<lista.length(); j++) {
+                    JSONObject arrVal = lista.getJSONObject(j);
+                    odgovori.add (arrVal.getString("stringValue"));
+                }
+
+                listaSvihPitanja.add (new Pitanje (naziv, naziv, odgovori.get(pozicijaTacnog), odgovori ));
+                odgovori.clear();
+            }
+      //   System.out.println(listaSvihPitanja.size() + "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+
+
+            JSONArray listaKvizova = kvizovi.getJSONArray("documents");
+
+            for (int i = 0 ; i<listaKvizova.length(); i++) {
+               listaPitanjaKviza.clear();
+
+                JSONObject jsonObj = listaKvizova.getJSONObject(i);
+
+                jsonObj= jsonObj.getJSONObject("fields");
+                //za naziv
+                JSONObject jsonNaziv = jsonObj.getJSONObject("naziv");
+                String naziv= jsonNaziv.getString("stringValue");
+
+                //za Id kategorije
+                JSONObject jsonKategorija = jsonObj.getJSONObject("idKategorije");
+                String kategorija =  jsonKategorija.getString("stringValue");
+              //  System.out.println(kategorija + "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                Kategorija k = dajKategorijuPoStringu (kategorija);
+
+               // if (k.getNaziv()!= katStr ) continue;
+                jsonObj= jsonObj.getJSONObject("pitanja");
+                jsonObj= jsonObj.getJSONObject("arrayValue");
+                JSONArray lista;
+                try {
+                    lista = jsonObj.getJSONArray("values");
+                }
+                catch (Exception e) {
+
+                    KvizoviAkt.odabraniKvizovi.add (new Kviz (naziv, new ArrayList<Pitanje>(), k));
+                    KvizoviAkt.listaKvizova.add (new Kviz (naziv,  new ArrayList<Pitanje>(), k));
+
+                    continue;
+                }
+
+                for (int j=0 ; j<lista.length(); j++) {
+                    JSONObject arrVal = lista.getJSONObject(j);
+                    String nazivPitanja = arrVal.getString("stringValue");
+
+                    Pitanje p = dajPitanjePoStringu(nazivPitanja,listaSvihPitanja);
+                    System.out.println(nazivPitanja +" | "+p.getNaziv());
+                    listaPitanjaKviza.add (p);
+
+                 //   listaPitanjaKviza.add (arrVal.getString("stringValue"));
+                }
+               ArrayList<Pitanje> zaKv = vratiListuPitanja(listaPitanjaKviza);
+                 KvizoviAkt.odabraniKvizovi.add (new Kviz (naziv, zaKv, k));
+                KvizoviAkt.listaKvizova.add (new Kviz (naziv, zaKv, k));
+            }
+
+
+         //   ArrayList<Pitanje> kopijaListeMogucih = kopiraj(listaMogucih);
+    /*        for (Pitanje x : listaSvihPitanja) {
+                for (String a : listaPitanjaKviza) {
+                    if (a.equals(x.getNaziv()))
+                }
+            }
+            listaMogucih=kopijaListeMogucih;
+           */
+        }
+     catch ( Exception e) {
+         System.out.println("UUUUUUUUUUUUUUU"+ e);
+
+
+     }
+        System.out.println("Izasao");
+    }
+
+    private void dodajKategoriju(Object [] objects) {
+        try {
+            Kategorija kat = (Kategorija) objects[1];
+            String nazivKategorije = kat.getNaziv();
+            String idIkonice = kat.getId();
+
+            String jsonObjekt = "{ \"fields\":{\"naziv\":{\"stringValue\":\"" + nazivKategorije + "\"},\"idIkonice\":{\"integerValue\":\"" + idIkonice  + "\"},}}"  ;
+
+            String linkExtension = "Kategorije?documentId=" + nazivKategorije + "&access_token=";
+            Log.d ("FAZA",  "SLANJE PODATAKA ZAPOCETO!" );
+            URL url = new URL(urlLink + linkExtension +URLEncoder.encode( KvizoviAkt.TOKEN, "UTF-8"));
+            System.out.println(url);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            //Postavka property-a
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept","application/json");
+
+
+            DataOutputStream os = new DataOutputStream(conn.getOutputStream());
+            os.writeBytes(jsonObjekt);
+            try(BufferedReader br = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                System.out.println(response.toString());
+            }
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onPostExecute(Object o) {
         super.onPostExecute(null);
-//          pozivatelj.poziv();
 
+
+    }
+
+    private Pitanje dajPitanjePoStringu (String s, ArrayList<Pitanje> x) {
+        int i=0;
+        for (Pitanje a : x) {
+            if (s.equals(x.get(i).getNaziv())) return a;
+                i++;
+        }
+         return null;
+    }
+
+    private Kategorija dajKategorijuPoStringu (String s) {
+        int i=0;
+        for (Kategorija a : KvizoviAkt.listaKategorija) {
+            if (s.equals(KvizoviAkt.listaKategorija.get(i).getNaziv())) return a;
+            i++;
+        }
+        return null;
     }
     private void nullF () {}
 
@@ -104,10 +298,10 @@ public class Firebase extends AsyncTask {
             String nazivKviza= noviKviz.getNaziv();
             String idKategorije=null;
             try {
-              idKategorije = noviKviz.getKategorija().getId();
+              idKategorije = noviKviz.getKategorija().getNaziv();
             }
             catch (Exception e) {
-                idKategorije="-1";
+                idKategorije="Svi";
             }
             ArrayList<Pitanje> listaPitanja = new ArrayList<>();
             try {
@@ -158,6 +352,7 @@ public class Firebase extends AsyncTask {
                     response.append(responseLine.trim());
                 }
                 System.out.println(response.toString());
+                kreirajListuMogucih();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,7 +458,7 @@ public class Firebase extends AsyncTask {
       String aktivirajRequest = conn.getResponseMessage();
       Log.d("Status brisanja: ", aktivirajRequest);
       dodajKviz(objects);
-
+       kreirajListuMogucih();
    }
    catch (Exception e) {
        System.out.println("Something went wrong");
@@ -271,6 +466,13 @@ public class Firebase extends AsyncTask {
     }
 
 
+    private ArrayList<Pitanje> vratiListuPitanja (ArrayList<Pitanje> x) {
+        ArrayList<Pitanje> avs= new ArrayList<>();
+        for (Pitanje xy: x  ) {
+            avs.add(xy);
+        }
+        return avs;
+    }
     private boolean daLiPostojiPitanje (String nazivPitanja) {
         try {
             URL url = new URL(urlLink +  "Pitanja?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
@@ -347,7 +549,7 @@ public class Firebase extends AsyncTask {
                int pozicijaTacnog = pozT.getInt("integerValue");
                JSONObject pit =   jsonPitanje.getJSONObject("odgovori");
                JSONObject pit2 = pit.getJSONObject("arrayValue");
-            //    System.out.println(pit2.toString() + "¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨");
+
 
                JSONArray lista = pit2.getJSONArray("values");
 
@@ -356,7 +558,7 @@ public class Firebase extends AsyncTask {
                       JSONObject arrVal = lista.getJSONObject(j);
                       odgovori.add (arrVal.getString("stringValue"));
                   }
-              //  System.out.println(naziv +   "¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨");
+
                 listaMogucih.add (new Pitanje (naziv, naziv, odgovori.get(pozicijaTacnog), odgovori ));
                   odgovori.clear();
             }
@@ -382,7 +584,7 @@ public class Firebase extends AsyncTask {
 
             }
 
-          System.out.println(listaPitanjaKviza.size() + "!!!!!!!!!!!!!!!!!!!" + listaMogucih.size());
+
              ArrayList<Pitanje> kopijaListeMogucih = kopiraj(listaMogucih);
             for (Pitanje x : listaMogucih) {
                 for (String a : listaPitanjaKviza) {
@@ -390,7 +592,7 @@ public class Firebase extends AsyncTask {
                 }
             }
             listaMogucih=kopijaListeMogucih;
-
+            System.out.println(listaPitanjaKviza.size() + "!!!!!!!!!!!!!!!!!!!" + listaMogucih.size());
         }
 
         catch (Exception e) {
@@ -398,6 +600,38 @@ public class Firebase extends AsyncTask {
             return ;
         }
 
+    }
+
+    private void ucitajKategorije () {
+
+        try {
+            globalniStatus= KvizoviAkt.OCstatus.GET_KATEGORIJE;
+
+            URL url = new URL(urlLink +  "Kategorije?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+            System.out.println(url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept","application/json");
+            String content= streamToString( new BufferedReader(new InputStreamReader(connection.getInputStream())));
+            connection.disconnect();
+            JSONObject kategorije = new JSONObject(content);
+            JSONArray listaKategorija = kategorije.getJSONArray("documents");
+
+            for (int i =0; i<listaKategorija.length(); i++) {
+                JSONObject jsonKat = listaKategorija.getJSONObject(i);
+                jsonKat = jsonKat.getJSONObject("fields");
+                JSONObject jsonNaziv = jsonKat.getJSONObject("naziv");
+                String naziv = jsonNaziv.getString("stringValue");
+                JSONObject jsonIkona = jsonKat.getJSONObject("idIkonice");
+                String idIkone = jsonIkona.getString("integerValue");
+                KvizoviAkt.listaKategorija.add(new Kategorija(naziv,idIkone));
+            }
+
+            }
+        catch ( Exception e) {
+            System.out.println(e);
+        }
     }
 
      private ArrayList<Pitanje> kopiraj (ArrayList<Pitanje> x) {

@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,7 +17,20 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.common.collect.Lists;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -31,12 +46,11 @@ import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 
-public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction {
+public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
 
 
 
-
-   public enum OCstatus {UNDEFINED , ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA}
+    public enum OCstatus {UNDEFINED , ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT}
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
@@ -59,7 +73,15 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+
         try {
+         //   new UcitavanjeBaze().execute().get();
+           // new Firebase(this).execute(OCstatus.GET_KATEGORIJE).get();
+            new Firebase(this).execute(OCstatus.GET_DB_CONTENT,"Svi").get();
+            System.out.println(listaKategorija.size() + "*********************************************************METODA *****************************************");
+            System.out.println (listaKvizova. size());
           ugrabiToken();
 
         }
@@ -131,7 +153,88 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     }
 
+  @Override
+    protected  void onStart () {
+        super.onStart();
 
+  }
+
+  public class UcitavanjeBaze extends AsyncTask {
+      private static final String urlLink ="https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/" ;
+        UcitavanjeBaze () {
+
+        }
+
+      private String streamToString (BufferedReader rd ) {
+          String content = "", line;
+          try {
+              while ((line = rd.readLine()) != null) {
+                  content += line + "\n";
+              }
+          }
+          catch (Exception e) {
+              return null;
+          }
+          return content;
+      }
+
+      @Override
+      protected Object doInBackground(Object[] objects) {
+
+
+          InputStream is = getResources().openRawResource(R.raw.secret);
+          GoogleCredential credentials=null;
+          try
+          {
+              credentials = GoogleCredential.fromStream(is).
+                      createScoped(Lists.newArrayList("https://www.googleapis.com/auth/datastore"));
+          } catch(IOException e)
+
+          {
+              credentials=null;
+
+          }
+          try {
+              if (credentials==null)  throw new Exception ("Greska pri dobavljanju tokena!");
+
+              credentials.refreshToken();
+          }
+          catch ( Exception e) {
+              System.out.println(e + "Nesto nije uredu sa tokenom.");
+          }
+         TOKEN= credentials.getAccessToken();
+
+          try {
+
+
+              URL url = new URL(urlLink +  "Kategorije?access_token=" + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+              System.out.println(url);
+              HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+              connection.setRequestMethod("GET");
+              connection.setRequestProperty("Content-Type", "application/json");
+              connection.setRequestProperty("Accept","application/json");
+              String content= streamToString( new BufferedReader(new InputStreamReader(connection.getInputStream())));
+              connection.disconnect();
+              JSONObject kategorije = new JSONObject(content);
+              JSONArray listaKategorija = kategorije.getJSONArray("documents");
+
+              for (int i =0; i<listaKategorija.length(); i++) {
+                  JSONObject jsonKat = listaKategorija.getJSONObject(i);
+                  jsonKat = jsonKat.getJSONObject("fields");
+                  JSONObject jsonNaziv = jsonKat.getJSONObject("naziv");
+                  String naziv = jsonNaziv.getString("stringValue");
+                  JSONObject jsonIkona = jsonKat.getJSONObject("idIkone");
+                  String idIkone = jsonIkona.getString("integerValue");
+                 KvizoviAkt.listaKategorija.add(new Kategorija(naziv,idIkone));
+              }
+
+          }
+          catch ( Exception e) {
+              System.out.println(e);
+          }
+          return null;
+      }
+  }
 
 
     public void setTrenutnaKategorija(String trenutnaKategorija) {
@@ -154,6 +257,14 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
     }
+
+    @Override
+    public void dobaviKategorije(ArrayList<Kategorija> kat) {
+
+          listaKategorija=kat;
+        System.out.println(listaKategorija.size() + "************************************************;EED***METODA *****************************************");
+    }
+
 
     private void dajKvizoveKategorije(String item) {
         int i = 0;
@@ -184,6 +295,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     public void popuni() {
         categories.add("Svi");
+        for (Kategorija a : listaKategorija) {
+            categories.add(a.getNaziv());
+        }
   //    Ako zelite eksperimentirati sa vec unesenim podatcima
   /*   Kategorija prva= new Kategorija("automobili", "1");
     Kategorija druga= new Kategorija("motori", "2");
@@ -223,7 +337,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     }
 
     private  void dugiKlik (int mPosition) {
-
+      //  new Firebase(this).execute(OCstatus.GET_MOGUCA);
         if (mPosition == odabraniKvizovi.size() - 1) {
             Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
             dodajIntent.putExtra("poz_kviza", -1);
@@ -307,6 +421,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //-32 oznacava dodavanje novog kviza, dok -133 azuriranje
         //Result kod 9000 oznacava izlazak na back dugme
+        mainList.setEnabled(false);
+        spinner.setEnabled(false);
         if (resultCode == -32) {
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
@@ -329,7 +445,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             mainList.setAdapter(mainListAdapter);
 
             }
+            Firebase.listaMogucih.clear();
             new Firebase(this).execute(OCstatus.GET_MOGUCA);
+            odblokirajListuISpinner();
         } else if (resultCode == -133) {
 
             Bundle bundleOb = data.getExtras();
@@ -347,6 +465,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 odabraniKvizovi.get(pozicija).setKategorija(null);
             }
             new Firebase(this).execute(OCstatus.EDIT_KVIZ, odabraniKvizovi.get(pozicija), stariNaziv);
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
             refreshCategories();
 
             if (isItPortrait()) {
@@ -354,28 +473,61 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
                 mainList.setAdapter(mainListAdapter);
             }
-            new Firebase(this).execute(OCstatus.GET_MOGUCA);
+            odblokirajListuISpinner();
         }
 
        else if (resultCode == 9000) {
-
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
+            odblokirajListuISpinner();
              refreshCategories();
         }
         else if (resultCode == 32000) {
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
+            odblokirajListuISpinner();
             return ;
         }
         else if (resultCode== 10000) {
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
             refreshCategories();
+            odblokirajListuISpinner();
         }
 
         if (isItPortrait()) {
+            new Firebase(this).execute(OCstatus.GET_MOGUCA);
             if (categories.size() > 1) {
                 spinner.setSelection(1);
                 spinner.setSelection(0);
             }
+            odblokirajListuISpinner();
         }
 
 
+    }
+
+
+
+    void odblokirajListuISpinner () {
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mainList.setEnabled(true);
+                spinner.setEnabled(true);
+
+            }
+        }, 2000);
+        final Thread r = new Thread() {
+            public void run() {
+                // DO WORK
+
+                // Call function.
+                handler.postDelayed(this, 1000);
+
+
+            }
+        };
+        r.start();
     }
 
     void refreshCategories() {
@@ -437,6 +589,7 @@ if (isItPortrait())     spinner.setAdapter(dataAdapter);
 
 
     private void ugrabiToken() throws Exception {
+
         new Firebase(this).execute(OCstatus.UNDEFINED,-1);
     }
 

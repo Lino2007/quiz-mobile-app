@@ -35,7 +35,7 @@ import ba.unsa.etf.rma.adapteri.PitanjaListAdapter;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 
-public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Firebase.UgrabiMoguca {
+public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText editText;
     private ListView listaPitanja, listaMogucih;
     private Spinner dkaSpinner;
@@ -80,6 +80,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
 
         if (pozicija != -1 && KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja() != null) {
+
             pitanjaKviza = KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja();
             naziv_kviza = getIntent().getExtras().getString("naziv_kviza");
             editText.setText(naziv_kviza);
@@ -93,7 +94,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         }
         //new Firebase(this).execute(KvizoviAkt.OCstatus.GET_MOGUCA);
 
-        System.out.println( Firebase.listaMogucih.size() + "*****************************UWOT*********************************************"  + kopijaMogucihPitanja.size());
+    //    System.out.println( Firebase.listaMogucih.size() + "*****************************UWOT*********************************************"  + kopijaMogucihPitanja.size());
         kopijaMogucihPitanja = kopirajPitanja(kopijaMogucihPitanja, Firebase.listaMogucih);
 
 
@@ -528,8 +529,5 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         return izlaz;
     }
 
-    @Override
-    public void poziv() {
 
-    }
 }
