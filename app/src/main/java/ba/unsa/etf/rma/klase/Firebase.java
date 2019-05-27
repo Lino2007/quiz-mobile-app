@@ -177,6 +177,12 @@ public class Firebase extends AsyncTask {
               //  System.out.println(kategorija + "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
                 Kategorija k = dajKategorijuPoStringu (kategorija);
 
+
+                if (!t_signal &&(k==null || (k!=null && !k.getNaziv().equals(katStr)))) {
+                    System.out.println(t_signal +" "  + k + "-------------------------------------------------------------------------------------");
+                    if (k!=null) System.out.println(k.getNaziv());
+                    continue;
+                }
                // if (k.getNaziv()!= katStr ) continue;
                 jsonObj= jsonObj.getJSONObject("pitanja");
                 jsonObj= jsonObj.getJSONObject("arrayValue");
@@ -206,6 +212,8 @@ public class Firebase extends AsyncTask {
                  KvizoviAkt.odabraniKvizovi.add (new Kviz (naziv, zaKv, k));
                 KvizoviAkt.listaKvizova.add (new Kviz (naziv, zaKv, k));
             }
+         System.out.println(   KvizoviAkt.odabraniKvizovi.size() + "|||||||||||||||||||||||||||||||"+   KvizoviAkt.listaKvizova.size());
+
 
 
          //   ArrayList<Pitanje> kopijaListeMogucih = kopiraj(listaMogucih);
@@ -282,8 +290,13 @@ public class Firebase extends AsyncTask {
 
     private Kategorija dajKategorijuPoStringu (String s) {
         int i=0;
+      //  System.out.println(KvizoviAkt.listaKategorija.size() + "******************************************************************************" + s);
         for (Kategorija a : KvizoviAkt.listaKategorija) {
-            if (s.equals(KvizoviAkt.listaKategorija.get(i).getNaziv())) return a;
+      //      System.out.println(a.getNaziv() + "******************************************************");
+            if (s.equals(a.getNaziv()))  {
+
+                return a;
+            }
             i++;
         }
         return null;
