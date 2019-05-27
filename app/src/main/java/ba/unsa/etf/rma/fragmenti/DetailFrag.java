@@ -41,7 +41,7 @@ public class DetailFrag extends Fragment  {
 
         View iv=inflater.inflate(R.layout.fragment_detail, container, false);
         grid= (GridView) iv.findViewById(R.id.gridKvizovi);
-
+        System.out.println(KvizoviAkt.odabraniKvizovi.size() + "***************************************************************************************");
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
         grid.setAdapter(gridViewAdapter);
 

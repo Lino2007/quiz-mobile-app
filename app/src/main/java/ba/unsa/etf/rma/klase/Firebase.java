@@ -89,12 +89,15 @@ public class Firebase extends AsyncTask {
         else if (opcode == KvizoviAkt.OCstatus.EDIT_KVIZ) editKviz(objects);
         else if (opcode == KvizoviAkt.OCstatus.ADD_PITANJE) dodajPitanje(objects);
         else if (opcode == KvizoviAkt.OCstatus.GET_MOGUCA) kreirajListuMogucih();
-        else if (opcode == KvizoviAkt.OCstatus.GET_KATEGORIJE) ucitajKategorije();
+        else if (opcode == KvizoviAkt.OCstatus.GET_KATEGORIJE) {
+            ucitajKategorije();
+        }
         else if (opcode == KvizoviAkt.OCstatus.ADD_KAT)  dodajKategoriju(objects);
         else if (opcode == KvizoviAkt.OCstatus.GET_DB_CONTENT)  {
             ucitajKategorije();
             ucitajKvizove((String) objects[1]);
         }
+        else if (opcode == KvizoviAkt.OCstatus.GET_SPINNER_CONTENT)  ucitajKvizove((String) objects[1]);
 
 
 

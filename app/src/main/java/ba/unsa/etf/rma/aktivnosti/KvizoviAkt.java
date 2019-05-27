@@ -52,7 +52,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
 
-    public enum OCstatus {UNDEFINED , ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT}
+    public enum OCstatus {UNDEFINED , ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT}
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
@@ -80,6 +80,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         try {
          //   new UcitavanjeBaze().execute().get();
+            odabraniKvizovi.clear(); listaKvizova.clear();
+            listaKategorija.clear();  categories.clear();
+            System.out.println("*************************************************************************************************************************************");
            // new Firebase(this).execute(OCstatus.GET_KATEGORIJE).get();
             new Firebase(this).execute(OCstatus.GET_DB_CONTENT,"Svi").get();
        //     System.out.println(listaKategorija.size() + "*********************************************************METODA *****************************************");
@@ -93,8 +96,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
         trenutnaKategorija = "Svi";
-        if(jedinica==1)  popuni();
-        jedinica--;
+      popuni();
+        //jedinica--;
 
 
 
@@ -113,7 +116,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             spinner.setOnItemSelectedListener(this);
 
             final ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
-            System.out.println (listaKvizova. size() + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, res);
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
             mainList.setAdapter(mainListAdapter);
@@ -163,82 +166,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
   }
 
-  public class UcitavanjeBaze extends AsyncTask {
-      private static final String urlLink ="https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/" ;
-        UcitavanjeBaze () {
-
-        }
-
-      private String streamToString (BufferedReader rd ) {
-          String content = "", line;
-          try {
-              while ((line = rd.readLine()) != null) {
-                  content += line + "\n";
-              }
-          }
-          catch (Exception e) {
-              return null;
-          }
-          return content;
-      }
-
-      @Override
-      protected Object doInBackground(Object[] objects) {
-
-
-          InputStream is = getResources().openRawResource(R.raw.secret);
-          GoogleCredential credentials=null;
-          try
-          {
-              credentials = GoogleCredential.fromStream(is).
-                      createScoped(Lists.newArrayList("https://www.googleapis.com/auth/datastore"));
-          } catch(IOException e)
-
-          {
-              credentials=null;
-
-          }
-          try {
-              if (credentials==null)  throw new Exception ("Greska pri dobavljanju tokena!");
-
-              credentials.refreshToken();
-          }
-          catch ( Exception e) {
-              System.out.println(e + "Nesto nije uredu sa tokenom.");
-          }
-         TOKEN= credentials.getAccessToken();
-
-          try {
-
-
-              URL url = new URL(urlLink +  "Kategorije?access_token=" + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
-              System.out.println(url);
-              HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-              connection.setRequestMethod("GET");
-              connection.setRequestProperty("Content-Type", "application/json");
-              connection.setRequestProperty("Accept","application/json");
-              String content= streamToString( new BufferedReader(new InputStreamReader(connection.getInputStream())));
-              connection.disconnect();
-              JSONObject kategorije = new JSONObject(content);
-              JSONArray listaKategorija = kategorije.getJSONArray("documents");
-
-              for (int i =0; i<listaKategorija.length(); i++) {
-                  JSONObject jsonKat = listaKategorija.getJSONObject(i);
-                  jsonKat = jsonKat.getJSONObject("fields");
-                  JSONObject jsonNaziv = jsonKat.getJSONObject("naziv");
-                  String naziv = jsonNaziv.getString("stringValue");
-                  JSONObject jsonIkona = jsonKat.getJSONObject("idIkone");
-                  String idIkone = jsonIkona.getString("integerValue");
-                 KvizoviAkt.listaKategorija.add(new Kategorija(naziv,idIkone));
-              }
-
-          }
-          catch ( Exception e) {
-              System.out.println(e);
-          }
-          return null;
-      }
-  }
 
 
     public void setTrenutnaKategorija(String trenutnaKategorija) {
@@ -255,25 +182,29 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         if (position >= 0 && position < categories.size()) {
             if (listaKvizova.size() > 1) {
               //  dajKvizoveKategorije(item);
-                listaKvizova.clear(); odabraniKvizovi.clear();
+
                 try {
-                    new Firebase(this).execute(OCstatus.GET_DB_CONTENT,item).get();
+                    new Firebase(this).execute(OCstatus.GET_SPINNER_CONTENT,item).get();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                listaKvizova.add(new Kviz(null, null, null));
+                odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
                 mainListAdapter = new MainListAdapter(kvizoviAkt, odabraniKvizovi, getResources());
                 mainList.setAdapter(mainListAdapter);
             }  else {
-                listaKvizova.clear(); odabraniKvizovi.clear();
+
                 try {
-                    new Firebase(this).execute(OCstatus.GET_DB_CONTENT,item).get();
+                    new Firebase(this).execute(OCstatus.GET_SPINNER_CONTENT,item).get();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                listaKvizova.add(new Kviz(null, null, null));
+                odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
                 mainListAdapter = new MainListAdapter(kvizoviAkt, odabraniKvizovi, getResources());
                 mainList.setAdapter(mainListAdapter);
               //  odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
@@ -356,9 +287,11 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         listaKvizova.add (new Kviz ("airbus", b, treca));
         listaKvizova.add (new Kviz ("airbusss", b, druga)); */
 
-    if (listaKvizova.isEmpty()) {
-            listaKvizova.add(new Kviz(null, null, null));
-      }
+ //   if (listaKvizova.isEmpty()) {
+        System.out.println(listaKvizova.get(listaKvizova.size()-1).getNaziv());
+        listaKvizova.add(new Kviz(null, null, null));
+
+   //   }
         odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
 
     }
