@@ -41,15 +41,15 @@ public class DetailFrag extends Fragment  {
 
         View iv=inflater.inflate(R.layout.fragment_detail, container, false);
         grid= (GridView) iv.findViewById(R.id.gridKvizovi);
-        System.out.println(KvizoviAkt.odabraniKvizovi.size() + "***************************************************************************************");
+
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
         grid.setAdapter(gridViewAdapter);
 
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position!= KvizoviAkt.odabraniKvizovi.size() -1 )
-                instanca.playKviz(position);
+          /*      if (position!= KvizoviAkt.odabraniKvizovi.size() -1 )
+                instanca.playKviz(position); */
 
             }
         });

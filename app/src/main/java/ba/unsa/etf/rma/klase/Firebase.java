@@ -42,12 +42,13 @@ public class Firebase extends AsyncTask {
     public interface ProvjeriStatus{
 
         public void dobaviKategorije (ArrayList<Kategorija> kat);
+        public void dobaviPodatke ();
     }
     private ProvjeriStatus pozivatelj;
-  /*  public Firebase (UgrabiMoguca poz) {
+  /* public Firebase (ProvjeriStatus poz) {
         pozivatelj=poz;
-    } */
-
+    }
+ */
 
     public Firebase(Context context) {
         this.context = context;
@@ -62,6 +63,7 @@ public class Firebase extends AsyncTask {
     @Override
     protected Object doInBackground(Object... objects) {
         KvizoviAkt.OCstatus opcode = (KvizoviAkt.OCstatus) objects[0];
+     //  globalniStatus= opcode;
 
         InputStream is = context.getResources().openRawResource(R.raw.secret);
         GoogleCredential credentials=null;
@@ -94,6 +96,7 @@ public class Firebase extends AsyncTask {
         }
         else if (opcode == KvizoviAkt.OCstatus.ADD_KAT)  dodajKategoriju(objects);
         else if (opcode == KvizoviAkt.OCstatus.GET_DB_CONTENT)  {
+            System.out.println("***********************************************************************************");
             ucitajKategorije();
             ucitajKvizove((String) objects[1]);
         }
@@ -181,11 +184,8 @@ public class Firebase extends AsyncTask {
                 Kategorija k = dajKategorijuPoStringu (kategorija);
 
 
-                if (!t_signal &&(k==null || (k!=null && !k.getNaziv().equals(katStr)))) {
-                    System.out.println(t_signal +" "  + k + "-------------------------------------------------------------------------------------");
-                    if (k!=null) System.out.println(k.getNaziv());
-                    continue;
-                }
+                if (!t_signal &&(k==null || (k!=null && !k.getNaziv().equals(katStr)))) continue;
+
                // if (k.getNaziv()!= katStr ) continue;
                 jsonObj= jsonObj.getJSONObject("pitanja");
                 jsonObj= jsonObj.getJSONObject("arrayValue");
@@ -206,7 +206,7 @@ public class Firebase extends AsyncTask {
                     String nazivPitanja = arrVal.getString("stringValue");
 
                     Pitanje p = dajPitanjePoStringu(nazivPitanja,listaSvihPitanja);
-                    System.out.println(nazivPitanja +" | "+p.getNaziv());
+                  //  System.out.println(nazivPitanja +" | "+p.getNaziv());
                     listaPitanjaKviza.add (p);
 
                  //   listaPitanjaKviza.add (arrVal.getString("stringValue"));
@@ -215,7 +215,7 @@ public class Firebase extends AsyncTask {
                  KvizoviAkt.odabraniKvizovi.add (new Kviz (naziv, zaKv, k));
                 KvizoviAkt.listaKvizova.add (new Kviz (naziv, zaKv, k));
             }
-         System.out.println(   KvizoviAkt.odabraniKvizovi.size() + "|||||||||||||||||||||||||||||||"+   KvizoviAkt.listaKvizova.size());
+      //   System.out.println(   KvizoviAkt.odabraniKvizovi.size() + "|||||||||||||||||||||||||||||||"+   KvizoviAkt.listaKvizova.size());
 
 
 
@@ -278,6 +278,9 @@ public class Firebase extends AsyncTask {
     @Override
     protected void onPostExecute(Object o) {
         super.onPostExecute(null);
+        System.out.println(globalniStatus);
+      if (globalniStatus== KvizoviAkt.OCstatus.GET_DB_CONTENT)  pozivatelj.dobaviPodatke();
+         globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
 
 
     }
@@ -374,27 +377,6 @@ public class Firebase extends AsyncTask {
             e.printStackTrace();
         }
 
-
-  /*
-         String content=null, line;
-        try {
-            URL url = new URL(urlLink);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setDoOutput(true);
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            connection.connect();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            while ((line = rd.readLine()) != null) {
-                content += line + "\n";
-            }
-        }
-        catch (Exception e) {
-            //...
-        }
-        System.out.println(content);
-   */
     }
 
 
@@ -608,7 +590,7 @@ public class Firebase extends AsyncTask {
                 }
             }
             listaMogucih=kopijaListeMogucih;
-            System.out.println(listaPitanjaKviza.size() + "!!!!!!!!!!!!!!!!!!!" + listaMogucih.size());
+           // System.out.println(listaPitanjaKviza.size() + "!!!!!!!!!!!!!!!!!!!" + listaMogucih.size());
         }
 
         catch (Exception e) {
@@ -621,7 +603,7 @@ public class Firebase extends AsyncTask {
     private void ucitajKategorije () {
 
         try {
-            globalniStatus= KvizoviAkt.OCstatus.GET_KATEGORIJE;
+         //   globalniStatus= KvizoviAkt.OCstatus.GET_KATEGORIJE;
 
             URL url = new URL(urlLink +  "Kategorije?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
             System.out.println(url);

@@ -92,9 +92,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             pitanjaKviza.add(new Pitanje(null, null, null, null));
             kopijaPitanjaKviza = kopirajPitanja(kopijaPitanjaKviza, pitanjaKviza);
         }
-        //new Firebase(this).execute(KvizoviAkt.OCstatus.GET_MOGUCA);
 
-    //    System.out.println( Firebase.listaMogucih.size() + "*****************************UWOT*********************************************"  + kopijaMogucihPitanja.size());
         kopijaMogucihPitanja = kopirajPitanja(kopijaMogucihPitanja, Firebase.listaMogucih);
 
 
