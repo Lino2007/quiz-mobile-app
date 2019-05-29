@@ -38,11 +38,16 @@ public class Firebase extends AsyncTask {
     private static final String urlLink ="https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/" ;
     public static ArrayList<Pitanje> listaMogucih = new ArrayList<>();
     private ArrayList<Kategorija> ucitaneKategorije = new ArrayList<>();
-    private KvizoviAkt.OCstatus globalniStatus = KvizoviAkt.OCstatus.UNDEFINED;
-    public interface ProvjeriStatus{
 
+    private KvizoviAkt.OCstatus globalniStatus = KvizoviAkt.OCstatus.UNDEFINED;
+
+
+    private ArrayList<Kviz> ucitaniKvizovi = new ArrayList<>();
+    private ArrayList<Kviz> ucitaniOdabraniKvizovi= new ArrayList<>();
+    public interface ProvjeriStatus{
+       public void dobaviSpinerPodatke (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
         public void dobaviKategorije (ArrayList<Kategorija> kat);
-        public void dobaviPodatke ();
+        public void dobaviPodatke (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat);
     }
     private ProvjeriStatus pozivatelj;
   /* public Firebase (ProvjeriStatus poz) {
@@ -113,6 +118,10 @@ public class Firebase extends AsyncTask {
     private void ucitajKvizove (String katStr) {
         boolean t_signal = false;
         if (katStr.equals("Svi") )  t_signal=true;
+
+        ArrayList<Kviz> odKvizovi = new ArrayList<>();
+        ArrayList<Kviz> svKvizovi = new ArrayList<>();
+        System.out.println("**************************||||||||||||||||||||||!########################################");
 
      try {
             ArrayList<Pitanje> listaPitanjaKviza = new ArrayList<>();
@@ -195,8 +204,8 @@ public class Firebase extends AsyncTask {
                 }
                 catch (Exception e) {
 
-                    KvizoviAkt.odabraniKvizovi.add (new Kviz (naziv, new ArrayList<Pitanje>(), k));
-                    KvizoviAkt.listaKvizova.add (new Kviz (naziv,  new ArrayList<Pitanje>(), k));
+                    odKvizovi.add (new Kviz (naziv, new ArrayList<Pitanje>(), k));
+                    svKvizovi.add (new Kviz (naziv,  new ArrayList<Pitanje>(), k));
 
                     continue;
                 }
@@ -212,21 +221,14 @@ public class Firebase extends AsyncTask {
                  //   listaPitanjaKviza.add (arrVal.getString("stringValue"));
                 }
                ArrayList<Pitanje> zaKv = vratiListuPitanja(listaPitanjaKviza);
-                 KvizoviAkt.odabraniKvizovi.add (new Kviz (naziv, zaKv, k));
-                KvizoviAkt.listaKvizova.add (new Kviz (naziv, zaKv, k));
+                odKvizovi.add (new Kviz (naziv, zaKv, k));
+                svKvizovi.add (new Kviz (naziv, zaKv, k));
             }
       //   System.out.println(   KvizoviAkt.odabraniKvizovi.size() + "|||||||||||||||||||||||||||||||"+   KvizoviAkt.listaKvizova.size());
 
+              ucitaniKvizovi= svKvizovi;
+              ucitaniOdabraniKvizovi = odKvizovi;
 
-
-         //   ArrayList<Pitanje> kopijaListeMogucih = kopiraj(listaMogucih);
-    /*        for (Pitanje x : listaSvihPitanja) {
-                for (String a : listaPitanjaKviza) {
-                    if (a.equals(x.getNaziv()))
-                }
-            }
-            listaMogucih=kopijaListeMogucih;
-           */
         }
      catch ( Exception e) {
          System.out.println("UUUUUUUUUUUUUUU"+ e);
@@ -279,7 +281,8 @@ public class Firebase extends AsyncTask {
     protected void onPostExecute(Object o) {
         super.onPostExecute(null);
         System.out.println(globalniStatus);
-      if (globalniStatus== KvizoviAkt.OCstatus.GET_DB_CONTENT)  pozivatelj.dobaviPodatke();
+      if (globalniStatus== KvizoviAkt.OCstatus.GET_DB_CONTENT )  pozivatelj.dobaviPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi,ucitaneKategorije);
+      else if (globalniStatus== KvizoviAkt.OCstatus.GET_SPINNER_CONTENT) pozivatelj.dobaviSpinerPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
          globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
 
 
@@ -601,7 +604,7 @@ public class Firebase extends AsyncTask {
     }
 
     private void ucitajKategorije () {
-
+         ArrayList<Kategorija> nKat= new ArrayList<>();
         try {
          //   globalniStatus= KvizoviAkt.OCstatus.GET_KATEGORIJE;
 
@@ -623,9 +626,10 @@ public class Firebase extends AsyncTask {
                 String naziv = jsonNaziv.getString("stringValue");
                 JSONObject jsonIkona = jsonKat.getJSONObject("idIkonice");
                 String idIkone = jsonIkona.getString("integerValue");
-                KvizoviAkt.listaKategorija.add(new Kategorija(naziv,idIkone));
+             //   KvizoviAkt.listaKategorija.add(new Kategorija(naziv,idIkone));
+                nKat.add(new Kategorija(naziv,idIkone));
             }
-
+            ucitaneKategorije=nKat;
             }
         catch ( Exception e) {
             System.out.println(e);
