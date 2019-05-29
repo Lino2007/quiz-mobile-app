@@ -18,11 +18,14 @@ import com.maltaisn.icondialog.Icon;
 import com.maltaisn.icondialog.IconDialog;
 import com.maltaisn.icondialog.IconHelper;
 
+import java.util.ArrayList;
+
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kategorija;
+import ba.unsa.etf.rma.klase.Kviz;
 
-public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.Callback {
+public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.Callback , Firebase.ProvjeriStatus{
     EditText naziv, nazivIkone;
     Button dodajIkonu, dodajKategoriju;
 
@@ -118,5 +121,25 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
             nazivIkone.setBackgroundColor(Color.WHITE);
             valid = true;
         }
+    }
+
+    @Override
+    public void dobaviSpinerPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
+
+    }
+
+    @Override
+    public void dobaviKategorije(ArrayList<Kategorija> kat) {
+
+    }
+
+    @Override
+    public void dobaviPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat) {
+
+    }
+
+    @Override
+    public void azurirajPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
+
     }
 }

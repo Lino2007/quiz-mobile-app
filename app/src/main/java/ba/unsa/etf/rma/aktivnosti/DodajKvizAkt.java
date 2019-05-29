@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,7 +36,7 @@ import ba.unsa.etf.rma.adapteri.PitanjaListAdapter;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 
-public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener ,Firebase.ProvjeriStatus {
     private EditText editText;
     private ListView listaPitanja, listaMogucih;
     private Spinner dkaSpinner;
@@ -113,30 +114,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         dodaj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                validacija();
-                if (pozicija == -1 && valid == true) {
-                    Bundle b = new Bundle();
-                    Intent addKviz = getIntent();
-                    b.putSerializable("listaPitanja", (Serializable) kopijaPitanjaKviza);
-                    addKviz.putExtras(b);
-                    addKviz.putExtra("kategorija", dkaSpinner.getSelectedItemPosition());
-                    addKviz.putExtra("naziv", editText.getText().toString());
-                    setResult(-32, addKviz);
-
-                    finish();
-                } else if (pozicija != -1 && valid == true) {
-                    Bundle b = new Bundle();
-                    Intent addKviz = getIntent();
-                    b.putSerializable("listaPitanja", (Serializable) kopijaPitanjaKviza);
-                    addKviz.putExtras(b);
-                    addKviz.putExtra("kategorija", dkaSpinner.getSelectedItemPosition());
-                    addKviz.putExtra("naziv", editText.getText().toString());
-                    addKviz.putExtra("pozicija", pozicija);
-                    setResult(-133, addKviz);
-                    pozicija = -1;
-                    finish();
-                }
-
+                Toast toast = Toast.makeText(getApplicationContext(), "Validacija u toku, molimo pricekajte!", Toast.LENGTH_SHORT);
+                toast.show();
+                dodaj.setEnabled(false);
+                new Firebase(  KvizoviAkt.OCstatus.GET_SPINNER_CONTENT,getApplicationContext() ,(Firebase.ProvjeriStatus)DodajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_SPINNER_CONTENT, "Svi");
 
             }
         });
@@ -528,4 +509,49 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
+    @Override
+    public void dobaviSpinerPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
+        KvizoviAkt.listaKvizova=sKv;
+        KvizoviAkt.odabraniKvizovi=oKv;
+        validacija();
+        if (pozicija == -1 && valid == true) {
+           Bundle b = new Bundle();
+            Intent addKviz = getIntent();
+            b.putSerializable("listaPitanja", (Serializable) kopijaPitanjaKviza);
+            addKviz.putExtras(b);
+            addKviz.putExtra("kategorija", dkaSpinner.getSelectedItemPosition());
+            addKviz.putExtra("naziv", editText.getText().toString());
+            setResult(-32, addKviz);
+            dodaj.setEnabled(true);
+            finish();
+        } else if (pozicija != -1 && valid == true) {
+           Bundle b = new Bundle();
+            Intent addKviz = getIntent();
+            b.putSerializable("listaPitanja", (Serializable) kopijaPitanjaKviza);
+            addKviz.putExtras(b);
+            addKviz.putExtra("kategorija", dkaSpinner.getSelectedItemPosition());
+            addKviz.putExtra("naziv", editText.getText().toString());
+            addKviz.putExtra("pozicija", pozicija);
+            setResult(-133, addKviz);
+            pozicija = -1;
+            dodaj.setEnabled(true);
+            finish();
+        }
+
+    }
+
+    @Override
+    public void dobaviKategorije(ArrayList<Kategorija> kat) {
+
+    }
+
+    @Override
+    public void dobaviPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat) {
+
+    }
+
+    @Override
+    public void azurirajPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
+
+    }
 }

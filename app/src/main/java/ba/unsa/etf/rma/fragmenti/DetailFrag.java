@@ -3,6 +3,7 @@ package ba.unsa.etf.rma.fragmenti;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -20,15 +21,16 @@ import ba.unsa.etf.rma.klase.Kviz;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DetailFrag extends Fragment  {
+public class DetailFrag extends Fragment implements ListaFrag.lockGridView {
 
-     GridView grid;
+    public GridView grid;
      public GridViewAdapter gridViewAdapter=null;
-
-    private Activity activity;
+     public Resources rs;
+   public Activity activity;
     ListFunction instanca;
     static boolean x= false;
     static boolean refresh=false;
+
 
     public DetailFrag() {
         // Required empty public constructor
@@ -41,9 +43,15 @@ public class DetailFrag extends Fragment  {
 
         View iv=inflater.inflate(R.layout.fragment_detail, container, false);
         grid= (GridView) iv.findViewById(R.id.gridKvizovi);
+        rs= getResources();
+        activity= getActivity();
 
-        gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
+       //   grid.setEnabled(false);
+        System.out.println(     KvizoviAkt.odabraniKvizovi.size()  + "VELICINA KVIZA");
+
+        gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, rs );
         grid.setAdapter(gridViewAdapter);
+      //  grid.setEnabled(true);
 
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -57,6 +65,7 @@ public class DetailFrag extends Fragment  {
         grid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+
                 instanca.addKviz(pos);
                 if (pos== KvizoviAkt.odabraniKvizovi.size()-1) {
                     x = true;
@@ -79,6 +88,12 @@ public class DetailFrag extends Fragment  {
         x=false;
         refresh=false;
         super.onResume();
+
+    }
+
+    @Override
+    public void lock() {
+        grid.setEnabled(false);
 
     }
 

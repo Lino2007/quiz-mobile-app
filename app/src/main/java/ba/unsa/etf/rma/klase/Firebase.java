@@ -48,6 +48,7 @@ public class Firebase extends AsyncTask {
        public void dobaviSpinerPodatke (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
         public void dobaviKategorije (ArrayList<Kategorija> kat);
         public void dobaviPodatke (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat);
+        public void azurirajPodatke  (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
     }
     private ProvjeriStatus pozivatelj;
   /* public Firebase (ProvjeriStatus poz) {
@@ -92,16 +93,27 @@ public class Firebase extends AsyncTask {
         }
         KvizoviAkt.TOKEN= credentials.getAccessToken();
 
-        if (opcode== KvizoviAkt.OCstatus.ADD_KVIZ) dodajKviz(objects);
-        else if (opcode == KvizoviAkt.OCstatus.EDIT_KVIZ) editKviz(objects);
-        else if (opcode == KvizoviAkt.OCstatus.ADD_PITANJE) dodajPitanje(objects);
+        if (opcode== KvizoviAkt.OCstatus.ADD_KVIZ) {
+            dodajKviz(objects);
+            ucitajKvizove("Svi");
+            kreirajListuMogucih();
+        }
+        else if (opcode == KvizoviAkt.OCstatus.EDIT_KVIZ)  {
+            editKviz(objects);
+            ucitajKvizove("Svi");
+            kreirajListuMogucih();
+        }
+        else if (opcode == KvizoviAkt.OCstatus.ADD_PITANJE) {
+            dodajPitanje(objects);
+
+        }
         else if (opcode == KvizoviAkt.OCstatus.GET_MOGUCA) kreirajListuMogucih();
         else if (opcode == KvizoviAkt.OCstatus.GET_KATEGORIJE) {
             ucitajKategorije();
         }
         else if (opcode == KvizoviAkt.OCstatus.ADD_KAT)  dodajKategoriju(objects);
         else if (opcode == KvizoviAkt.OCstatus.GET_DB_CONTENT)  {
-            System.out.println("***********************************************************************************");
+
             ucitajKategorije();
             ucitajKvizove((String) objects[1]);
         }
@@ -283,6 +295,7 @@ public class Firebase extends AsyncTask {
         System.out.println(globalniStatus);
       if (globalniStatus== KvizoviAkt.OCstatus.GET_DB_CONTENT )  pozivatelj.dobaviPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi,ucitaneKategorije);
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_SPINNER_CONTENT) pozivatelj.dobaviSpinerPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
+      else if (globalniStatus==KvizoviAkt.OCstatus.ADD_KVIZ || globalniStatus==KvizoviAkt.OCstatus.EDIT_KVIZ)   pozivatelj.azurirajPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
          globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
 
 
@@ -328,7 +341,7 @@ public class Firebase extends AsyncTask {
             ArrayList<Pitanje> listaPitanja = new ArrayList<>();
             try {
                listaPitanja = noviKviz.getPitanja();
-                System.out.println(listaPitanja.size()+ "˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙˙");
+
             }
             catch (Exception e) {
                 Log.d("Dodavanje kviza", "Lista pitanja prazna, prekidam daljnji unos u bazu.");
