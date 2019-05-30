@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.maltaisn.icondialog.Icon;
 import com.maltaisn.icondialog.IconDialog;
@@ -59,13 +60,11 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         dodajKategoriju.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                validiraj();
-                if (valid) {
-                    KvizoviAkt.listaKategorija.add(new Kategorija(nazivKategorije, ikona));
-                    new Firebase(DodajKategorijuAkt.this.getApplicationContext()).execute (KvizoviAkt.OCstatus.ADD_KAT, new Kategorija(nazivKategorije,ikona));
-                    setResult(-100);
-                    finish();
-                }
+                Toast toast = Toast.makeText(getApplicationContext(), "Validacija u toku, molimo pricekajte!", Toast.LENGTH_SHORT);
+                toast.show();
+                dodajIkonu.setEnabled(false);
+                dodajKategoriju.setEnabled(false);
+                new Firebase(  KvizoviAkt.OCstatus.V_GET_KATEGORIJE,getApplicationContext() ,(Firebase.ProvjeriStatus)DodajKategorijuAkt.this).execute(KvizoviAkt.OCstatus.V_GET_KATEGORIJE);
             }
         });
 
@@ -75,6 +74,7 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+
         if ((keyCode == KeyEvent.KEYCODE_BACK)) setResult(-300);
         return super.onKeyDown(keyCode, event);
     }
@@ -130,6 +130,16 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
 
     @Override
     public void dobaviKategorije(ArrayList<Kategorija> kat) {
+        KvizoviAkt.listaKategorija= kat;
+        validiraj();
+        dodajIkonu.setEnabled(true);
+        dodajKategoriju.setEnabled(true);
+        if (valid) {
+            KvizoviAkt.listaKategorija.add(new Kategorija(nazivKategorije, ikona));
+            new Firebase(DodajKategorijuAkt.this.getApplicationContext()).execute (KvizoviAkt.OCstatus.ADD_KAT, new Kategorija(nazivKategorije,ikona));
+            setResult(-100);
+            finish();
+        }
 
     }
 

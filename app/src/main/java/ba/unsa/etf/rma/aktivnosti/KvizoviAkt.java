@@ -36,7 +36,7 @@ import ba.unsa.etf.rma.klase.Pitanje;
 public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
 
 
-    public enum OCstatus {UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT}
+    public enum OCstatus {UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT, V_GET_KATEGORIJE}
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
@@ -65,37 +65,17 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
         try {
-            /*    odabraniKvizovi.clear();
-            listaKvizova.clear();
-            listaKategorija.clear();
-            categories.clear(); */
-         //   blokirajElemente ();
-
             new Firebase(  OCstatus.GET_DB_CONTENT,this ,(Firebase.ProvjeriStatus)KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
-
-            //new Firebase(this).execute(OCstatus.GET_KATEGORIJE).get();
-          //  new Firebase(this).execute(OCstatus.GET_DB_CONTENT, "Svi").get();
-
-
-         //   ugrabiToken();
-
         } catch (Exception e) {
             System.out.println("Nesto nije uredu sa pristupom tokenu!");
         }
-
-
         trenutnaKategorija = "Svi";
-      //  popuni();
-
-
-
         kvizoviAkt = this;
         Resources res = getResources();
         spinner = (Spinner) findViewById(R.id.spPostojeceKategorije);
         mainList = (ListView) findViewById(R.id.lvKvizovi);
         config = getResources().getConfiguration();
-
-         fragmentm = getSupportFragmentManager();
+        fragmentm = getSupportFragmentManager();
         detail = (FrameLayout) findViewById(R.id.detailPlace);
         lista = (FrameLayout) findViewById(R.id.listPlace);
 
@@ -127,12 +107,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                /*   if (position != odabraniKvizovi.size() - 1) {
+                   if (position != odabraniKvizovi.size() - 1) {
                         Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
                         newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(position));
                         KvizoviAkt.this.startActivityForResult(newIntent, 32000);
                         //Poziv igrajkvizakt
-                    }  */
+                    }
                 }
 
             });
@@ -236,25 +216,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 dfm.grid.setEnabled(true);
             }
         }
-      /*  final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
 
-
-            }
-        }, 2000);
-        final Thread r = new Thread() {
-            public void run() {
-                // DO WORK
-
-                // Call function.
-                handler.postDelayed(this, 1000);
-
-
-            }
-        };
-        r.start(); */
     }
 
     @Override
@@ -501,7 +463,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //-32 oznacava dodavanje novog kviza, dok -133 azuriranje
         //Result kod 9000 oznacava izlazak na back dugme
-
+        // 32000 oznacava izlazak iz IgrajKvizAkt klikom na zavrsi kviz button
+        // 9000 izlazak iz IgrajKvizAkt putem back buttona
         config = getResources().getConfiguration();
         blokirajElemente ();
         if (resultCode == -32) {
@@ -558,24 +521,13 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
              odblokirajElemente();
             refreshCategories();
         } else if (resultCode == 32000) {
-            new Firebase(this).execute(OCstatus.GET_MOGUCA);
             odblokirajElemente();
-            return;
+
         } else if (resultCode == 10000) {
-            new Firebase(this).execute(OCstatus.GET_MOGUCA);
             refreshCategories();
              odblokirajElemente();
         }
-
-      /*  if (isItPortrait()) {
-            new Firebase(this).execute(OCstatus.GET_MOGUCA);
-            if (categories.size() > 1) {
-                spinner.setSelection(1);
-                spinner.setSelection(0);
-            }
-            if (config.orientation == Configuration.ORIENTATION_PORTRAIT) odblokirajElemente();
-        } */
-
+        odblokirajElemente();
 
     }
 

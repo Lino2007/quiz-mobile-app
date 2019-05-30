@@ -2,7 +2,9 @@ package ba.unsa.etf.rma.fragmenti;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -59,6 +61,7 @@ public class PitanjeFrag extends Fragment {
         if (pitanja==null ) {
             listaOdgovora.setAdapter(null);
             nazivPitanja.setText("Kviz je zavrsen!");
+            instanca.krajKviza();
         }
         else {
             som = pitanja.dajRandomOdgovore();
@@ -121,6 +124,7 @@ public class PitanjeFrag extends Fragment {
 
      public interface UpdateListener {
         public void updateByAction(boolean tacno);
+        public void krajKviza ();
      }
 
 

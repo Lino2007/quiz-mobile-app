@@ -108,7 +108,7 @@ public class Firebase extends AsyncTask {
 
         }
         else if (opcode == KvizoviAkt.OCstatus.GET_MOGUCA) kreirajListuMogucih();
-        else if (opcode == KvizoviAkt.OCstatus.GET_KATEGORIJE) {
+        else if (opcode == KvizoviAkt.OCstatus.GET_KATEGORIJE || opcode== KvizoviAkt.OCstatus.V_GET_KATEGORIJE) {
             ucitajKategorije();
         }
         else if (opcode == KvizoviAkt.OCstatus.ADD_KAT)  dodajKategoriju(objects);
@@ -133,7 +133,7 @@ public class Firebase extends AsyncTask {
 
         ArrayList<Kviz> odKvizovi = new ArrayList<>();
         ArrayList<Kviz> svKvizovi = new ArrayList<>();
-        System.out.println("**************************||||||||||||||||||||||!########################################");
+
 
      try {
             ArrayList<Pitanje> listaPitanjaKviza = new ArrayList<>();
@@ -179,11 +179,9 @@ public class Firebase extends AsyncTask {
                     JSONObject arrVal = lista.getJSONObject(j);
                     odgovori.add (arrVal.getString("stringValue"));
                 }
-
                 listaSvihPitanja.add (new Pitanje (naziv, naziv, odgovori.get(pozicijaTacnog), odgovori ));
-                odgovori.clear();
             }
-      //   System.out.println(listaSvihPitanja.size() + "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+
 
 
             JSONArray listaKvizova = kvizovi.getJSONArray("documents");
@@ -201,13 +199,9 @@ public class Firebase extends AsyncTask {
                 //za Id kategorije
                 JSONObject jsonKategorija = jsonObj.getJSONObject("idKategorije");
                 String kategorija =  jsonKategorija.getString("stringValue");
-              //  System.out.println(kategorija + "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
                 Kategorija k = dajKategorijuPoStringu (kategorija);
-
-
                 if (!t_signal &&(k==null || (k!=null && !k.getNaziv().equals(katStr)))) continue;
-
-               // if (k.getNaziv()!= katStr ) continue;
                 jsonObj= jsonObj.getJSONObject("pitanja");
                 jsonObj= jsonObj.getJSONObject("arrayValue");
                 JSONArray lista;
@@ -227,16 +221,15 @@ public class Firebase extends AsyncTask {
                     String nazivPitanja = arrVal.getString("stringValue");
 
                     Pitanje p = dajPitanjePoStringu(nazivPitanja,listaSvihPitanja);
-                  //  System.out.println(nazivPitanja +" | "+p.getNaziv());
+
                     listaPitanjaKviza.add (p);
 
-                 //   listaPitanjaKviza.add (arrVal.getString("stringValue"));
+
                 }
                ArrayList<Pitanje> zaKv = vratiListuPitanja(listaPitanjaKviza);
                 odKvizovi.add (new Kviz (naziv, zaKv, k));
                 svKvizovi.add (new Kviz (naziv, zaKv, k));
             }
-      //   System.out.println(   KvizoviAkt.odabraniKvizovi.size() + "|||||||||||||||||||||||||||||||"+   KvizoviAkt.listaKvizova.size());
 
               ucitaniKvizovi= svKvizovi;
               ucitaniOdabraniKvizovi = odKvizovi;
@@ -296,6 +289,7 @@ public class Firebase extends AsyncTask {
       if (globalniStatus== KvizoviAkt.OCstatus.GET_DB_CONTENT )  pozivatelj.dobaviPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi,ucitaneKategorije);
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_SPINNER_CONTENT) pozivatelj.dobaviSpinerPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
       else if (globalniStatus==KvizoviAkt.OCstatus.ADD_KVIZ || globalniStatus==KvizoviAkt.OCstatus.EDIT_KVIZ)   pozivatelj.azurirajPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
+      else if (globalniStatus== KvizoviAkt.OCstatus.V_GET_KATEGORIJE) pozivatelj.dobaviKategorije(ucitaneKategorije);
          globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
 
 
@@ -312,9 +306,9 @@ public class Firebase extends AsyncTask {
 
     private Kategorija dajKategorijuPoStringu (String s) {
         int i=0;
-      //  System.out.println(KvizoviAkt.listaKategorija.size() + "******************************************************************************" + s);
+
         for (Kategorija a : KvizoviAkt.listaKategorija) {
-      //      System.out.println(a.getNaziv() + "******************************************************");
+
             if (s.equals(a.getNaziv()))  {
 
                 return a;
@@ -527,6 +521,7 @@ public class Firebase extends AsyncTask {
         }
         return content;
      }
+
     public void kreirajListuMogucih () {
         listaMogucih.clear();
         try {
@@ -619,7 +614,7 @@ public class Firebase extends AsyncTask {
     private void ucitajKategorije () {
          ArrayList<Kategorija> nKat= new ArrayList<>();
         try {
-         //   globalniStatus= KvizoviAkt.OCstatus.GET_KATEGORIJE;
+
 
             URL url = new URL(urlLink +  "Kategorije?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
             System.out.println(url);
@@ -639,7 +634,6 @@ public class Firebase extends AsyncTask {
                 String naziv = jsonNaziv.getString("stringValue");
                 JSONObject jsonIkona = jsonKat.getJSONObject("idIkonice");
                 String idIkone = jsonIkona.getString("integerValue");
-             //   KvizoviAkt.listaKategorija.add(new Kategorija(naziv,idIkone));
                 nKat.add(new Kategorija(naziv,idIkone));
             }
             ucitaneKategorije=nKat;
