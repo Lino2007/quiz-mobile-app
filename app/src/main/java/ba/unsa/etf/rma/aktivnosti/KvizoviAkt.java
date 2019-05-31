@@ -36,7 +36,7 @@ import ba.unsa.etf.rma.klase.Pitanje;
 public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
 
 
-    public enum OCstatus {UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT, V_GET_KATEGORIJE}
+    public enum OCstatus {UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT, V_GET_KATEGORIJE, GET_RL}
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();

@@ -15,9 +15,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,7 @@ public class Firebase extends AsyncTask {
     private static final String urlLink ="https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/" ;
     public static ArrayList<Pitanje> listaMogucih = new ArrayList<>();
     private ArrayList<Kategorija> ucitaneKategorije = new ArrayList<>();
-
+    private ArrayList<String>  rangList = new ArrayList<>();
     private KvizoviAkt.OCstatus globalniStatus = KvizoviAkt.OCstatus.UNDEFINED;
 
 
@@ -50,6 +52,10 @@ public class Firebase extends AsyncTask {
         public void dobaviPodatke (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat);
         public void azurirajPodatke  (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
     }
+
+  /*  public interface Rangliste {
+        public void getRangliste ()
+    } */
     private ProvjeriStatus pozivatelj;
   /* public Firebase (ProvjeriStatus poz) {
         pozivatelj=poz;
@@ -118,7 +124,7 @@ public class Firebase extends AsyncTask {
             ucitajKvizove((String) objects[1]);
         }
         else if (opcode == KvizoviAkt.OCstatus.GET_SPINNER_CONTENT)  ucitajKvizove((String) objects[1]);
-
+        else if (opcode== KvizoviAkt.OCstatus.GET_RL) ucitajRanglistu("drugiKviz");
 
 
 
@@ -127,6 +133,91 @@ public class Firebase extends AsyncTask {
         return null;
     }
 
+    private void ucitajRanglistu (String nazivKviza) {
+
+        String query = "{\n" +
+                "  \"structuredQuery\": {\n" +
+                "    \"where\" : {\n" +
+                "     \"fieldFilter\" : { \n" + "    \"field\": {\"fieldPath\": \"nazivKviza\"}, \n"  +
+                "       \"op\": \"EQUAL\" ,   \n" +
+                "        \"value\": {\"stringValue\": \"" + nazivKviza  + "\"}\n" +  " }\n" +   "  },\n" +
+                "            \"select\": { \"fields\": [  {\"fieldPath\": \"brojPozicija\"},  {\"fieldPath\": \"lista\"},  {\"fieldPath\": \"nazivKviza\"}]}, \n" +
+                "             \"from\": [{\"collectionId\": \"Rangliste\"}],\n" +
+                "              \"limit\": 1000 \n            "+
+                "      }\n" +
+                "}";
+        try {
+            URL url = new URL("https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents:runQuery?access_token=" + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+            System.out.println(url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            try (OutputStream os =connection.getOutputStream()) {
+                byte[] input = query.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            System.out.println(connection.getResponseMessage() + "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
+          ArrayList<String> rangLista = new ArrayList<>();
+          String  content= streamToString( new BufferedReader(new InputStreamReader(connection.getInputStream())));
+          content = "{\"documents\":" + content + "}";
+            System.out.println(content);
+          JSONObject dokumenti= new JSONObject(content);
+            JSONArray statistike =  dokumenti.getJSONArray("documents");
+            if (statistike.length()==0) throw new Exception("Array statistike je prazan!");
+            JSONObject doc = statistike.getJSONObject(0);
+          // System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" + doc.toString());
+            doc = doc.getJSONObject("document");
+            doc = doc.getJSONObject("fields");
+            JSONObject poz = doc.getJSONObject("brojPozicija");
+            int brojPozicija = poz.getInt("integerValue");
+            JSONObject polja = doc;
+            polja = polja.getJSONObject("lista");
+            polja= polja.getJSONObject("mapValue");
+
+            polja = polja.getJSONObject("fields");
+            for (Integer i=1; i<=brojPozicija; i++) {
+                JSONObject mapVal = polja.getJSONObject(i.toString());
+                mapVal= mapVal.getJSONObject("mapValue");
+                mapVal = mapVal.getJSONObject("fields");
+                String naziv =  new String (dajIme(mapVal));
+
+                mapVal = mapVal.getJSONObject(naziv);
+               Integer procenat = mapVal.getInt ("integerValue");
+                System.out.println("Pozicija "+ i +" -> Ime i prezime: "+ naziv + "Procenat: "+ procenat +"\n");
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println("QUERY ISSUE: " + e);
+        }
+    }
+
+    private String dajIme (JSONObject a) {
+        try {
+            String obj = a.toString();
+
+            int i=0;
+            while (i<obj.length()) {
+                if (obj.charAt(i)=='"') {
+                    int j=i+1;
+                    while (j<obj.length()) {
+                        if (obj.charAt(j)=='"') return obj.substring(i+1, j);
+                        j++;
+                    }
+                }
+                i++;
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+        return  null;
+    }
     private void ucitajKvizove (String katStr) {
         boolean t_signal = false;
         if (katStr.equals("Svi") )  t_signal=true;

@@ -23,6 +23,7 @@ import java.util.Random;
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.fragmenti.InformacijeFrag;
 import ba.unsa.etf.rma.fragmenti.PitanjeFrag;
+import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
@@ -42,6 +43,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_igraj_kviz_akt);
+        new Firebase(this).execute(KvizoviAkt.OCstatus.GET_RL);
         zaPit= (FrameLayout) findViewById(R.id.pitanjePlace);
         zaInfo= (FrameLayout) findViewById(R.id.informacijePlace);
 
