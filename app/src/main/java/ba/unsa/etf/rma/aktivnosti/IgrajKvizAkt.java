@@ -37,6 +37,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
      ArrayList<Pitanje> odgovorenaPitanja= new ArrayList<>();
      int brojTacnih=0;
      double procenatTacnih=0;
+     static double procT = 0;
      int inx=-1;
      String nazivKv = new String();
    // private EditText result;
@@ -129,7 +130,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
             procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
             procenatTacnih=Math.round(procenatTacnih*10000.0)/10000.0;
             zaFragPit.putSerializable("pitanja", preostalaPitanja.get(inx));
-
+            procT=procenatTacnih;
             zaFragInfo.putInt("broj_tacnih", brojTacnih);
             zaFragInfo.putInt("broj_preostalih", preostalaPitanja.size());
             zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
@@ -142,6 +143,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
             zaFragPit.putSerializable("pitanja", null);
             procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
             procenatTacnih=Math.round(procenatTacnih*10000.0)/10000.0;
+            procT=procenatTacnih;
             zaFragInfo.putInt("broj_preostalih",0);
 
             zaFragInfo.putInt("broj_tacnih", brojTacnih);
@@ -212,7 +214,10 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
                     Toast.makeText(context, "Greska, niste unjeli validno ime i prezime, pokusajte ponovo ili kliknite cancel!", Toast.LENGTH_LONG).show();
                 }
                 else {
-                    new Firebase(KvizoviAkt.OCstatus.GET_RL,getApplicationContext(), (Firebase.Rangliste)IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL,nazivKv);
+                    String imeIgraca = userInput.getText().toString();
+                    System.out.println(procenatTacnih + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    new Firebase(KvizoviAkt.OCstatus.GET_RL,getApplicationContext(), (Firebase.Rangliste)IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL,nazivKv, imeIgraca, procenatTacnih );
+                    procT=0;
                     userInput.setBackgroundColor(Color.WHITE);
                     alertDialog.dismiss();
                 }

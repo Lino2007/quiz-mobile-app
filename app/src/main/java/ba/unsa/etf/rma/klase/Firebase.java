@@ -23,6 +23,7 @@ import java.net.URLEncoder;
 import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +46,8 @@ public class Firebase extends AsyncTask {
     private ArrayList<Kategorija> ucitaneKategorije = new ArrayList<>();
     private ArrayList<String>  rangList = new ArrayList<>();
     private KvizoviAkt.OCstatus globalniStatus = KvizoviAkt.OCstatus.UNDEFINED;
-    private Map<Integer , Pair<String,Double>> mapRangLista = new TreeMap<>();
+    private Map<Double,String> mapRangLista = new TreeMap<>(Collections.<Double>reverseOrder());
+    private Map<Integer,Pair<Double,String>> conversionMap = new TreeMap<>();
 
     private ArrayList<Kviz> ucitaniKvizovi = new ArrayList<>();
     private ArrayList<Kviz> ucitaniOdabraniKvizovi= new ArrayList<>();
@@ -134,8 +136,8 @@ public class Firebase extends AsyncTask {
         }
         else if (opcode == KvizoviAkt.OCstatus.GET_SPINNER_CONTENT)  ucitajKvizove((String) objects[1]);
         else if (opcode== KvizoviAkt.OCstatus.GET_RL) {
-            String kviz = (String) objects[1];
-            ucitajRanglistu(kviz);
+
+            ucitajRanglistu(objects);
         }
 
 
@@ -145,7 +147,10 @@ public class Firebase extends AsyncTask {
         return null;
     }
 
-    private void ucitajRanglistu (String nazivKviza) {
+    private void ucitajRanglistu (Object[] objects) {
+        String nazivKviza = (String) objects[1];
+        String imeIgraca = (String) objects[2];
+        double procent = (double) objects[3];
 
         String query = "{\n" +
                 "  \"structuredQuery\": {\n" +
@@ -200,12 +205,13 @@ public class Firebase extends AsyncTask {
                 mapVal = mapVal.getJSONObject(naziv);
                String procen = mapVal.getString("stringValue");
                Double procenat = Double.parseDouble(procen);
-               rangList.add ("Pozicija "+ i + " Ime i prezime: " + naziv + "\nProcenat tacnih: "+ procenat + "%");
-               mapRangLista.put(i,new Pair<String, Double>(naziv,procenat));
+            //   rangList.add ("Pozicija "+ i + " Ime i prezime: " + naziv + "\nProcenat tacnih: "+ procenat + "%");
+               mapRangLista.put(procenat,naziv);
             }
-
+            dodajIgraca(nazivKviza,imeIgraca,procent);
         }
         catch (Exception e) {
+            dodajIgraca(nazivKviza,imeIgraca,procent);
             System.out.println("QUERY ISSUE: " + e);
         }
     }
@@ -395,7 +401,7 @@ public class Firebase extends AsyncTask {
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_SPINNER_CONTENT) pozivatelj.dobaviSpinerPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
       else if (globalniStatus==KvizoviAkt.OCstatus.ADD_KVIZ || globalniStatus==KvizoviAkt.OCstatus.EDIT_KVIZ)   pozivatelj.azurirajPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
       else if (globalniStatus== KvizoviAkt.OCstatus.V_GET_KATEGORIJE) pozivatelj.dobaviKategorije(ucitaneKategorije);
-      else if (globalniStatus== KvizoviAkt.OCstatus.GET_RL)  poziv.getRangliste(rangList);
+      else if (globalniStatus== KvizoviAkt.OCstatus.GET_RL || globalniStatus==KvizoviAkt.OCstatus.ADD_RL)  poziv.getRangliste(rangList);
 
          globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
 
@@ -425,28 +431,32 @@ public class Firebase extends AsyncTask {
         }
         return null;
     }
+
+
     private void dodajIgraca(String nazivKviza, String imeIgraca, double procent) {
 
-           mapRangLista.put(mapRangLista.size(), new Pair<String, Double>(imeIgraca,procent));
-       // String jsonObjekt =  "{ \"fields\":{\"lista\":{\"stringValue\":\""+ nazivPitanja + "\"},\"indexTacnog\":{\"integerValue\":\""+ indexTacnog +"\"},"+ listaOdgovoraStr+ "}}}}";
+           mapRangLista.put(procent,imeIgraca);
+
+
           String jsonObj = "{ \"fields\": {\n" +
                   "        \"lista\": {\n" +
                   "          \"mapValue\": {\n" +
                   "            \"fields\": {";
           String map = jsonObj+ " ";
+          rangList.clear();
           int i=0;
-          for (Map.Entry<Integer , Pair<String,Double>> obj : mapRangLista.entrySet()) {
-
-              map += " \"" + obj.getKey() + "\": {\n" +
+          for (Map.Entry<Double,String> obj : mapRangLista.entrySet()) {
+              rangList.add ("Pozicija "+ ++i + " Ime i prezime: " + obj.getValue() + "\nProcenat tacnih: "+ obj.getKey() + "%");
+              map += " \"" + i + "\": {\n" +
                       "                \"mapValue\": {\n" +
                       "                  \"fields\": {\n" +
-                      "                   " + "\"" + obj.getValue().first + "\": {\n" +
-                      "                      \"stringValue\": \"" + obj.getValue().second + "\"\n" +
+                      "                   " + "\"" + obj.getValue() + "\": {\n" +
+                      "                      \"stringValue\": \"" + obj.getKey() + "\"\n" +
                       "                    }\n" +
                       "                  }\n" +
                       "                }\n" +
                       "              }";
-              if (i<mapRangLista.size()-1) {
+              if (i<mapRangLista.size()) {
                   map+=",";
                        }
               else {
@@ -454,7 +464,7 @@ public class Firebase extends AsyncTask {
                          "          }\n" +
                          "        },";
               }
-              i++;
+
           }
 
           map+= "    \"nazivKviza\": {\n" +
@@ -464,6 +474,37 @@ public class Firebase extends AsyncTask {
                   "          \"integerValue\": \""+mapRangLista.size()+"\"\n" +
                   "        }\n" +
                   "      } }";
+        System.out.println(map);
+          try {
+              URL url = new URL("https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/Rangliste/" + nazivKviza+ "?access_token=" + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+              System.out.println(url);
+              HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+              connection.setDoInput(true);
+              connection.setRequestMethod("PATCH");
+              connection.setRequestProperty("Content-Type", "application/json");
+              connection.setRequestProperty("Accept", "application/json");
+
+
+
+              DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+              os.writeBytes(map);
+
+              System.out.println(connection.getResponseMessage() + "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+              try(BufferedReader br = new BufferedReader(
+                      new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                  StringBuilder response = new StringBuilder();
+                  String responseLine = null;
+                  while ((responseLine = br.readLine()) != null) {
+                      response.append(responseLine.trim());
+                  }
+                  System.out.println(response.toString());
+              }
+          }
+
+
+          catch (Exception e) {
+
+          }
     }
 
     private void  dodajKviz (Object [] objects  ) {
