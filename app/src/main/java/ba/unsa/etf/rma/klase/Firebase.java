@@ -2,6 +2,7 @@ package ba.unsa.etf.rma.klase;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.json.JsonParser;
@@ -23,8 +24,10 @@ import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
@@ -42,7 +45,7 @@ public class Firebase extends AsyncTask {
     private ArrayList<Kategorija> ucitaneKategorije = new ArrayList<>();
     private ArrayList<String>  rangList = new ArrayList<>();
     private KvizoviAkt.OCstatus globalniStatus = KvizoviAkt.OCstatus.UNDEFINED;
-
+    private Map<Integer , Pair<String,Double>> mapRangLista = new TreeMap<>();
 
     private ArrayList<Kviz> ucitaniKvizovi = new ArrayList<>();
     private ArrayList<Kviz> ucitaniOdabraniKvizovi= new ArrayList<>();
@@ -53,14 +56,20 @@ public class Firebase extends AsyncTask {
         public void azurirajPodatke  (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
     }
 
-  /*  public interface Rangliste {
-        public void getRangliste ()
-    } */
+    public interface Rangliste {
+        public void getRangliste (ArrayList<String> rl);
+    }
     private ProvjeriStatus pozivatelj;
+    private Rangliste poziv;
   /* public Firebase (ProvjeriStatus poz) {
         pozivatelj=poz;
     }
  */
+  public Firebase (KvizoviAkt.OCstatus stat, Context context, Rangliste poziv) {
+      this.globalniStatus= stat;
+      this.context = context;
+      this.poziv=poziv;
+  }
 
     public Firebase(Context context) {
         this.context = context;
@@ -124,7 +133,10 @@ public class Firebase extends AsyncTask {
             ucitajKvizove((String) objects[1]);
         }
         else if (opcode == KvizoviAkt.OCstatus.GET_SPINNER_CONTENT)  ucitajKvizove((String) objects[1]);
-        else if (opcode== KvizoviAkt.OCstatus.GET_RL) ucitajRanglistu("drugiKviz");
+        else if (opcode== KvizoviAkt.OCstatus.GET_RL) {
+            String kviz = (String) objects[1];
+            ucitajRanglistu(kviz);
+        }
 
 
 
@@ -186,8 +198,10 @@ public class Firebase extends AsyncTask {
                 String naziv =  new String (dajIme(mapVal));
 
                 mapVal = mapVal.getJSONObject(naziv);
-               Integer procenat = mapVal.getInt ("integerValue");
-                System.out.println("Pozicija "+ i +" -> Ime i prezime: "+ naziv + "Procenat: "+ procenat +"\n");
+               String procen = mapVal.getString("stringValue");
+               Double procenat = Double.parseDouble(procen);
+               rangList.add ("Pozicija "+ i + " Ime i prezime: " + naziv + "\nProcenat tacnih: "+ procenat + "%");
+               mapRangLista.put(i,new Pair<String, Double>(naziv,procenat));
             }
 
         }
@@ -381,10 +395,13 @@ public class Firebase extends AsyncTask {
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_SPINNER_CONTENT) pozivatelj.dobaviSpinerPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
       else if (globalniStatus==KvizoviAkt.OCstatus.ADD_KVIZ || globalniStatus==KvizoviAkt.OCstatus.EDIT_KVIZ)   pozivatelj.azurirajPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
       else if (globalniStatus== KvizoviAkt.OCstatus.V_GET_KATEGORIJE) pozivatelj.dobaviKategorije(ucitaneKategorije);
+      else if (globalniStatus== KvizoviAkt.OCstatus.GET_RL)  poziv.getRangliste(rangList);
+
          globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
 
 
     }
+
 
     private Pitanje dajPitanjePoStringu (String s, ArrayList<Pitanje> x) {
         int i=0;
@@ -408,7 +425,46 @@ public class Firebase extends AsyncTask {
         }
         return null;
     }
-    private void nullF () {}
+    private void dodajIgraca(String nazivKviza, String imeIgraca, double procent) {
+
+           mapRangLista.put(mapRangLista.size(), new Pair<String, Double>(imeIgraca,procent));
+       // String jsonObjekt =  "{ \"fields\":{\"lista\":{\"stringValue\":\""+ nazivPitanja + "\"},\"indexTacnog\":{\"integerValue\":\""+ indexTacnog +"\"},"+ listaOdgovoraStr+ "}}}}";
+          String jsonObj = "{ \"fields\": {\n" +
+                  "        \"lista\": {\n" +
+                  "          \"mapValue\": {\n" +
+                  "            \"fields\": {";
+          String map = jsonObj+ " ";
+          int i=0;
+          for (Map.Entry<Integer , Pair<String,Double>> obj : mapRangLista.entrySet()) {
+
+              map += " \"" + obj.getKey() + "\": {\n" +
+                      "                \"mapValue\": {\n" +
+                      "                  \"fields\": {\n" +
+                      "                   " + "\"" + obj.getValue().first + "\": {\n" +
+                      "                      \"stringValue\": \"" + obj.getValue().second + "\"\n" +
+                      "                    }\n" +
+                      "                  }\n" +
+                      "                }\n" +
+                      "              }";
+              if (i<mapRangLista.size()-1) {
+                  map+=",";
+                       }
+              else {
+                 map+="  }\n" +
+                         "          }\n" +
+                         "        },";
+              }
+              i++;
+          }
+
+          map+= "    \"nazivKviza\": {\n" +
+                  "          \"stringValue\": \"" +nazivKviza+ "\"\n" +
+                  "        },\n" +
+                  "        \"brojPozicija\": {\n" +
+                  "          \"integerValue\": \""+mapRangLista.size()+"\"\n" +
+                  "        }\n" +
+                  "      } }";
+    }
 
     private void  dodajKviz (Object [] objects  ) {
 

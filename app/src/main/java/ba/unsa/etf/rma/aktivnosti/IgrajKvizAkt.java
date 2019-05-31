@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,11 +24,12 @@ import java.util.Random;
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.fragmenti.InformacijeFrag;
 import ba.unsa.etf.rma.fragmenti.PitanjeFrag;
+import ba.unsa.etf.rma.fragmenti.RangListaFrag;
 import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
-public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.UpdateListener, InformacijeFrag.UpdateListener {
+public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.UpdateListener, InformacijeFrag.UpdateListener, Firebase.Rangliste {
     FrameLayout zaPit, zaInfo;
     Context context=null;
     Kviz kviz;
@@ -43,7 +45,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_igraj_kviz_akt);
-        new Firebase(this).execute(KvizoviAkt.OCstatus.GET_RL);
+
         zaPit= (FrameLayout) findViewById(R.id.pitanjePlace);
         zaInfo= (FrameLayout) findViewById(R.id.informacijePlace);
 
@@ -210,6 +212,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
                     Toast.makeText(context, "Greska, niste unjeli validno ime i prezime, pokusajte ponovo ili kliknite cancel!", Toast.LENGTH_LONG).show();
                 }
                 else {
+                    new Firebase(KvizoviAkt.OCstatus.GET_RL,getApplicationContext(), (Firebase.Rangliste)IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL,nazivKv);
                     userInput.setBackgroundColor(Color.WHITE);
                     alertDialog.dismiss();
                 }
@@ -223,6 +226,18 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         Intent zavrsi = getIntent();
         setResult(32000, zavrsi);
         finish();
+
+    }
+
+    @Override
+    public void getRangliste(ArrayList<String> rl) {
+        Bundle zaRangFrag = new Bundle();
+        RangListaFrag rlf= new RangListaFrag();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        zaRangFrag.putStringArrayList("ranglista", rl);
+        zaRangFrag.putString("nazivKviza", nazivKv);
+        rlf.setArguments(zaRangFrag);
+        fragmentManager.beginTransaction().replace(R.id.pitanjePlace, rlf, rlf.getTag()).commitAllowingStateLoss();
 
     }
 }

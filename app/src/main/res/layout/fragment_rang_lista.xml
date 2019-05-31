@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=" "
+    tools:context=".fragmenti.RangListaFrag"
     >
 
 
@@ -13,14 +13,18 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
         android:layout_marginTop="40dp"
-        android:text="Rang lista: " />
+        android:text="Rang lista: "
+        android:textStyle="bold"
+        android:textSize="15dp"
+        android:textColor="@color/plava"
+        />
 
     <ListView
-        android:id="@+id/odgovoriPitanja"
+        android:id="@+id/ranglista"
         android:layout_width="match_parent"
         android:layout_height="252dp"
         android:layout_marginTop="80dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginEnd="25dp"/>
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"/>
 
 </FrameLayout>
