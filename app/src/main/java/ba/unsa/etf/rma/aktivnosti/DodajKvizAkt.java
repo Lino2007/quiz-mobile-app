@@ -514,6 +514,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         KvizoviAkt.listaKvizova=sKv;
         KvizoviAkt.odabraniKvizovi=oKv;
         validacija();
+        System.out.println(valid);
         if (pozicija == -1 && valid == true) {
            Bundle b = new Bundle();
             Intent addKviz = getIntent();
@@ -537,6 +538,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             dodaj.setEnabled(true);
             finish();
         }
+        dodaj.setEnabled(true);
 
     }
 

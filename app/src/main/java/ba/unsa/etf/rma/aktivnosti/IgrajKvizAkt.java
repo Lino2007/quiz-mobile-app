@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -215,8 +216,7 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
                 }
                 else {
                     String imeIgraca = userInput.getText().toString();
-                    System.out.println(procenatTacnih + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    new Firebase(KvizoviAkt.OCstatus.GET_RL,getApplicationContext(), (Firebase.Rangliste)IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL,nazivKv, imeIgraca, procenatTacnih );
+                    new Firebase(KvizoviAkt.OCstatus.GET_RL,getApplicationContext(), (Firebase.Rangliste)IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL,nazivKv, imeIgraca, procenatTacnih*100 );
                     procT=0;
                     userInput.setBackgroundColor(Color.WHITE);
                     alertDialog.dismiss();
@@ -244,5 +244,15 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         rlf.setArguments(zaRangFrag);
         fragmentManager.beginTransaction().replace(R.id.pitanjePlace, rlf, rlf.getTag()).commitAllowingStateLoss();
 
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            Intent x = getIntent();
+            setResult(12333, x);
+
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

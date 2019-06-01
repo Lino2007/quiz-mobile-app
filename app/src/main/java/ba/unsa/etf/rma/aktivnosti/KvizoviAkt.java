@@ -293,6 +293,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         if (isItPortrait()) {
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
             mainList.setAdapter(mainListAdapter);
+            if (spinner.getSelectedItemPosition()!=0)
+            spinner.setSelection(0);
         }
         else {
         //   popuni();
@@ -468,6 +470,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         config = getResources().getConfiguration();
         blokirajElemente ();
         if (resultCode == -32) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Ucitavam izmjene, pricekajte!", Toast.LENGTH_SHORT);
+            toast.show();
           Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
 
@@ -492,8 +496,10 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             } */
 
 
-        odblokirajElemente();
+
         } else if (resultCode == -133) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Ucitavam izmjene, pricekajte!", Toast.LENGTH_SHORT);
+            toast.show();
 
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
@@ -527,7 +533,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             refreshCategories();
              odblokirajElemente();
         }
-        odblokirajElemente();
+         else if (resultCode== 12333) {
+             odblokirajElemente();
+        }
 
     }
 

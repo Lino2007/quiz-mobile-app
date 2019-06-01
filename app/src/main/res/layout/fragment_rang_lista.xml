@@ -7,11 +7,7 @@
     >
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:weightSum="10">
+
 
         <TextView
             android:id="@+id/rangListaTekst"
@@ -25,17 +21,13 @@
             android:textColor="@color/plava"
             />
 
-        <ListView
-            android:id="@+id/ranglista"
-            android:layout_width="match_parent"
-            android:layout_height="252dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"/>
-    </LinearLayout>
-
-
-
+    <ListView
+        android:id="@+id/ranglista"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="15dp" />
 
 
 </FrameLayout>

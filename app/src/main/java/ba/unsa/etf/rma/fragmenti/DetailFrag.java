@@ -56,8 +56,8 @@ public class DetailFrag extends Fragment implements ListaFrag.lockGridView {
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-          /*      if (position!= KvizoviAkt.odabraniKvizovi.size() -1 )
-                instanca.playKviz(position); */
+              if (position!= KvizoviAkt.odabraniKvizovi.size() -1 )
+                instanca.playKviz(position);
 
             }
         });
