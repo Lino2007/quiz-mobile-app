@@ -53,8 +53,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     private ArrayList<String> kategorije = new ArrayList<>();
     public ArrayList<Pitanje> kopijaPitanjaKviza = new ArrayList<>();
     public ArrayList<Pitanje> kopijaMogucihPitanja = new ArrayList<>();
+    private ArrayList<String> validacijaPitanja = new ArrayList<>();
     DodajKvizAkt dkaAkk = null;
     private boolean refreshKat = false;
+    Uri localUri= null;
 
 
     @Override
@@ -294,6 +296,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //-200: dodavanje novog pitanja , -300: Povratak back buttonom , -100: Dodavanje kategorije
+        // 1999: povratak iz odabira csv/txt fajla
         if (resultCode == (-200)) {
             kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size() - 1);
             kopijaPitanjaKviza.add(new Pitanje(data.getStringExtra("naziv"), data.getStringExtra("naziv"), data.getStringExtra("tacan"), data.getStringArrayListExtra("pitanje")));
@@ -316,7 +319,9 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             Uri uri= null;
           if (data!=null) {
                 uri= data.getData();
-                parsirajCSV(uri);
+                localUri = uri;
+                new Firebase(KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK,this , (Firebase.ProvjeriStatus)DodajKvizAkt.this).execute(KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK);
+            //    parsirajCSV(uri);  /////////////////////////////////////////////////////////////////////////////////
             }
 
         }
@@ -434,6 +439,12 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 isItOkay=false;
                 break;
             }
+
+            if (validacijaPitanja!=null && validacijaPitanja.indexOf(ostali[0])!=-1) {
+                pozoviAlert("Greska pri importu", "Kviz nije ispravan pitanja vec postoje u bazi!" );
+                isItOkay=false;
+                break;
+            }
             try {
                 brojOdgovora= Integer.parseInt(ostali[1]);
             }
@@ -476,6 +487,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         int indKat= kategorije.indexOf(kategorija);
           if (indKat==-1) {
               KvizoviAkt.listaKategorija.add ( new Kategorija(kategorija,DEFAULT_ICON));
+              new Firebase (this).execute(KvizoviAkt.OCstatus.ADD_KAT, new Kategorija(kategorija, DEFAULT_ICON));
+
               kategorije.remove(kategorije.size() - 1);
               kategorije.add(KvizoviAkt.listaKategorija.get(KvizoviAkt.listaKategorija.size() - 1).getNaziv());
               kategorije.add("Dodaj kategoriju");
@@ -485,13 +498,16 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         }
 
         if (isItOkay) {
+
                 dkaSpinner.setSelection(indKat);
+                ArrayList<Pitanje> zaFb = kopirajPitanja(kopijaPitanjaKviza,zaPitanja);
+                new Firebase(this). execute(KvizoviAkt.OCstatus.IMPORT_PITANJA_ADD, zaFb);
                 kopijaPitanjaKviza.clear();
                kopijaPitanjaKviza= kopirajPitanja(kopijaPitanjaKviza,zaPitanja);
                kopijaPitanjaKviza.add (new Pitanje (null, null, null, null));
                 pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
                 listaPitanja.setAdapter(pitanjaAdapter);
-                listaMogucih.setAdapter(null);
+              //  listaMogucih.setAdapter(null);
                 editText.setText(nazivKviza);
             }
 
@@ -554,6 +570,13 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void azurirajPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
+
+    }
+
+    @Override
+    public void validacijaPitanja(ArrayList<String> listaPitanja) {
+        validacijaPitanja=listaPitanja;
+        parsirajCSV(localUri);
 
     }
 }

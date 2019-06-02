@@ -39,7 +39,7 @@ import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
 
 
 public class Firebase extends AsyncTask {
-
+    private ArrayList<String> zaValidacijuPitanja = new ArrayList<>();
     private Context context;
     private static final String urlLink ="https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/" ;
     public static ArrayList<Pitanje> listaMogucih = new ArrayList<>();
@@ -56,6 +56,7 @@ public class Firebase extends AsyncTask {
         public void dobaviKategorije (ArrayList<Kategorija> kat);
         public void dobaviPodatke (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat);
         public void azurirajPodatke  (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
+        public void validacijaPitanja (ArrayList<String> listaPitanja);
     }
 
     public interface Rangliste {
@@ -87,7 +88,7 @@ public class Firebase extends AsyncTask {
     protected Object doInBackground(Object... objects) {
         KvizoviAkt.OCstatus opcode = (KvizoviAkt.OCstatus) objects[0];
      //  globalniStatus= opcode;
-
+      //  System.out.println(opcode);
         InputStream is = context.getResources().openRawResource(R.raw.secret);
         GoogleCredential credentials=null;
         try
@@ -138,6 +139,13 @@ public class Firebase extends AsyncTask {
         else if (opcode== KvizoviAkt.OCstatus.GET_RL) {
 
             ucitajRanglistu(objects);
+        }
+        else if (globalniStatus == KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK) {
+            vratiPitanja();
+        }
+        else if (opcode == KvizoviAkt.OCstatus.IMPORT_PITANJA_ADD) {
+            System.out.println("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+            ucitajListuPitanja(objects);
         }
         return null;
     }
@@ -448,6 +456,7 @@ public class Firebase extends AsyncTask {
       else if (globalniStatus==KvizoviAkt.OCstatus.ADD_KVIZ || globalniStatus==KvizoviAkt.OCstatus.EDIT_KVIZ)   pozivatelj.azurirajPodatke(ucitaniOdabraniKvizovi,ucitaniKvizovi);
       else if (globalniStatus== KvizoviAkt.OCstatus.V_GET_KATEGORIJE) pozivatelj.dobaviKategorije(ucitaneKategorije);
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_RL || globalniStatus==KvizoviAkt.OCstatus.ADD_RL)  poziv.getRangliste(rangList);
+      else if (globalniStatus== KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK) pozivatelj.validacijaPitanja(zaValidacijuPitanja);
 
          globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
 
@@ -642,6 +651,7 @@ public class Firebase extends AsyncTask {
                 idKategorije="Svi";
             }
             ArrayList<Pitanje> listaPitanja = new ArrayList<>();
+
             try {
                listaPitanja = noviKviz.getPitanja();
 
@@ -755,7 +765,7 @@ public class Firebase extends AsyncTask {
                 System.out.println(response.toString());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Problem sa ucitavanjem pitanja " + e);
         }
 
 
@@ -793,6 +803,7 @@ public class Firebase extends AsyncTask {
         }
         return avs;
     }
+
     private boolean daLiPostojiPitanje (String nazivPitanja) {
         try {
             URL url = new URL(urlLink +  "Pitanja?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
@@ -823,7 +834,46 @@ public class Firebase extends AsyncTask {
         return false;
     }
 
-     private String streamToString (BufferedReader rd ) {
+    private  void ucitajListuPitanja (Object ... obj) {
+      ArrayList<Pitanje> listaPitanja = (ArrayList<Pitanje>) obj[1];
+      for (Pitanje p : listaPitanja) {
+         obj[1] =  p;
+          System.out.println(p.toString());
+          dodajPitanje(obj);
+      }
+
+    }
+     private void vratiPitanja () {
+        try {
+            URL url = new URL(urlLink +  "Pitanja?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+            System.out.println(url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept","application/json");
+            BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String content = "", line;
+            while ((line = rd.readLine()) != null) {
+                content += line + "\n";
+            }
+            JSONObject jsonObj = new JSONObject(content);
+            JSONArray dokumenti= jsonObj.getJSONArray("documents");
+            for (int i=0; i<dokumenti.length(); i++) {
+                JSONObject doc = dokumenti.getJSONObject(i);
+                String docP = doc.getString("name");
+                String[] lista = docP.split("/");
+                zaValidacijuPitanja.add(lista[lista.length-1]);
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println(e);
+
+        }
+
+    }
+
+    private String streamToString (BufferedReader rd ) {
          String content = "", line;
         try {
             while ((line = rd.readLine()) != null) {

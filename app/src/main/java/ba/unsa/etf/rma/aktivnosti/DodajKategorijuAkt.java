@@ -152,4 +152,9 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
     public void azurirajPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
 
     }
+
+    @Override
+    public void validacijaPitanja(ArrayList<String> listaPitanja) {
+
+    }
 }
