@@ -26,7 +26,7 @@ import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class GridViewAdapter extends BaseAdapter  implements /*View.OnClickListener,*/ IconDialog.Callback {
+public class GridViewAdapter extends BaseAdapter  implements  IconDialog.Callback {
     /*********** Declare Used Variables *********/
     private Activity activity = null;
     private ArrayList data;

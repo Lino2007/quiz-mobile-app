@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.OdgovoriListAdapter;
-import ba.unsa.etf.rma.klase.TestFirebaseKlasa;
 
 public class DodajPitanjeAkt extends AppCompatActivity {
 
@@ -44,15 +43,12 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         lvOdgovori = (ListView) findViewById(R.id.lvOdgovori);
         zaValidaciju= getIntent().getStringArrayListExtra("zaValidaciju");
         odgovoriAdapter = new OdgovoriListAdapter(this, listaOdgovora, getResources());
-
         if (listaOdgovora == null) lvOdgovori.setAdapter(null);
-
-        new TestFirebaseKlasa().execute(null, null);
-
 
         dodajTacan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Prosljedjuje se pozicija tacnog radi obojenja
                 if (tacan == null && odgovor.getText().toString().length() > 0 && (listaOdgovora.indexOf(odgovor.getText().toString()) == -1 || listaOdgovora.isEmpty())) {
                     poz = listaOdgovora.size();
                     pozicijaTacnog= listaOdgovora.size();
@@ -75,8 +71,7 @@ public class DodajPitanjeAkt extends AppCompatActivity {
             }
             });
 
-
-        nazivPitanja.setOnClickListener(new View.OnClickListener() {
+       nazivPitanja.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 nazivPitanja.setBackgroundColor(Color.WHITE);
@@ -86,7 +81,7 @@ public class DodajPitanjeAkt extends AppCompatActivity {
         dodaj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 if (listaOdgovora.indexOf(odgovor.getText().toString())==-1 && odgovor.getText().toString().length() > 0) { // U SLUCAJU AKO JE TRAZENO DA ODGOVORI MORAJU BITI RAZLICITI
+                 if (listaOdgovora.indexOf(odgovor.getText().toString())==-1 && odgovor.getText().toString().length() > 0) {
                 listaOdgovora.add(odgovor.getText().toString());
                 lvOdgovori.setAdapter(odgovoriAdapter);
                      lvOdgovori.setBackgroundColor(Color.WHITE);
@@ -135,8 +130,6 @@ public class DodajPitanjeAkt extends AppCompatActivity {
             }
 
         });
-
-
     }
 
     @Override

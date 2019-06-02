@@ -23,7 +23,6 @@ import java.util.ArrayList;
 //import com.google.api.services.sqladmin.SQLAdminScopes;
 
 import ba.unsa.etf.rma.R;
-import ba.unsa.etf.rma.adapteri.GridViewAdapter;
 import ba.unsa.etf.rma.adapteri.MainListAdapter;
 import ba.unsa.etf.rma.fragmenti.DetailFrag;
 import ba.unsa.etf.rma.fragmenti.ListaFrag;
@@ -36,12 +35,14 @@ import ba.unsa.etf.rma.klase.Pitanje;
 public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
 
     //Statusni signali za poziv metoda u firebase-u
-    public enum OCstatus {UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT, V_GET_KATEGORIJE, GET_RL , ADD_RL, IMPORT_PITANJA_CHECK , IMPORT_PITANJA_ADD}
+    public enum OCstatus {
+        UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT, V_GET_KATEGORIJE, GET_RL, ADD_RL, IMPORT_PITANJA_CHECK, IMPORT_PITANJA_ADD
+    }
 
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
     public KvizoviAkt kvizoviAkt;
-    public static ArrayList<Kviz> odabraniKvizovi = new ArrayList<>();
+    public static ArrayList<Kviz> odabraniKvizovi = new ArrayList<>();  //Odabrani kvizovi vise nemaju nikakvu funkciju (po dodavanju baze), ali bi oduzelo dosta vremena da se uklone
     private String trenutnaKategorija = new String();
     private ListView mainList;
     public MainListAdapter mainListAdapter = null;
@@ -49,13 +50,11 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     private Spinner spinner;
     public static int jedinica = 1;
     private FrameLayout detail, lista;
-    Activity refreshActivity = null;
-    TestRefresh instanca;
     public static String TOKEN = null;
     Configuration config;
     FragmentManager fragmentm = null;
     ListaFrag lfm = null;
-    DetailFrag dfm =null;
+    DetailFrag dfm = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +63,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         setContentView(R.layout.activity_main);
         //Inicijalno citanje iz baze
         try {
-            new Firebase(  OCstatus.GET_DB_CONTENT,this ,(Firebase.ProvjeriStatus)KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
+            new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
         } catch (Exception e) {
             System.out.println("Nesto nije uredu sa pristupom tokenu!");
         }
@@ -77,6 +76,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         fragmentm = getSupportFragmentManager();
         detail = (FrameLayout) findViewById(R.id.detailPlace);
         lista = (FrameLayout) findViewById(R.id.listPlace);
+
         //Postavka ponasanja pri razlicitim konfiguracijama (portrait ili landscape)
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
             spinner.setOnItemSelectedListener(this);
@@ -86,7 +86,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             mainList.setAdapter(mainListAdapter);
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(dataAdapter);
-            blokirajElemente ();
+            blokirajElemente();
             new Firebase(this).execute(OCstatus.GET_MOGUCA);
             //Dugi klik
             mainList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -101,7 +101,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                   if (position != odabraniKvizovi.size() - 1) {
+                    if (position != odabraniKvizovi.size() - 1) {
                         Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
                         newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(position));
                         KvizoviAkt.this.startActivityForResult(newIntent, 32000);
@@ -111,8 +111,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             });
 
         } else {
+            //Inicijalizacija fragmenata u landscape modu
             lfm = new ListaFrag();
-             dfm = new DetailFrag();
+            dfm = new DetailFrag();
             fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commit();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commit();
         }
@@ -125,30 +126,20 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         super.onStart();
     }
 
-
-    public void setTrenutnaKategorija(String trenutnaKategorija) {
-        this.trenutnaKategorija = trenutnaKategorija;
-    }
-
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+        //Izmjena liste prilikom odabira kategorije iz spinnera
         String item = parent.getItemAtPosition(position).toString();
         config = getResources().getConfiguration();
-
-
         Toast toast = Toast.makeText(getApplicationContext(), "Ucitavaju se kvizovi, molimo sacekajte!", Toast.LENGTH_SHORT);
-          toast.show();
+        toast.show();
         if (position >= 0 && position < categories.size()) {
             if (listaKvizova.size() > 1) {
-
-                blokirajElemente ();
-                new Firebase(  OCstatus.GET_SPINNER_CONTENT,this ,(Firebase.ProvjeriStatus)KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, item);
-
+                blokirajElemente();
+                new Firebase(OCstatus.GET_SPINNER_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, item);
             } else {
-                blokirajElemente ();
-                new Firebase( OCstatus.GET_SPINNER_CONTENT,this ,(Firebase.ProvjeriStatus)KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, item);
+                blokirajElemente();
+                new Firebase(OCstatus.GET_SPINNER_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, item);
 
             }
         }
@@ -158,15 +149,15 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
-    private void blokirajElemente () {
+    private void blokirajElemente() {
+        //Sigurnosna blokacija elemenata prilikom rada async taska
         config = getResources().getConfiguration();
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mainList.setEnabled(false);
             spinner.setEnabled(false);
-        }
-        else {
-            if (dfm.grid!=null)
-            dfm.grid.setEnabled(false);
+        } else {
+            if (dfm.grid != null)
+                dfm.grid.setEnabled(false);
         }
     }
 
@@ -175,9 +166,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mainList.setEnabled(true);
             spinner.setEnabled(true);
-        }
-        else {
-            if (dfm.grid!=null) {
+        } else {
+            if (dfm.grid != null) {
                 dfm.grid.setEnabled(true);
             }
         }
@@ -186,63 +176,50 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     @Override
     public void dobaviSpinerPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
-
-        listaKvizova=sKv;
-        odabraniKvizovi=oKv;
-         popuni();
+        //Pomocna metoda iz intefejsa za dobavljanje kvizova prema kategoriji
+        listaKvizova = sKv;
+        odabraniKvizovi = oKv;
+        popuni();
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
             mainList.setAdapter(mainListAdapter);
 
-        }
-        else {
-
-             dfm = new DetailFrag();
+        } else {
+            dfm = new DetailFrag();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
-
         }
         odblokirajElemente();
-
     }
 
     @Override
     public void dobaviKategorije(ArrayList<Kategorija> kat) {
-
         listaKategorija = kat;
-
     }
 
     @Override
-    public void dobaviPodatke( ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat) {
-         listaKvizova=sKv;
-         odabraniKvizovi=oKv;
-         listaKategorija=kat;
-      config = getResources().getConfiguration();
-  //    categories.clear();
+    public void dobaviPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv, ArrayList<Kategorija> kat) {
+        //Dobavljanje svih podataka, koristi se najcesce pri prvom paljenju aplikacije
+        listaKvizova = sKv;
+        odabraniKvizovi = oKv;
+        listaKategorija = kat;
+        config = getResources().getConfiguration();
 
+        //Popunjavanje GUI elemenata na osnovu konfiguracije
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
-        popuni();
-
-        mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
-        mainList.setAdapter(mainListAdapter);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(dataAdapter);
-
-        spinner.setSelection(0);
-
-        }
-        else {
-        popuni();
-         fragmentm = getSupportFragmentManager();
-             lfm = new ListaFrag();
+            popuni();
+            mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categories);
+            mainList.setAdapter(mainListAdapter);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(dataAdapter);
+            spinner.setSelection(0);
+        } else {
+            popuni();
+            fragmentm = getSupportFragmentManager();
+            lfm = new ListaFrag();
             dfm = new DetailFrag();
-
-
             fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
-
-
         }
         odblokirajElemente();
 
@@ -250,22 +227,18 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     @Override
     public void azurirajPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
-
-        odabraniKvizovi=oKv;
-        listaKvizova=sKv;
-
-          popuni();
+        //Koristi se prilikom klika na spinner ili listu (u ovisnosti od konfiguracije)
+        odabraniKvizovi = oKv;
+        listaKvizova = sKv;
+        popuni();
         if (isItPortrait()) {
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, getResources());
             mainList.setAdapter(mainListAdapter);
-            if (spinner.getSelectedItemPosition()!=0)
-            spinner.setSelection(0);
-        }
-        else {
-        //   popuni();
+            if (spinner.getSelectedItemPosition() != 0)
+                spinner.setSelection(0);
+        } else {
             dfm = new DetailFrag();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
-         //   recallFrags();
         }
         odblokirajElemente();
 
@@ -273,39 +246,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     @Override
     public void validacijaPitanja(ArrayList<String> listaPitanja) {
-
+        //koristi se u drugim klasama
     }
-
-
-    private void dajKvizoveKategorije(String item) {
-        int i = 0;
-     //   odabraniKvizovi.clear();
-        Configuration config = getResources().getConfiguration();
-        if (item != "Svi") {
-            for (Kviz x : listaKvizova) {
-                if (x.getKategorija() != null && x.getKategorija().getNaziv() == item) {
-                    odabraniKvizovi.add(x);
-                }
-            }
-            setTrenutnaKategorija(item);
-
-            odabraniKvizovi.add(listaKvizova.get(listaKvizova.size() - 1));
-            if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                mainListAdapter = new MainListAdapter(kvizoviAkt, odabraniKvizovi, getResources());
-                mainList.setAdapter(mainListAdapter);
-            }
-            return;
-        }
-        odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
-        if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mainListAdapter = new MainListAdapter(kvizoviAkt, odabraniKvizovi, getResources());
-            mainList.setAdapter(mainListAdapter);
-        }
-    }
-
 
     public void popuni() {
-        if (categories.size()>0) categories.clear();
+        //Popunjavanje potrebnih podataka za spinnere i Dodaj element list view-a
+        if (categories.size() > 0) categories.clear();
         categories.add("Svi");
         for (Kategorija a : listaKategorija) {
             categories.add(a.getNaziv());
@@ -315,7 +261,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     }
 
     private void dugiKlik(int mPosition) {
-        //  new Firebase(this).execute(OCstatus.GET_MOGUCA);
+        //  Dugim klikom inicira poziv DodajKvizAkt (azuriranje ili dodavanje u ovisnosti od uslova)
         if (mPosition == odabraniKvizovi.size() - 1) {
             Intent dodajIntent = new Intent(KvizoviAkt.this, DodajKvizAkt.class);
             dodajIntent.putExtra("poz_kviza", -1);
@@ -340,7 +286,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             KvizoviAkt.this.startActivityForResult(dodajIntent, 0);
         }
     }
-
 
     public ArrayList<Kviz> kopiraj(ArrayList<Kviz> a, ArrayList<Kviz> b) {
         b.clear();
@@ -376,37 +321,31 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         // 32000 oznacava izlazak iz IgrajKvizAkt klikom na zavrsi kviz button
         // 9000 izlazak iz IgrajKvizAkt putem back buttona
         config = getResources().getConfiguration();
-        blokirajElemente ();
+        blokirajElemente();
         if (resultCode == -32) {
             Toast toast = Toast.makeText(getApplicationContext(), "Ucitavam izmjene, pricekajte!", Toast.LENGTH_SHORT);
             toast.show();
-          Bundle bundleOb = data.getExtras();
+            Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
 
             novaPitanja.remove(novaPitanja.size() - 1);
-           if (listaKvizova.size()>0) listaKvizova.remove(listaKvizova.size() - 1);
+            if (listaKvizova.size() > 0) listaKvizova.remove(listaKvizova.size() - 1);
             Kviz noviKviz = null;
             if ((data.getExtras().getInt("kategorija") - 1) != -1) {
                 noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt("kategorija") - 1));
             } else noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, null);
             listaKvizova.add(new Kviz(null, null, null));
-
-            new Firebase(   OCstatus.ADD_KVIZ,this ,(Firebase.ProvjeriStatus)KvizoviAkt.this).execute(OCstatus.ADD_KVIZ, noviKviz);
-
+            new Firebase(OCstatus.ADD_KVIZ, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.ADD_KVIZ, noviKviz);
             dodajKviz(noviKviz);
-
-
-
         } else if (resultCode == -133) {
             Toast toast = Toast.makeText(getApplicationContext(), "Ucitavam izmjene, pricekajte!", Toast.LENGTH_SHORT);
             toast.show();
-
             Bundle bundleOb = data.getExtras();
             ArrayList<Pitanje> novaPitanja = (ArrayList<Pitanje>) bundleOb.getSerializable("listaPitanja");
             novaPitanja.remove(novaPitanja.size() - 1);
             int pozicija = data.getExtras().getInt("pozicija");
-            //Stari naziv za azuriranje u bazi
 
+            //Stari naziv za brisanje starog dokumenta
             String stariNaziv = odabraniKvizovi.get(pozicija).getNaziv();
             odabraniKvizovi.get(pozicija).setPitanja(novaPitanja);
             odabraniKvizovi.get(pozicija).setNaziv(data.getStringExtra("naziv"));
@@ -416,31 +355,23 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             } else {
                 odabraniKvizovi.get(pozicija).setKategorija(null);
             }
-
-            new Firebase(   OCstatus.EDIT_KVIZ,this ,(Firebase.ProvjeriStatus)KvizoviAkt.this).execute(OCstatus.EDIT_KVIZ,  odabraniKvizovi.get(pozicija), stariNaziv);
-
-
-
+            new Firebase(OCstatus.EDIT_KVIZ, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.EDIT_KVIZ, odabraniKvizovi.get(pozicija), stariNaziv);
         } else if (resultCode == 9000) {
-             odblokirajElemente();
+            odblokirajElemente();
             refreshCategories();
         } else if (resultCode == 32000) {
             odblokirajElemente();
-
         } else if (resultCode == 10000) {
             refreshCategories();
-             odblokirajElemente();
-        }
-         else if (resultCode== 12333) {
-             odblokirajElemente();
+            odblokirajElemente();
+        } else if (resultCode == 12333) {
+            odblokirajElemente();
         }
 
     }
 
-
-
-
     void refreshCategories() {
+        //Osvjezavanje liste kategorija ukoliko su se desile izmjene
         categories.clear();
         categories.add("Svi");
         for (Kategorija k : listaKategorija) {
@@ -454,27 +385,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     @Override
     public void filterList(int i) {
         if (i < 0) return;
-        //dajKvizoveKategorije(categories.get(i));
-        new Firebase( OCstatus.GET_SPINNER_CONTENT,this ,(Firebase.ProvjeriStatus)KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, categories.get(i));
-
-
+        new Firebase(OCstatus.GET_SPINNER_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, categories.get(i));
     }
 
     @Override
     public void addKviz(int i) {
         dugiKlik(i);
-    }
-
-
-    void recallFrags() {
-        fragmentm = getSupportFragmentManager();
-        lfm = new ListaFrag();
-        dfm = new DetailFrag();
-
-
-        fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
-        fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
-
     }
 
     @Override
@@ -488,21 +404,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
             newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(i));
             KvizoviAkt.this.startActivityForResult(newIntent, 32000);
-
-            //Poziv igrajkvizakt
         }
 
     }
 
-
-    private void ugrabiToken() throws Exception {
-
-        new Firebase(this).execute(OCstatus.UNDEFINED, -1);
-    }
-
-    public interface TestRefresh {
-        void refreshKat();
-
-        void refreshKviz();
-    }
 }

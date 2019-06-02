@@ -145,24 +145,5 @@ public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListe
         return vi;
     }
 
-   /* @Override
-    public void onClick(View v) {
-        Log.v("CustomAdapter", "=====Row button clicked=====");
-    }
-
-
-    private class OnItemClickListener implements View.OnClickListener {
-        private int mPosition;
-
-        OnItemClickListener(int position) {
-            mPosition = position;
-        }
-
-        @Override
-        public void onClick(View arg0) {
-            KvizoviAkt sct = (KvizoviAkt) activity;
-            sct.onItemClick(mPosition);
-        }
-    } */
 
 }

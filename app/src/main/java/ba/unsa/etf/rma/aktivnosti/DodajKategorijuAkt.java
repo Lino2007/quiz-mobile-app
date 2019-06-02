@@ -29,7 +29,6 @@ import ba.unsa.etf.rma.klase.Kviz;
 public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.Callback , Firebase.ProvjeriStatus{
     EditText naziv, nazivIkone;
     Button dodajIkonu, dodajKategoriju;
-
     private boolean valid = false;
     public static Icon[] selectedIcons;
     String ikona, nazivKategorije;
@@ -44,9 +43,7 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         nazivIkone = (EditText) findViewById(R.id.etIkona);
         dodajIkonu = (Button) findViewById(R.id.btnDodajIkonu);
         dodajKategoriju = (Button) findViewById(R.id.btnDodajKategoriju);
-
-
-        nazivIkone.setEnabled(false);
+        nazivIkone.setEnabled(false);     //Blokacija fielda za ikonu
         nazivIkone.setFocusable(false);
 
         dodajIkonu.setOnClickListener(new View.OnClickListener() {
@@ -67,9 +64,6 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
                 new Firebase(  KvizoviAkt.OCstatus.V_GET_KATEGORIJE,getApplicationContext() ,(Firebase.ProvjeriStatus)DodajKategorijuAkt.this).execute(KvizoviAkt.OCstatus.V_GET_KATEGORIJE);
             }
         });
-
-
-
     }
 
     @Override
@@ -78,7 +72,7 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         if ((keyCode == KeyEvent.KEYCODE_BACK)) setResult(-300);
         return super.onKeyDown(keyCode, event);
     }
-  //
+
     @Override
     public void onIconDialogIconsSelected(Icon[] icons) {
         selectedIcons = icons;
@@ -96,11 +90,8 @@ public class DodajKategorijuAkt extends AppCompatActivity implements IconDialog.
         else nazivIkone.setBackgroundColor(Color.WHITE);
         boolean naz = true, ik = true;
         if ((!(nazivKategorije.isEmpty())) && !(ikona.isEmpty())) {
-
             for (Kategorija test : KvizoviAkt.listaKategorija) {
-
                 if (test.getNaziv().equals(nazivKategorije) || test.getNaziv().equals("Dodaj kategoriju")) {
-
                     naziv.setBackgroundColor(Color.parseColor("#E85F41"));
                     naz = false;
                 }

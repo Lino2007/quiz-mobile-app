@@ -1,13 +1,12 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 
-import android.annotation.SuppressLint;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,7 +17,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -30,72 +29,63 @@ import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
-public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.UpdateListener, InformacijeFrag.UpdateListener, Firebase.Rangliste {
+public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.UpdateListener, InformacijeFrag.UpdateListener, Firebase.Rangliste {
     FrameLayout zaPit, zaInfo;
-    Context context=null;
+    Context context = null;
     Kviz kviz;
-     ArrayList<Pitanje> preostalaPitanja= new ArrayList<>();
-     ArrayList<Pitanje> odgovorenaPitanja= new ArrayList<>();
-     int brojTacnih=0;
-     double procenatTacnih=0;
-     static double procT = 0;
-     int inx=-1;
-     String nazivKv = new String();
-   // private EditText result;
+    ArrayList<Pitanje> preostalaPitanja = new ArrayList<>();
+    ArrayList<Pitanje> odgovorenaPitanja = new ArrayList<>();
+    int brojTacnih = 0;
+    double procenatTacnih = 0;
+    static double procT = 0;
+    int inx = -1;
+    String nazivKv = new String();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_igraj_kviz_akt);
 
-        zaPit= (FrameLayout) findViewById(R.id.pitanjePlace);
-        zaInfo= (FrameLayout) findViewById(R.id.informacijePlace);
+        zaPit = (FrameLayout) findViewById(R.id.pitanjePlace);
+        zaInfo = (FrameLayout) findViewById(R.id.informacijePlace);
 
-        //init frags
-        context=this;
-        InformacijeFrag infoFrag= new InformacijeFrag();
-        PitanjeFrag pitFrag= new PitanjeFrag();
+        //Uspostava fragmenata
+        context = this;
+        InformacijeFrag infoFrag = new InformacijeFrag();
+        PitanjeFrag pitFrag = new PitanjeFrag();
 
-        Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
-         kviz= (Kviz) getIntent().getSerializableExtra("kviz");
-         //prekopirajPitanja(kviz.getPitanja());
-          preostalaPitanja= prekopirajPitanja(kviz.getPitanja());
+        Bundle zaFragPit = new Bundle(), zaFragInfo = new Bundle();
+        kviz = (Kviz) getIntent().getSerializableExtra("kviz");
+        preostalaPitanja = prekopirajPitanja(kviz.getPitanja());
 
-          int a=-1;
-          if ( preostalaPitanja!= null && !preostalaPitanja.isEmpty()) {
-              a = getRandomIndex(preostalaPitanja.size());
-              inx=a;
-          }
-          else {
-
-          }
-
-
-        nazivKv=kviz.getNaziv();
+        int a = -1;
+        if (preostalaPitanja != null && !preostalaPitanja.isEmpty()) {
+            a = getRandomIndex(preostalaPitanja.size());
+            inx = a;
+        }
+        nazivKv = kviz.getNaziv();
         zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
         zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
         zaFragInfo.putInt("broj_tacnih", brojTacnih);
-        if (preostalaPitanja==null) {  zaFragPit.putSerializable("pitanja", null);
-            zaFragInfo.putInt ("broj_preostalih", 0);}
-      else {
+        if (preostalaPitanja == null) {
+            zaFragPit.putSerializable("pitanja", null);
+            zaFragInfo.putInt("broj_preostalih", 0);
+        } else {
             zaFragPit.putSerializable("pitanja", preostalaPitanja.get(a));
-            zaFragInfo.putInt ("broj_preostalih", preostalaPitanja.size());
+            zaFragInfo.putInt("broj_preostalih", preostalaPitanja.size());
         }
-
 
         infoFrag.setArguments(zaFragInfo);
         pitFrag.setArguments(zaFragPit);
-
-
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag,infoFrag.getTag()).commit();
-        fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag,infoFrag.getTag()).commit();
+        fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag, infoFrag.getTag()).commit();
+        fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag, infoFrag.getTag()).commit();
 
 
     }
 
-    private ArrayList<Pitanje> prekopirajPitanja (ArrayList<Pitanje> a ) {
-        ArrayList<Pitanje> v= new ArrayList<>();
+    private ArrayList<Pitanje> prekopirajPitanja(ArrayList<Pitanje> a) {
+        ArrayList<Pitanje> v = new ArrayList<>();
         if (a.isEmpty()) return null;
         for (Pitanje x : a) {
             v.add(x);
@@ -103,50 +93,45 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         return v;
     }
 
-    int getRandomIndex (int x) {
-        Random rand= new Random();
+    int getRandomIndex(int x) {
+        Random rand = new Random();
         return rand.nextInt(x);
     }
 
-
     @Override
     public void updateByAction(boolean tacno) {
-        InformacijeFrag infoFrag= new InformacijeFrag();
-        PitanjeFrag pitFrag= new PitanjeFrag();
-        Bundle zaFragPit= new Bundle(), zaFragInfo= new Bundle();
+        //Po odgovoru na pitanje se vrse akcije azuriranja statistika, i ucitavanja novih pitanja
+        InformacijeFrag infoFrag = new InformacijeFrag();
+        PitanjeFrag pitFrag = new PitanjeFrag();
+        Bundle zaFragPit = new Bundle(), zaFragInfo = new Bundle();
         zaFragInfo.putString("naziv_kviza", nazivKv);
 
-        if (preostalaPitanja.size()>1) {
+        if (preostalaPitanja.size() > 1) {
             odgovorenaPitanja.add(preostalaPitanja.get(inx));
             preostalaPitanja.remove(inx);
             inx = getRandomIndex(preostalaPitanja.size());
-        }
-        else if (preostalaPitanja.size()==1) {
+        } else if (preostalaPitanja.size() == 1) {
             odgovorenaPitanja.add(preostalaPitanja.get(0));
             preostalaPitanja.remove(0);
-            inx =0;
+            inx = 0;
         }
-        if (preostalaPitanja.size()>=1) {
+        if (preostalaPitanja.size() >= 1) {
             if (tacno) brojTacnih++;
-            procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
-            procenatTacnih=Math.round(procenatTacnih*10000.0)/10000.0;
+            procenatTacnih = (double) brojTacnih / odgovorenaPitanja.size();
+            procenatTacnih = Math.round(procenatTacnih * 10000.0) / 10000.0;
             zaFragPit.putSerializable("pitanja", preostalaPitanja.get(inx));
-            procT=procenatTacnih;
+            procT = procenatTacnih;
             zaFragInfo.putInt("broj_tacnih", brojTacnih);
             zaFragInfo.putInt("broj_preostalih", preostalaPitanja.size());
             zaFragInfo.putString("naziv_kviza", kviz.getNaziv());
             zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
-
-
-        }
-       else if (preostalaPitanja.size()==0) {
+        } else if (preostalaPitanja.size() == 0) {
             if (tacno) brojTacnih++;
             zaFragPit.putSerializable("pitanja", null);
-            procenatTacnih= (double) brojTacnih/odgovorenaPitanja.size();
-            procenatTacnih=Math.round(procenatTacnih*10000.0)/10000.0;
-            procT=procenatTacnih;
-            zaFragInfo.putInt("broj_preostalih",0);
-
+            procenatTacnih = (double) brojTacnih / odgovorenaPitanja.size();
+            procenatTacnih = Math.round(procenatTacnih * 10000.0) / 10000.0;
+            procT = procenatTacnih;
+            zaFragInfo.putInt("broj_preostalih", 0);
             zaFragInfo.putInt("broj_tacnih", brojTacnih);
             zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
         }
@@ -154,12 +139,11 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         pitFrag.setArguments(zaFragPit);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-   //finalpush
+
         try {
             fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag, infoFrag.getTag()).commit();
             fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag, infoFrag.getTag()).commit();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             buttonClick();
         }
 
@@ -172,52 +156,42 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         LayoutInflater li = LayoutInflater.from(context);
         View promptsView = li.inflate(R.layout.layout_for_alert_dialog, null);
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
-
-        // set prompts.xml to alertdialog builder
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setView(promptsView);
+        final EditText userInput = (EditText) promptsView.findViewById(R.id.editTextDialogUserInput);
 
-        final EditText userInput = (EditText) promptsView
-                .findViewById(R.id.editTextDialogUserInput);
-
-        // set dialog message
+        // Uspostava alert dijaloga
         alertDialogBuilder
                 .setCancelable(false)
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
-                                // get user input and set it to result
-                                // edit text
-                             //   result.setText(userInput.getText());
+                            public void onClick(DialogInterface dialog, int id) {
+
                             }
                         })
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
+                            public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                             }
                         });
 
-        // create alert dialog
+
         final AlertDialog alertDialog = alertDialogBuilder.create();
 
-        // show it
         alertDialog.show();
-
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-        //   @SuppressLint("ResourceAsColor")
+            //   @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View v) {
-                String ime= userInput.getText().toString();
-                if ( ime==null || ime.length()==0) {
+                String ime = userInput.getText().toString();
+                if (ime == null || ime.length() == 0) {
                     userInput.setBackgroundColor(getResources().getColor(R.color.crvena));
                     Toast.makeText(context, "Greska, niste unjeli validno ime i prezime, pokusajte ponovo ili kliknite cancel!", Toast.LENGTH_LONG).show();
-                }
-                else {
+                } else {
                     String imeIgraca = userInput.getText().toString();
-                    new Firebase(KvizoviAkt.OCstatus.GET_RL,getApplicationContext(), (Firebase.Rangliste)IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL,nazivKv, imeIgraca, procenatTacnih*100 );
-                    procT=0;
+                    new Firebase(KvizoviAkt.OCstatus.GET_RL, getApplicationContext(), (Firebase.Rangliste) IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL, nazivKv, imeIgraca, procenatTacnih * 100);
+                    procT = 0;
                     userInput.setBackgroundColor(Color.WHITE);
                     alertDialog.dismiss();
                 }
@@ -227,23 +201,22 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
     }
 
     @Override
-    public void buttonClick ( ) {
+    public void buttonClick() {
+        //Forsirani izlaz
         Intent zavrsi = getIntent();
         setResult(32000, zavrsi);
         finish();
-
     }
 
     @Override
     public void getRangliste(ArrayList<String> rl) {
         Bundle zaRangFrag = new Bundle();
-        RangListaFrag rlf= new RangListaFrag();
+        RangListaFrag rlf = new RangListaFrag();
         FragmentManager fragmentManager = getSupportFragmentManager();
         zaRangFrag.putStringArrayList("ranglista", rl);
         zaRangFrag.putString("nazivKviza", nazivKv);
         rlf.setArguments(zaRangFrag);
         fragmentManager.beginTransaction().replace(R.id.pitanjePlace, rlf, rlf.getTag()).commitAllowingStateLoss();
-
     }
 
     @Override
@@ -251,7 +224,6 @@ public class IgrajKvizAkt extends AppCompatActivity   implements PitanjeFrag.Upd
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Intent x = getIntent();
             setResult(12333, x);
-
         }
         return super.onKeyDown(keyCode, event);
     }

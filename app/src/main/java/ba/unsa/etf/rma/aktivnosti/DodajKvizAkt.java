@@ -36,11 +36,11 @@ import ba.unsa.etf.rma.adapteri.PitanjaListAdapter;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 
-public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener ,Firebase.ProvjeriStatus {
+public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnItemSelectedListener, Firebase.ProvjeriStatus {
     private EditText editText;
     private ListView listaPitanja, listaMogucih;
     private Spinner dkaSpinner;
-    private Button dodaj,importKviz;
+    private Button dodaj, importKviz;
     private boolean valid = false;
     public PitanjaListAdapter pitanjaAdapter = null;
     public MogucaListAdapter mogucaAdapter = null;
@@ -56,7 +56,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     private ArrayList<String> validacijaPitanja = new ArrayList<>();
     DodajKvizAkt dkaAkk = null;
     private boolean refreshKat = false;
-    Uri localUri= null;
+    Uri localUri = null;
 
 
     @Override
@@ -69,21 +69,16 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         pozicija = getIntent().getExtras().getInt("poz_kviza");
         poz_kat = getIntent().getExtras().getInt("poz_kategorije");
 
-        File file = new File (Environment.getExternalStorageDirectory(), "test.csv");
-
+        File file = new File(Environment.getExternalStorageDirectory(), "test.csv");
 
         dodaj = (Button) findViewById(R.id.btnDodajKviz);
         editText = (EditText) findViewById(R.id.etNaziv);
         listaMogucih = (ListView) findViewById(R.id.lvMogucaPitanja);
         listaPitanja = (ListView) findViewById(R.id.lvDodanaPitanja);
         dkaSpinner = (Spinner) findViewById(R.id.spKategorije);
-        importKviz= (Button) findViewById(R.id.btnImportKviz);
-
-
-
-
+        importKviz = (Button) findViewById(R.id.btnImportKviz);
+        //Na osnovu pozicije se otkriva da li je odabrano dodavanje (-1) ili  azuriranje (!=-1)
         if (pozicija != -1 && KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja() != null) {
-
             pitanjaKviza = KvizoviAkt.odabraniKvizovi.get(pozicija).getPitanja();
             naziv_kviza = getIntent().getExtras().getString("naziv_kviza");
             editText.setText(naziv_kviza);
@@ -97,9 +92,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         }
 
         kopijaMogucihPitanja = kopirajPitanja(kopijaMogucihPitanja, Firebase.listaMogucih);
-
-
-
         mogucaAdapter = new MogucaListAdapter(this, kopijaMogucihPitanja, getResources());
         pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
 
@@ -119,7 +111,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 Toast toast = Toast.makeText(getApplicationContext(), "Validacija u toku, molimo pricekajte!", Toast.LENGTH_SHORT);
                 toast.show();
                 dodaj.setEnabled(false);
-                new Firebase(  KvizoviAkt.OCstatus.GET_SPINNER_CONTENT,getApplicationContext() ,(Firebase.ProvjeriStatus)DodajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_SPINNER_CONTENT, "Svi");
+                new Firebase(KvizoviAkt.OCstatus.GET_SPINNER_CONTENT, getApplicationContext(), (Firebase.ProvjeriStatus) DodajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_SPINNER_CONTENT, "Svi");
 
             }
         });
@@ -131,7 +123,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                     kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size() - 1);
                 kopijaPitanjaKviza.add(kopijaMogucihPitanja.get(position));
                 kopijaMogucihPitanja.remove(position);
-
                 refresh();
                 mogucaAdapter = new MogucaListAdapter(dkaAkk, kopijaMogucihPitanja, getResources());
                 if (kopijaMogucihPitanja.size() == 0) listaMogucih.setAdapter(null);
@@ -153,7 +144,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 } else if (position == kopijaPitanjaKviza.size() - 1) {
                     ArrayList<String> zaValidaciju = new ArrayList<>();
                     Intent dodajPitanje = new Intent(DodajKvizAkt.this, DodajPitanjeAkt.class);
-
+                    //Za provjeru da li je pitanje vec dodano
                     for (Pitanje x : kopijaMogucihPitanja) {
                         zaValidaciju.add(x.getNaziv());
                     }
@@ -167,10 +158,10 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
         });
 
-        importKviz.setOnClickListener( new View.OnClickListener() {
+        importKviz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent importIntent = new Intent (Intent.ACTION_OPEN_DOCUMENT);
+                Intent importIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 importIntent.addCategory(Intent.CATEGORY_OPENABLE);
                 importIntent.setType("text/*");
                 startActivityForResult(importIntent, 1999);
@@ -189,6 +180,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //Predvidjene akcija ukoliko se vrati u activity sa back buttonom
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Intent x = getIntent();
             setResult(10000, x);
@@ -196,9 +188,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             if (refreshKat) {
                 setResult(9000, x);
                 refreshKat = false;
-
             }
-
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -207,7 +197,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         for (Kviz a : KvizoviAkt.listaKvizova) {
             listaKvizova.add(a.getNaziv());
         }
-
     }
 
     void validacija() {
@@ -266,10 +255,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         kopijaPitanjaKviza.add(new Pitanje(null, null, null, null));
     }
 
-    void shut() {
-        kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size() - 1);
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String item = parent.getItemAtPosition(position).toString();
@@ -285,7 +270,6 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public ArrayList<Pitanje> kopirajPitanja(ArrayList<Pitanje> a, ArrayList<Pitanje> b) {
-
         if (b == null) return null;
         for (Pitanje x : b) {
             a.add(x);
@@ -300,7 +284,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
         if (resultCode == (-200)) {
             kopijaPitanjaKviza.remove(kopijaPitanjaKviza.size() - 1);
             kopijaPitanjaKviza.add(new Pitanje(data.getStringExtra("naziv"), data.getStringExtra("naziv"), data.getStringExtra("tacan"), data.getStringArrayListExtra("pitanje")));
-            new Firebase(this).execute(KvizoviAkt.OCstatus.ADD_PITANJE, kopijaPitanjaKviza.get(kopijaPitanjaKviza.size()-1));
+            new Firebase(this).execute(KvizoviAkt.OCstatus.ADD_PITANJE, kopijaPitanjaKviza.get(kopijaPitanjaKviza.size() - 1));
 
             refresh();
             listaPitanja.setAdapter(pitanjaAdapter);
@@ -314,20 +298,19 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             refreshKat = true;
         } else if (resultCode == (-300)) {
             dkaSpinner.setSelection(0);
-        }
-        else if (requestCode==1999 && resultCode == Activity.RESULT_OK) {
-            Uri uri= null;
-          if (data!=null) {
-                uri= data.getData();
+        } else if (requestCode == 1999 && resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+            if (data != null) {
+                uri = data.getData();
                 localUri = uri;
-                new Firebase(KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK,this , (Firebase.ProvjeriStatus)DodajKvizAkt.this).execute(KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK);
-            //    parsirajCSV(uri);  /////////////////////////////////////////////////////////////////////////////////
+                new Firebase(KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK, this, (Firebase.ProvjeriStatus) DodajKvizAkt.this).execute(KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK);
             }
 
         }
     }
 
-    private String getTextFromUri (Uri uri) throws IOException {
+    private String getTextFromUri(Uri uri) throws IOException {
+        //Preuzimanje sadrzaja datoteke iz URI-ja
         InputStream inputStream = getContentResolver().openInputStream(uri);
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 inputStream));
@@ -337,17 +320,17 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             stringBuilder.append(line + "\n");
         }
         inputStream.close();
-        stringBuilder.setLength(stringBuilder.length()-1);
+        stringBuilder.setLength(stringBuilder.length() - 1);
         return stringBuilder.toString();
-
     }
 
-    private int dajBrojLinija (String str) {
-        String[] brLinija= str.split("\r\n|\r|\n");
+    private int dajBrojLinija(String str) {
+        //Broj linija u CSV fajlu
+        String[] brLinija = str.split("\r\n|\r|\n");
         return brLinija.length;
     }
 
-    private void pozoviAlert (String a, String b) {
+    private void pozoviAlert(String a, String b) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
                 .setTitle(a)
                 .setMessage(b)
@@ -357,182 +340,165 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert);
         alertDialogBuilder.show();
-
     }
 
-    private void parsirajCSV (Uri uri) {
-        if (uri==null) return ;
-        final String DEFAULT_ICON= "1000";
+    private void parsirajCSV(Uri uri) {
+        if (uri == null) return;
+        final String DEFAULT_ICON = "1000";
 
-         String parsedString= new String();
+        String parsedString = new String();
         try {
             parsedString = getTextFromUri(uri);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Nesto nije uredu sa fajlom");
-            System.out.println("Podaci o problemu: "  +  e);
-
+            System.out.println("Podaci o problemu: " + e);
         }
 
-
-        if (parsedString.isEmpty())  return ;
-        String testStr= new String (parsedString);
-         int brojPitanja= dajBrojLinija(testStr)-1;
-
-
-
-        String [] parsedList= parsedString.split(System.lineSeparator());
-
-
+        if (parsedString.isEmpty()) return;
+        String testStr = new String(parsedString);
+        int brojPitanja = dajBrojLinija(testStr) - 1;
+        String[] parsedList = parsedString.split(System.lineSeparator());
 
         //Parsiranje prvog reda
-        if (parsedList==null || parsedList.length==0) return ;
-        String [] prviRed= parsedList[0].split(",");
-        if (prviRed.length!=3) {
-            pozoviAlert("Greska pri importu", "Datoteka kviza kojeg importujete nema ispravan format!" );
-            return ;
+        if (parsedList == null || parsedList.length == 0) return;
+        String[] prviRed = parsedList[0].split(",");
+        if (prviRed.length != 3) {
+            pozoviAlert("Greska pri importu", "Datoteka kviza kojeg importujete nema ispravan format!");
+            return;
         }
         String nazivKviza, kategorija;
-        nazivKviza = prviRed[0];    kategorija= prviRed[1];
+        nazivKviza = prviRed[0];
+        kategorija = prviRed[1];
 
 
-
-        int brPitanja=-1;
+        int brPitanja = -1;
         try {
-            brPitanja=Integer.parseInt(prviRed[2]);
+            brPitanja = Integer.parseInt(prviRed[2]);
+        } catch (Exception e) {
+            pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!");
+            return;
         }
-        catch (Exception e){
-            pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!" );
-            return ;
-        }
-        int index= listaKvizova.indexOf(prviRed[0]);
-        if (index!=-1 || nazivKviza.length()<1) {
-            pozoviAlert("Greska pri importu", "Kviz kojeg importujete već postoji!" );
-            return ;
+        int index = listaKvizova.indexOf(prviRed[0]);
+        if (index != -1 || nazivKviza.length() < 1) {
+            pozoviAlert("Greska pri importu", "Kviz kojeg importujete već postoji!");
+            return;
         }
 
 
-
-        if (brPitanja!= parsedList.length-1) {
-            pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!" );
-            return ;
+        if (brPitanja != parsedList.length - 1) {
+            pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!");
+            return;
         }
-        int i=1;
-        boolean isItOkay=true, tacanPostoji=true;
-        ArrayList<String> zaOdgovore= new ArrayList<>();
-        ArrayList<String> validPitanja= new ArrayList<>();
-        ArrayList<Pitanje> zaPitanja= new ArrayList<>();
-      //  String tacan= new String();
-        int tacan=-1;
-        int brojOdgovora=-1;
-        String tacanOdgovor= new String();
-        while (i<parsedList.length) {
+        int i = 1;
+        boolean isItOkay = true, tacanPostoji = true;
+        ArrayList<String> zaOdgovore = new ArrayList<>();
+        ArrayList<String> validPitanja = new ArrayList<>();
+        ArrayList<Pitanje> zaPitanja = new ArrayList<>();
+        int tacan = -1;
+        int brojOdgovora = -1;
+        String tacanOdgovor = new String();
 
-            String[] ostali= parsedList[i].split(",");
-            if (ostali.length<4) {
-                pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!" );
-                isItOkay=false;
+        //Parsiranje ostalih redova
+        while (i < parsedList.length) {
+
+            String[] ostali = parsedList[i].split(",");
+            if (ostali.length < 4) {
+                pozoviAlert("Greska pri importu", "Kviz kojeg imporujete ima neispravan broj pitanja!");
+                isItOkay = false;
                 break;
             }
-            if (validPitanja!=null && validPitanja.indexOf(ostali[0])!=-1) {
-                pozoviAlert("Greska pri importu", "Kviz nije ispravan postoje dva pitanja sa istim nazivom!" );
-                isItOkay=false;
+            if (validPitanja != null && validPitanja.indexOf(ostali[0]) != -1) {
+                pozoviAlert("Greska pri importu", "Kviz nije ispravan postoje dva pitanja sa istim nazivom!");
+                isItOkay = false;
                 break;
             }
 
-            if (validacijaPitanja!=null && validacijaPitanja.indexOf(ostali[0])!=-1) {
-                pozoviAlert("Greska pri importu", "Kviz nije ispravan pitanja vec postoje u bazi!" );
-                isItOkay=false;
+            if (validacijaPitanja != null && validacijaPitanja.indexOf(ostali[0]) != -1) {
+                pozoviAlert("Greska pri importu", "Kviz nije ispravan pitanja vec postoje u bazi!");
+                isItOkay = false;
                 break;
             }
             try {
-                brojOdgovora= Integer.parseInt(ostali[1]);
-            }
-            catch (Exception e) {
+                brojOdgovora = Integer.parseInt(ostali[1]);
+            } catch (Exception e) {
                 pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan broj odgovora!");
-                isItOkay=false;
+                isItOkay = false;
                 break;
             }
-              if (brojOdgovora<1 || brojOdgovora!= ostali.length-3) {
-                  pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan broj odgovora!");
-                  isItOkay=false;
-                  break;
-              }
-              try {
-                  tacan = Integer.parseInt(ostali[2]);
-              }
-              catch (Exception e) {
-                  pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan index tačnog odgovora!");
-                  isItOkay=false;
-                  break;
-              }
-              if (tacan<0 ||  tacan>brojOdgovora) {
-                  pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan index tačnog odgovora!");
-                  break;
-              }
-              for (int j=3; j<brojOdgovora+3; j++ ) {
-                  zaOdgovore.add (ostali[j]);
-                  if (j-3==tacan) tacanOdgovor=ostali[j];
-              }
+            if (brojOdgovora < 1 || brojOdgovora != ostali.length - 3) {
+                pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan broj odgovora!");
+                isItOkay = false;
+                break;
+            }
+            try {
+                tacan = Integer.parseInt(ostali[2]);
+            } catch (Exception e) {
+                pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan index tačnog odgovora!");
+                isItOkay = false;
+                break;
+            }
+            if (tacan < 0 || tacan > brojOdgovora) {
+                pozoviAlert("Greska pri importu", "Kviz kojeg importujete ima neispravan index tačnog odgovora!");
+                break;
+            }
+            for (int j = 3; j < brojOdgovora + 3; j++) {
+                zaOdgovore.add(ostali[j]);
+                if (j - 3 == tacan) tacanOdgovor = ostali[j];
+            }
 
-              validPitanja.add (ostali[0]);
-              zaPitanja.add (new Pitanje (ostali[0], ostali[0], tacanOdgovor, copy(zaOdgovore)));
-
-              zaOdgovore.clear();
-              tacan=-1;
-              tacanOdgovor=null;
+            validPitanja.add(ostali[0]);
+            zaPitanja.add(new Pitanje(ostali[0], ostali[0], tacanOdgovor, copy(zaOdgovore)));
+            zaOdgovore.clear();
+            tacan = -1;
+            tacanOdgovor = null;
             i++;
         }
 
-        int indKat= kategorije.indexOf(kategorija);
-          if (indKat==-1) {
-              KvizoviAkt.listaKategorija.add ( new Kategorija(kategorija,DEFAULT_ICON));
-              new Firebase (this).execute(KvizoviAkt.OCstatus.ADD_KAT, new Kategorija(kategorija, DEFAULT_ICON));
+        int indKat = kategorije.indexOf(kategorija);
 
-              kategorije.remove(kategorije.size() - 1);
-              kategorije.add(KvizoviAkt.listaKategorija.get(KvizoviAkt.listaKategorija.size() - 1).getNaziv());
-              kategorije.add("Dodaj kategoriju");
-              indKat= kategorije.indexOf(kategorija);
-              ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, kategorije);
-              dkaSpinner.setAdapter(dataAdapter);
+        //Akcije za dodavanje nove kategorije iz datoteke
+        if (indKat == -1) {
+            KvizoviAkt.listaKategorija.add(new Kategorija(kategorija, DEFAULT_ICON));
+            new Firebase(this).execute(KvizoviAkt.OCstatus.ADD_KAT, new Kategorija(kategorija, DEFAULT_ICON));
+            kategorije.remove(kategorije.size() - 1);
+            kategorije.add(KvizoviAkt.listaKategorija.get(KvizoviAkt.listaKategorija.size() - 1).getNaziv());
+            kategorije.add("Dodaj kategoriju");
+            indKat = kategorije.indexOf(kategorija);
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, kategorije);
+            dkaSpinner.setAdapter(dataAdapter);
         }
 
+        //Akcije za dodavanje pitanja, naziva kviza
         if (isItOkay) {
-
-                dkaSpinner.setSelection(indKat);
-                ArrayList<Pitanje> zaFb = kopirajPitanja(kopijaPitanjaKviza,zaPitanja);
-                new Firebase(this). execute(KvizoviAkt.OCstatus.IMPORT_PITANJA_ADD, zaFb);
-                kopijaPitanjaKviza.clear();
-               kopijaPitanjaKviza= kopirajPitanja(kopijaPitanjaKviza,zaPitanja);
-               kopijaPitanjaKviza.add (new Pitanje (null, null, null, null));
-                pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
-                listaPitanja.setAdapter(pitanjaAdapter);
-              //  listaMogucih.setAdapter(null);
-                editText.setText(nazivKviza);
-            }
-
-
-
+            dkaSpinner.setSelection(indKat);
+            ArrayList<Pitanje> zaFb = kopirajPitanja(kopijaPitanjaKviza, zaPitanja);
+            new Firebase(this).execute(KvizoviAkt.OCstatus.IMPORT_PITANJA_ADD, zaFb);
+            kopijaPitanjaKviza.clear();
+            kopijaPitanjaKviza = kopirajPitanja(kopijaPitanjaKviza, zaPitanja);
+            kopijaPitanjaKviza.add(new Pitanje(null, null, null, null));
+            pitanjaAdapter = new PitanjaListAdapter(this, kopijaPitanjaKviza, getResources());
+            listaPitanja.setAdapter(pitanjaAdapter);
+            editText.setText(nazivKviza);
+        }
     }
 
-    private ArrayList<String> copy (ArrayList<String> base) {
-        if (base.size()==0) return null;
-        ArrayList<String> izlaz= new ArrayList<>();
-        for (String x: base) {
-            izlaz.add (x);
+    private ArrayList<String> copy(ArrayList<String> base) {
+        if (base.size() == 0) return null;
+        ArrayList<String> izlaz = new ArrayList<>();
+        for (String x : base) {
+            izlaz.add(x);
         }
         return izlaz;
     }
 
-
     @Override
     public void dobaviSpinerPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
-        KvizoviAkt.listaKvizova=sKv;
-        KvizoviAkt.odabraniKvizovi=oKv;
+        KvizoviAkt.listaKvizova = sKv;
+        KvizoviAkt.odabraniKvizovi = oKv;
         validacija();
         System.out.println(valid);
         if (pozicija == -1 && valid == true) {
-           Bundle b = new Bundle();
+            Bundle b = new Bundle();
             Intent addKviz = getIntent();
             b.putSerializable("listaPitanja", (Serializable) kopijaPitanjaKviza);
             addKviz.putExtras(b);
@@ -542,7 +508,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
             dodaj.setEnabled(true);
             finish();
         } else if (pozicija != -1 && valid == true) {
-           Bundle b = new Bundle();
+            Bundle b = new Bundle();
             Intent addKviz = getIntent();
             b.putSerializable("listaPitanja", (Serializable) kopijaPitanjaKviza);
             addKviz.putExtras(b);
@@ -575,8 +541,8 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void validacijaPitanja(ArrayList<String> listaPitanja) {
-        validacijaPitanja=listaPitanja;
+        //Ucitavanje svih pitanja da bi se moglo kasnije validirati da li postoje u bazi
+        validacijaPitanja = listaPitanja;
         parsirajCSV(localUri);
-
     }
 }
