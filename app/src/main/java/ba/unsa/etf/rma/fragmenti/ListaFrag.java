@@ -24,7 +24,6 @@ import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
 public class ListaFrag extends Fragment   {
 
     ListUpdater instanca;
-    lockGridView instanca2 ;
     ListView listaKategorija;
     Activity activity= null;
     public ListaFrag() {
@@ -44,7 +43,6 @@ public class ListaFrag extends Fragment   {
         listaKategorija.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            //    instanca2.lock();
                 Toast toast = Toast.makeText(getActivity(), "Ucitavaju se kvizovi, molimo sacekajte!", Toast.LENGTH_SHORT);
                 toast.show();
               instanca.filterList(position);
@@ -57,9 +55,6 @@ public class ListaFrag extends Fragment   {
     }
 
 
-    public interface lockGridView {
-        public void lock();
-    }
 
     public interface ListUpdater {
         public void filterList (int i);
@@ -67,6 +62,7 @@ public class ListaFrag extends Fragment   {
 
     @Override
     public void onResume() {
+        //Refresh liste
         ArrayAdapter<String> arrayAdapter= new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1 , KvizoviAkt.categories);
         listaKategorija.setAdapter(arrayAdapter);
         super.onResume();
@@ -79,8 +75,6 @@ public class ListaFrag extends Fragment   {
         activity=(Activity)context;
         try {
             instanca = (ListUpdater) activity;
-
-
         }
         catch (Exception e) {
             //

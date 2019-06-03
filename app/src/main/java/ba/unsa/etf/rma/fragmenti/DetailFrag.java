@@ -21,7 +21,7 @@ import ba.unsa.etf.rma.klase.Kviz;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DetailFrag extends Fragment implements ListaFrag.lockGridView {
+public class DetailFrag extends Fragment  {
 
     public GridView grid;
      public GridViewAdapter gridViewAdapter=null;
@@ -46,12 +46,8 @@ public class DetailFrag extends Fragment implements ListaFrag.lockGridView {
         rs= getResources();
         activity= getActivity();
 
-       //   grid.setEnabled(false);
-        System.out.println(     KvizoviAkt.odabraniKvizovi.size()  + "VELICINA KVIZA");
-
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, rs );
         grid.setAdapter(gridViewAdapter);
-      //  grid.setEnabled(true);
 
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -91,11 +87,6 @@ public class DetailFrag extends Fragment implements ListaFrag.lockGridView {
 
     }
 
-    @Override
-    public void lock() {
-        grid.setEnabled(false);
-
-    }
 
 
     public interface ListFunction {

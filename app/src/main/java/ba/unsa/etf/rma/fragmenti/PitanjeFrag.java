@@ -45,8 +45,6 @@ public class PitanjeFrag extends Fragment {
         // Required empty public constructor
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -57,7 +55,7 @@ public class PitanjeFrag extends Fragment {
         Bundle bundleObj= this.getArguments();
         pitanja=  (Pitanje) bundleObj.getSerializable("pitanja");
         listaOdgovora.setEnabled(true);
-
+        //Ucitavanje pitanja
         if (pitanja==null ) {
             listaOdgovora.setAdapter(null);
             nazivPitanja.setText("Kviz je zavrsen!");
@@ -84,9 +82,9 @@ public class PitanjeFrag extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-     // nazivIkone.setEnabled(false);
 
-                     /*  if(!(nazivPitanja.getText().equals("Kviz je zavrsen")))  */ instanca.updateByAction( pozicijaTacnog==kliknutaPozicija);
+
+                   instanca.updateByAction( pozicijaTacnog==kliknutaPozicija);
                         pozicijaTacnog=kliknutaPozicija=-1;
                         listaOdgovora.setEnabled(true);
 

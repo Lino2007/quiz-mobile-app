@@ -35,9 +35,6 @@ import ba.unsa.etf.rma.aktivnosti.KvizoviAkt;
 
 
 
-//import com.google.api.client.util.*;
-
-
 public class Firebase extends AsyncTask {
     private ArrayList<String> zaValidacijuPitanja = new ArrayList<>();
     private Context context;
@@ -51,6 +48,8 @@ public class Firebase extends AsyncTask {
 
     private ArrayList<Kviz> ucitaniKvizovi = new ArrayList<>();
     private ArrayList<Kviz> ucitaniOdabraniKvizovi= new ArrayList<>();
+
+    //Mjesto za intefejse
     public interface ProvjeriStatus{
        public void dobaviSpinerPodatke (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
         public void dobaviKategorije (ArrayList<Kategorija> kat);
@@ -58,16 +57,13 @@ public class Firebase extends AsyncTask {
         public void azurirajPodatke  (ArrayList<Kviz> oKv, ArrayList<Kviz> sKv);
         public void validacijaPitanja (ArrayList<String> listaPitanja);
     }
-
     public interface Rangliste {
         public void getRangliste (ArrayList<String> rl);
     }
+
     private ProvjeriStatus pozivatelj;
     private Rangliste poziv;
-  /* public Firebase (ProvjeriStatus poz) {
-        pozivatelj=poz;
-    }
- */
+
   public Firebase (KvizoviAkt.OCstatus stat, Context context, Rangliste poziv) {
       this.globalniStatus= stat;
       this.context = context;
@@ -87,8 +83,8 @@ public class Firebase extends AsyncTask {
     @Override
     protected Object doInBackground(Object... objects) {
         KvizoviAkt.OCstatus opcode = (KvizoviAkt.OCstatus) objects[0];
-     //  globalniStatus= opcode;
-      //  System.out.println(opcode);
+
+        //Proces dobavljanja tokena
         InputStream is = context.getResources().openRawResource(R.raw.secret);
         GoogleCredential credentials=null;
         try
@@ -111,6 +107,8 @@ public class Firebase extends AsyncTask {
         }
         KvizoviAkt.TOKEN= credentials.getAccessToken();
 
+
+         //Pozivi metoda na osnovu akcije definirane signalom
         if (opcode== KvizoviAkt.OCstatus.ADD_KVIZ) {
             dodajKviz(objects);
             ucitajKvizove("Svi");
@@ -144,7 +142,6 @@ public class Firebase extends AsyncTask {
             vratiPitanja();
         }
         else if (opcode == KvizoviAkt.OCstatus.IMPORT_PITANJA_ADD) {
-            System.out.println("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
             ucitajListuPitanja(objects);
         }
         return null;
@@ -152,7 +149,6 @@ public class Firebase extends AsyncTask {
 
     private void azurirajNazivKvizaRL (String stariNaziv) {
         try {
-
             String linkExtension = "Rangliste/" + stariNaziv + "?access_token=";
             URL url = new URL(urlLink + linkExtension + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
             System.out.println(url);
@@ -220,8 +216,8 @@ public class Firebase extends AsyncTask {
           JSONObject dokumenti= new JSONObject(content);
             JSONArray statistike =  dokumenti.getJSONArray("documents");
             if (statistike.length()==0) throw new Exception("Array statistike je prazan!");
+
             JSONObject doc = statistike.getJSONObject(0);
-          // System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" + doc.toString());
             doc = doc.getJSONObject("document");
             doc = doc.getJSONObject("fields");
             JSONObject poz = doc.getJSONObject("brojPozicija");
@@ -236,11 +232,9 @@ public class Firebase extends AsyncTask {
                 mapVal= mapVal.getJSONObject("mapValue");
                 mapVal = mapVal.getJSONObject("fields");
                 String naziv =  new String (dajIme(mapVal));
-
                 mapVal = mapVal.getJSONObject(naziv);
                String procen = mapVal.getString("stringValue");
                Double procenat = Double.parseDouble(procen);
-            //   rangList.add ("Pozicija "+ i + " Ime i prezime: " + naziv + "\nProcenat tacnih: "+ procenat + "%");
                mapRangLista.put(procenat,naziv);
             }
            if (globalniStatus== KvizoviAkt.OCstatus.ADD_RL || globalniStatus== KvizoviAkt.OCstatus.GET_RL ) dodajIgraca(nazivKviza,imeIgraca,procent);
@@ -263,6 +257,7 @@ public class Firebase extends AsyncTask {
     }
 
     private String dajIme (JSONObject a) {
+      //Preuzimanje imena kviza za ranglistu iz stringa koji na pocetku ima "<ime>"
         try {
             String obj = a.toString();
 
@@ -313,9 +308,7 @@ public class Firebase extends AsyncTask {
             content= streamToString( new BufferedReader(new InputStreamReader(connection.getInputStream())));
             connection.disconnect();
             JSONObject kvizovi = new JSONObject(content);
-         System.out.println("xxxx");
 
-         System.out.println("xyyyss");
             ArrayList<Pitanje> listaSvihPitanja = new ArrayList<>();
             try {
                 JSONArray listaPitanja = pitanja.getJSONArray("documents");
@@ -325,16 +318,11 @@ public class Firebase extends AsyncTask {
                     jsonPitanje = jsonPitanje.getJSONObject("fields");
                     JSONObject jsonNaziv = jsonPitanje.getJSONObject("naziv");
                     String naziv = jsonNaziv.getString("stringValue");
-
                     JSONObject pozT = jsonPitanje.getJSONObject("indexTacnog");
-
                     int pozicijaTacnog = pozT.getInt("integerValue");
                     JSONObject pit = jsonPitanje.getJSONObject("odgovori");
                     JSONObject pit2 = pit.getJSONObject("arrayValue");
-
-
                     JSONArray lista = pit2.getJSONArray("values");
-
                     ArrayList<String> odgovori = new ArrayList<>();
                     for (int j = 0; j < lista.length(); j++) {
                         JSONObject arrVal = lista.getJSONObject(j);
@@ -346,8 +334,6 @@ public class Firebase extends AsyncTask {
             catch (Exception e) {
 
             }
-
-
 
             JSONArray listaKvizova = kvizovi.getJSONArray("documents");
 
@@ -374,22 +360,16 @@ public class Firebase extends AsyncTask {
                     lista = jsonObj.getJSONArray("values");
                 }
                 catch (Exception e) {
-
                     odKvizovi.add (new Kviz (naziv, new ArrayList<Pitanje>(), k));
                     svKvizovi.add (new Kviz (naziv,  new ArrayList<Pitanje>(), k));
-
                     continue;
                 }
 
                 for (int j=0 ; j<lista.length(); j++) {
                     JSONObject arrVal = lista.getJSONObject(j);
                     String nazivPitanja = arrVal.getString("stringValue");
-
                     Pitanje p = dajPitanjePoStringu(nazivPitanja,listaSvihPitanja);
-
                     listaPitanjaKviza.add (p);
-
-
                 }
                ArrayList<Pitanje> zaKv = vratiListuPitanja(listaPitanjaKviza);
                 odKvizovi.add (new Kviz (naziv, zaKv, k));
@@ -398,14 +378,11 @@ public class Firebase extends AsyncTask {
 
               ucitaniKvizovi= svKvizovi;
               ucitaniOdabraniKvizovi = odKvizovi;
-
-        }
-     catch ( Exception e) {
-         System.out.println("UUUUUUUUUUUUUUU"+ e);
-
-
      }
-        System.out.println("Izasao");
+     catch ( Exception e) {
+         System.out.println(e);
+     }
+
     }
 
     private void dodajKategoriju(Object [] objects) {
@@ -413,7 +390,6 @@ public class Firebase extends AsyncTask {
             Kategorija kat = (Kategorija) objects[1];
             String nazivKategorije = kat.getNaziv();
             String idIkonice = kat.getId();
-
             String jsonObjekt = "{ \"fields\":{\"naziv\":{\"stringValue\":\"" + nazivKategorije + "\"},\"idIkonice\":{\"integerValue\":\"" + idIkonice  + "\"},}}"  ;
 
             String linkExtension = "Kategorije?documentId=" + nazivKategorije + "&access_token=";
@@ -427,7 +403,6 @@ public class Firebase extends AsyncTask {
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Accept","application/json");
-
 
             DataOutputStream os = new DataOutputStream(conn.getOutputStream());
             os.writeBytes(jsonObjekt);
@@ -458,10 +433,8 @@ public class Firebase extends AsyncTask {
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_RL || globalniStatus==KvizoviAkt.OCstatus.ADD_RL)  poziv.getRangliste(rangList);
       else if (globalniStatus== KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK) pozivatelj.validacijaPitanja(zaValidacijuPitanja);
 
-         globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
-
-
-    }
+      globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
+  }
 
 
     private Pitanje dajPitanjePoStringu (String s, ArrayList<Pitanje> x) {
@@ -560,6 +533,7 @@ public class Firebase extends AsyncTask {
         }
 
     }
+
     private void dodajIgraca(String nazivKviza, String imeIgraca, double procent) {
 
            mapRangLista.put(procent,imeIgraca);
@@ -709,26 +683,24 @@ public class Firebase extends AsyncTask {
 
     }
 
-
     private void dodajPitanje (Object [] objects) {
 
 
         try {
             Pitanje novoPitanje = (Pitanje) objects[1];
-            String nazivPitanja= novoPitanje.getNaziv();
-
-                if (daLiPostojiPitanje(nazivPitanja)) {
-                    Log.d("Dodaj pitanje", "Pitanje vec postoji, preskacem dodavanje u bazu.");
-                    return;
-                }
+            String nazivPitanja = novoPitanje.getNaziv();
+            if (daLiPostojiPitanje(nazivPitanja)) {
+                Log.d("Dodaj pitanje", "Pitanje vec postoji, preskacem dodavanje u bazu.");
+                return;
+            }
 
 
             int indexTacnog = novoPitanje.getOdgovori().indexOf(novoPitanje.getTacan());
 
-            ArrayList<String> listaOdgovora= novoPitanje.getOdgovori();
+            ArrayList<String> listaOdgovora = novoPitanje.getOdgovori();
             String linkExtension = "Pitanja?documentId=" + nazivPitanja + "&access_token=";
-            Log.d ("FAZA",  "SLANJE PODATAKA ZAPOCETO!" );
-            URL url = new URL(urlLink + linkExtension +URLEncoder.encode( KvizoviAkt.TOKEN, "UTF-8"));
+            Log.d("FAZA", "SLANJE PODATAKA ZAPOCETO!");
+            URL url = new URL(urlLink + linkExtension + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
             System.out.println(url);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -736,26 +708,25 @@ public class Firebase extends AsyncTask {
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept","application/json");
+            conn.setRequestProperty("Accept", "application/json");
 
 
             String listaOdgovoraStr = "\"odgovori\":{\"arrayValue\": {\"values\": [";
-            int i =0;
-            for (String x : listaOdgovora ) {
-                if (i< listaOdgovora.size()-1) {
-                    listaOdgovoraStr+= "{ \"stringValue\":\"" + x + "\"},";
-                }
-                else    listaOdgovoraStr += "{ \"stringValue\":\"" + x + "\"}]";
+            int i = 0;
+            for (String x : listaOdgovora) {
+                if (i < listaOdgovora.size() - 1) {
+                    listaOdgovoraStr += "{ \"stringValue\":\"" + x + "\"},";
+                } else listaOdgovoraStr += "{ \"stringValue\":\"" + x + "\"}]";
                 ++i;
             }
-            Log.d ("URL",  url.toString() );
+            Log.d("URL", url.toString());
 
-            String jsonObjekt =  "{ \"fields\":{\"naziv\":{\"stringValue\":\""+ nazivPitanja + "\"},\"indexTacnog\":{\"integerValue\":\""+ indexTacnog +"\"},"+ listaOdgovoraStr+ "}}}}";
+            String jsonObjekt = "{ \"fields\":{\"naziv\":{\"stringValue\":\"" + nazivPitanja + "\"},\"indexTacnog\":{\"integerValue\":\"" + indexTacnog + "\"}," + listaOdgovoraStr + "}}}}";
 
 
             DataOutputStream os = new DataOutputStream(conn.getOutputStream());
             os.writeBytes(jsonObjekt);
-            try(BufferedReader br = new BufferedReader(
+            try (BufferedReader br = new BufferedReader(
                     new InputStreamReader(conn.getInputStream(), "utf-8"))) {
                 StringBuilder response = new StringBuilder();
                 String responseLine = null;
@@ -795,8 +766,8 @@ public class Firebase extends AsyncTask {
    }
     }
 
-
     private ArrayList<Pitanje> vratiListuPitanja (ArrayList<Pitanje> x) {
+      //Duboko kopiranje
         ArrayList<Pitanje> avs= new ArrayList<>();
         for (Pitanje xy: x  ) {
             avs.add(xy);
@@ -835,14 +806,15 @@ public class Firebase extends AsyncTask {
     }
 
     private  void ucitajListuPitanja (Object ... obj) {
+      //Svako pitanje se pojedinacno dodaje iz prosljedjene liste (CSV import)
       ArrayList<Pitanje> listaPitanja = (ArrayList<Pitanje>) obj[1];
       for (Pitanje p : listaPitanja) {
          obj[1] =  p;
-          System.out.println(p.toString());
           dodajPitanje(obj);
       }
 
     }
+
      private void vratiPitanja () {
         try {
             URL url = new URL(urlLink +  "Pitanja?access_token=" +URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));

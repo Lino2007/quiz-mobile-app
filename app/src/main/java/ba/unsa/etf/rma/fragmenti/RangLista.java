@@ -18,7 +18,7 @@ import ba.unsa.etf.rma.R;
 
 
 
-public class RangListaFrag extends Fragment {
+public class RangLista extends Fragment {
 
 
     ListView lista;
@@ -26,7 +26,7 @@ public class RangListaFrag extends Fragment {
     String naziv = new String ();
     TextView rangListaTekst;
 
-    public RangListaFrag() {
+    public RangLista() {
         // Required empty public constructor
     }
 
@@ -44,9 +44,7 @@ public class RangListaFrag extends Fragment {
         rangListaTekst.setText("Ranglista za kviz: " + naziv);
        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1 , rangLista);
          lista.setAdapter(arrayAdapter);
-
-
-        return iv;
+         return iv;
     }
 
 

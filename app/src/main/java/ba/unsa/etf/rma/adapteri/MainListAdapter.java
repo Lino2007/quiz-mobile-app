@@ -25,7 +25,7 @@ import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
-public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListener,*/ IconDialog.Callback {
+public class MainListAdapter extends BaseAdapter  implements  IconDialog.Callback {
     /*********** Declare Used Variables *********/
     private Activity activity = null;
     private ArrayList data;
@@ -86,21 +86,14 @@ public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListe
         final ViewHolder holder;
 
         if (convertView == null) {
-
             // Inflate tabitem.xml file for each row ( Defined below )
             vi = inflater.inflate(R.layout.main_table_item, null);
-
-
             holder = new ViewHolder();
             holder.nazivKviza = (TextView) vi.findViewById(R.id.nazivKviza);
             holder.dot = (ImageView) vi.findViewById(R.id.image);
-
-
-
             vi.setTag(holder);
         } else
             holder = (ViewHolder) vi.getTag();
-
 
         if (data.size() <= 0) {
             holder.nazivKviza.setText("Dodaj Kviz");
@@ -139,7 +132,6 @@ public class MainListAdapter extends BaseAdapter  implements /*View.OnClickListe
                 }
 
             }
-         //   vi.setOnClickListener(new OnItemClickListener(position));
         }
 
         return vi;

@@ -24,7 +24,7 @@ import java.util.Random;
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.fragmenti.InformacijeFrag;
 import ba.unsa.etf.rma.fragmenti.PitanjeFrag;
-import ba.unsa.etf.rma.fragmenti.RangListaFrag;
+import ba.unsa.etf.rma.fragmenti.RangLista;
 import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
@@ -211,7 +211,7 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     @Override
     public void getRangliste(ArrayList<String> rl) {
         Bundle zaRangFrag = new Bundle();
-        RangListaFrag rlf = new RangListaFrag();
+        RangLista rlf = new RangLista();
         FragmentManager fragmentManager = getSupportFragmentManager();
         zaRangFrag.putStringArrayList("ranglista", rl);
         zaRangFrag.putString("nazivKviza", nazivKv);
