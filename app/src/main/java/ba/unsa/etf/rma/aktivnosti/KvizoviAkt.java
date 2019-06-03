@@ -185,7 +185,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             mainList.setAdapter(mainListAdapter);
 
         } else {
+            lfm = new ListaFrag();
             dfm = new DetailFrag();
+            fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
         }
         odblokirajElemente();
@@ -237,7 +239,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             if (spinner.getSelectedItemPosition() != 0)
                 spinner.setSelection(0);
         } else {
+            lfm = new ListaFrag();
             dfm = new DetailFrag();
+            fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
         }
         odblokirajElemente();
