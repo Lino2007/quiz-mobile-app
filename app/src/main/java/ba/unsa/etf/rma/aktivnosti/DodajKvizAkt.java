@@ -200,7 +200,7 @@ public class DodajKvizAkt extends AppCompatActivity implements AdapterView.OnIte
     }
 
     void validacija() {
-
+        uloadujListuKvizova();
         boolean aPoint = false, bPoint = false, cPoint = false;
         if (naziv_kviza == null) {
             if (editText.getText().length() == 0)
