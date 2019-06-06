@@ -11,7 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <receiver
+            android:name=".klase.NetworkChangeReceiver"
+            android:label="NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
         <activity android:name=".aktivnosti.IgrajKvizAkt"></activity>
         <activity android:name=".aktivnosti.DodajKategorijuAkt" />
         <activity android:name=".aktivnosti.DodajPitanjeAkt" />
