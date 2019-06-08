@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase.*;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class OdgovoriDB extends SQLiteOpenHelper {
+public class OdgovorDB extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "mojaBaza.db";
     public static final String DATABASE_TABLE = "Odgovori";
@@ -24,8 +24,8 @@ public class OdgovoriDB extends SQLiteOpenHelper {
 
 
 
-    public OdgovoriDB  (Context context, String name,
-                  CursorFactory factory, int version) {
+    public OdgovorDB(Context context, String name,
+                     CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
 
