@@ -11,7 +11,7 @@ public class KvizDB extends SQLiteOpenHelper {
     public static final String DATABASE_TABLE = "Kvizovi";
     public static final int DATABASE_VERSION = 1;
     public static final String KOLONA_ID = "_id";
-    public static final String KVIZ_ID ="idKviza";
+    public static final String KVIZ_ID ="nazivKviza";
     public static final String KATEGORIJA_ID ="kategorija";
 
 
@@ -34,6 +34,7 @@ public class KvizDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        System.out.println("____________________________________________________________________ASDFSAFASFASFASFASFASFASFASFASFASf");
        db.execSQL(DATABASE_CREATE);
     }
 

@@ -74,4 +74,13 @@ public class Pitanje implements Serializable  {
     public int hashCode() {
         return Objects.hash(naziv, tekstPitanja, tacan, odgovori);
     }
+
+    @Override
+    public String toString() {
+        return "Pitanje{" +
+                "naziv='" + naziv + '\'' +
+                ", tekstPitanja='" + tekstPitanja + '\'' +
+                ", tacan='" + tacan + '\'' +
+                '}';
+    }
 }

@@ -31,7 +31,10 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.MainListAdapter;
+import ba.unsa.etf.rma.baza.KategorijaDB;
 import ba.unsa.etf.rma.baza.KvizDB;
+import ba.unsa.etf.rma.baza.OdgovorDB;
+import ba.unsa.etf.rma.baza.PitanjeDB;
 import ba.unsa.etf.rma.fragmenti.DetailFrag;
 import ba.unsa.etf.rma.fragmenti.ListaFrag;
 import ba.unsa.etf.rma.klase.Firebase;
@@ -39,9 +42,14 @@ import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 
+import static ba.unsa.etf.rma.baza.KategorijaDB.IKONICA_ID;
 import static ba.unsa.etf.rma.baza.KvizDB.KATEGORIJA_ID;
 import static ba.unsa.etf.rma.baza.KvizDB.KOLONA_ID;
 import static ba.unsa.etf.rma.baza.KvizDB.KVIZ_ID;
+import static ba.unsa.etf.rma.baza.OdgovorDB.ODGOVOR_ID;
+import static ba.unsa.etf.rma.baza.PitanjeDB.KVIZ_FK;
+import static ba.unsa.etf.rma.baza.PitanjeDB.PITANJE_ID;
+import static ba.unsa.etf.rma.baza.PitanjeDB.TACAN_ODGOVOR;
 
 
 public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
@@ -53,6 +61,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     //instanca baze podataka
     KvizDB kvizDB;
+    OdgovorDB odgovorDB;
+    PitanjeDB pitanjeDB;
+    KategorijaDB kategorijaDB;
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
     public KvizoviAkt kvizoviAkt;
@@ -77,6 +88,10 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        kvizDB = new KvizDB(this,"Kvizovi", null, 1);
+        odgovorDB = new OdgovorDB (this, "Odgovori", null, 1);
+        pitanjeDB = new PitanjeDB(this, "Pitanja", null, 1);
+        kategorijaDB = new KategorijaDB(this, "Kategorije", null, 1);
 
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -119,7 +134,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(dataAdapter);
 
-          if(isConnected) {
+         if(isConnected) {
               blokirajElemente();
               new Firebase(this).execute(OCstatus.GET_MOGUCA);
           }
@@ -225,6 +240,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
         }
+
         odblokirajElemente();
     }
 
@@ -240,9 +256,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         odabraniKvizovi = oKv;
         listaKategorija = kat;
         config = getResources().getConfiguration();
-         popuniLokalnuBazu();
-        //Popunjavanje lokalne baze
 
+        //Popunjavanje lokalne baze
+        popuniLokalnuBazu();
         //Popunjavanje GUI elemenata na osnovu konfiguracije
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
             popuni();
@@ -252,6 +268,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(dataAdapter);
             spinner.setSelection(0);
+
         } else {
             popuni();
             fragmentm = getSupportFragmentManager();
@@ -260,39 +277,24 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
         }
+
         odblokirajElemente();
 
     }
 
     public void popuniLokalnuBazu () {
-
-        kvizDB = new KvizDB(this,"Kvizovi", null, 1);
-        ContentValues novi = new ContentValues();
         SQLiteDatabase db = kvizDB.getWritableDatabase();
+        db.execSQL("delete from Kvizovi");
+        db = kategorijaDB.getWritableDatabase();
+        db.execSQL("delete from Kategorije");
+        db = pitanjeDB.getWritableDatabase();
+        db.execSQL("delete from Pitanja");
+        db = odgovorDB.getWritableDatabase();
+        db.execSQL("delete from Odgovori");
         try {
-
+            ucitajKategorijeSQL(listaKategorija);
             for (Kviz a : listaKvizova) {
-                novi.put(KVIZ_ID, a.getNaziv());
-                if (a.getKategorija()!=null)
-                novi.put(KATEGORIJA_ID, a.getKategorija().getNaziv());
-                else
-                    novi.put(KATEGORIJA_ID,"Svi");
-                db.insert(KvizDB.DATABASE_TABLE, null, novi);
-                novi.clear();
-            }
-
-            String[] koloneRezulat = new String[]{ KOLONA_ID, KVIZ_ID, KATEGORIJA_ID};
-            String where = KVIZ_ID + "!=0";
-            String whereArgs[] = null;
-            String groupBy = null;
-            String having = null;
-            String order = null;
-
-            Cursor cursor = db.query(KvizDB.DATABASE_TABLE, koloneRezulat,where,
-                    whereArgs, groupBy, having, order);
-        //    int INDEX_KOLONE_IME = cursor.getColumnIndexOrThrow(KV);
-            while(cursor.moveToNext()){
-                Log.d("Ime: ",cursor.getString(1));
+                dodajKvizSQL(a);
             }
         }
         catch (Exception e) {
@@ -301,6 +303,95 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
 
+    }
+
+    public boolean daLiTabelaPostojiSQL (String nazivTabele) {
+        SQLiteDatabase db = kvizDB.getWritableDatabase();
+        Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+                + nazivTabele + "'", null);
+        int rezultat= cursor.getCount();
+        System.out.println(rezultat + "******************************************************************");
+        if (rezultat!=0) return true;
+        return false;
+    }
+
+    public void dodajKvizSQL (Kviz kviz) {
+
+        try {
+            SQLiteDatabase db = kvizDB.getWritableDatabase();
+            ContentValues dodajKviz = new ContentValues();
+            dodajKviz.put(KVIZ_ID, kviz.getNaziv());
+            if (kviz.getKategorija() != null) {
+                dodajKviz.put(KATEGORIJA_ID, kviz.getKategorija().getNaziv());
+            }
+            else {
+                dodajKviz.put(KATEGORIJA_ID, "Svi");
+            }
+            if (kviz.getPitanja()!=null && kviz.getPitanja().size()!=0) {
+
+                ucitajPitanjaSQL(kviz.getPitanja(), kviz.getNaziv());
+            }
+            db.insert(KvizDB.DATABASE_TABLE, null, dodajKviz);
+        }
+        catch (Exception e) {
+            System.out.println("##############Greska prilikom dodavanja kviza u lokalnu bazu: "+ e);
+        }
+
+    }
+
+    public void ucitajPitanjaSQL (ArrayList<Pitanje> listaPitanja , String nazivKviza) {
+
+        try {
+            SQLiteDatabase db = pitanjeDB.getWritableDatabase();
+            ContentValues dodajPitanje = new ContentValues();
+            for (Pitanje p : listaPitanja) {
+                 ucitajOdgovoreSQL(p.getOdgovori(), p.getNaziv());
+                dodajPitanje.put (PITANJE_ID, p.getNaziv());
+                dodajPitanje.put (TACAN_ODGOVOR, p.getTacan());
+                dodajPitanje.put (KVIZ_FK, nazivKviza);
+                db.insert(PitanjeDB.DATABASE_TABLE, null, dodajPitanje);
+                dodajPitanje.clear();
+            }
+        }
+        catch (Exception e) {
+            System.out.println("##############Greska prilikom dodavanja pitanja u lokalnu bazu: "+ e);
+        }
+    }
+
+    public void ucitajKategorijeSQL (ArrayList<Kategorija> kat) {
+        try {
+            SQLiteDatabase db = kategorijaDB.getWritableDatabase();
+            ContentValues dodajKategorije = new ContentValues();
+            for (Kategorija k : listaKategorija) {
+                if (k.getNaziv()!= null) {
+                    dodajKategorije.put(KategorijaDB.KATEGORIJA_ID, k.getNaziv());
+                    dodajKategorije.put(IKONICA_ID, k.getId());
+                    db.insert(KategorijaDB.DATABASE_TABLE, null, dodajKategorije);
+                }
+                dodajKategorije.clear();
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println("##############Greska prilikom dodavanja kategorije u lokalnu bazu: "+ e);
+        }
+
+    }
+
+    public void ucitajOdgovoreSQL (ArrayList<String> odgovori, String nazivPitanja) {
+        try {
+            SQLiteDatabase db = odgovorDB.getWritableDatabase();
+            ContentValues dodajOdgovore = new ContentValues();
+            for (String s : odgovori) {
+                dodajOdgovore.put (ODGOVOR_ID, s);
+                dodajOdgovore.put (PITANJE_ID, nazivPitanja);
+                db.insert(OdgovorDB.DATABASE_TABLE, null, dodajOdgovore);
+                dodajOdgovore.clear();
+            }
+        }
+        catch (Exception e) {
+            System.out.println("##############Greska prilikom dodavanja odgovora u lokalnu bazu: "+ e);
+        }
     }
 
     @Override
