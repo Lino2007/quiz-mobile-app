@@ -1,12 +1,19 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -24,12 +31,17 @@ import java.util.ArrayList;
 
 import ba.unsa.etf.rma.R;
 import ba.unsa.etf.rma.adapteri.MainListAdapter;
+import ba.unsa.etf.rma.baza.KvizDB;
 import ba.unsa.etf.rma.fragmenti.DetailFrag;
 import ba.unsa.etf.rma.fragmenti.ListaFrag;
 import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
+
+import static ba.unsa.etf.rma.baza.KvizDB.KATEGORIJA_ID;
+import static ba.unsa.etf.rma.baza.KvizDB.KOLONA_ID;
+import static ba.unsa.etf.rma.baza.KvizDB.KVIZ_ID;
 
 
 public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
@@ -39,6 +51,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT, V_GET_KATEGORIJE, GET_RL, ADD_RL, IMPORT_PITANJA_CHECK, IMPORT_PITANJA_ADD
     }
 
+    //instanca baze podataka
+    KvizDB kvizDB;
     public static ArrayList<Kategorija> listaKategorija = new ArrayList<>();
     public static ArrayList<String> categories = new ArrayList<>();
     public KvizoviAkt kvizoviAkt;
@@ -55,18 +69,36 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     FragmentManager fragmentm = null;
     ListaFrag lfm = null;
     DetailFrag dfm = null;
+    boolean isConnected=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Inicijalno citanje iz baze
-        try {
-            new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
-        } catch (Exception e) {
-            System.out.println("Nesto nije uredu sa pristupom tokenu!");
+
+
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+       isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        if (isConnected) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Ima internet konekcije!", Toast.LENGTH_SHORT);
+            toast.show();
+            try {
+                new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
+            } catch (Exception e) {
+                System.out.println("Nesto nije uredu sa pristupom tokenu!");
+            }
         }
+        else {
+            popuni();
+            Toast toast = Toast.makeText(getApplicationContext(), "Nema internet konekcije!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        //Inicijalno citanje iz baze
+
         trenutnaKategorija = "Svi";
         kvizoviAkt = this;
         Resources res = getResources();
@@ -86,13 +118,16 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             mainList.setAdapter(mainListAdapter);
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(dataAdapter);
-            blokirajElemente();
-            new Firebase(this).execute(OCstatus.GET_MOGUCA);
+
+          if(isConnected) {
+              blokirajElemente();
+              new Firebase(this).execute(OCstatus.GET_MOGUCA);
+          }
             //Dugi klik
             mainList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-                    dugiKlik(pos);
+                  if (isConnected)  dugiKlik(pos);
                     return true;
                 }
             });
@@ -205,6 +240,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         odabraniKvizovi = oKv;
         listaKategorija = kat;
         config = getResources().getConfiguration();
+         popuniLokalnuBazu();
+        //Popunjavanje lokalne baze
 
         //Popunjavanje GUI elemenata na osnovu konfiguracije
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -224,6 +261,45 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
         }
         odblokirajElemente();
+
+    }
+
+    public void popuniLokalnuBazu () {
+
+        kvizDB = new KvizDB(this,"Kvizovi", null, 1);
+        ContentValues novi = new ContentValues();
+        SQLiteDatabase db = kvizDB.getWritableDatabase();
+        try {
+
+            for (Kviz a : listaKvizova) {
+                novi.put(KVIZ_ID, a.getNaziv());
+                if (a.getKategorija()!=null)
+                novi.put(KATEGORIJA_ID, a.getKategorija().getNaziv());
+                else
+                    novi.put(KATEGORIJA_ID,"Svi");
+                db.insert(KvizDB.DATABASE_TABLE, null, novi);
+                novi.clear();
+            }
+
+            String[] koloneRezulat = new String[]{ KOLONA_ID, KVIZ_ID, KATEGORIJA_ID};
+            String where = KVIZ_ID + "!=0";
+            String whereArgs[] = null;
+            String groupBy = null;
+            String having = null;
+            String order = null;
+
+            Cursor cursor = db.query(KvizDB.DATABASE_TABLE, koloneRezulat,where,
+                    whereArgs, groupBy, having, order);
+        //    int INDEX_KOLONE_IME = cursor.getColumnIndexOrThrow(KV);
+            while(cursor.moveToNext()){
+                Log.d("Ime: ",cursor.getString(1));
+            }
+        }
+        catch (Exception e) {
+            System.out.println("Nesto nije uredu sa lokalnom bazom "+ e);
+        }
+
+
 
     }
 
