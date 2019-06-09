@@ -34,7 +34,7 @@ public class KvizDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        System.out.println("____________________________________________________________________ASDFSAFASFASFASFASFASFASFASFASFASf");
+
        db.execSQL(DATABASE_CREATE);
     }
 

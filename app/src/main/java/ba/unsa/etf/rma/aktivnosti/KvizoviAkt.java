@@ -1,6 +1,5 @@
 package ba.unsa.etf.rma.aktivnosti;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -292,7 +292,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         db = odgovorDB.getWritableDatabase();
         db.execSQL("delete from Odgovori");
         try {
-            ucitajKategorijeSQL(listaKategorija);
+            dodajKategorijeSQL(listaKategorija);
             for (Kviz a : listaKvizova) {
                 dodajKvizSQL(a);
             }
@@ -329,7 +329,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             }
             if (kviz.getPitanja()!=null && kviz.getPitanja().size()!=0) {
 
-                ucitajPitanjaSQL(kviz.getPitanja(), kviz.getNaziv());
+                dodajPitanjaSQL(kviz.getPitanja(), kviz.getNaziv());
             }
             db.insert(KvizDB.DATABASE_TABLE, null, dodajKviz);
         }
@@ -337,15 +337,16 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             System.out.println("##############Greska prilikom dodavanja kviza u lokalnu bazu: "+ e);
         }
 
+
     }
 
-    public void ucitajPitanjaSQL (ArrayList<Pitanje> listaPitanja , String nazivKviza) {
+    public void dodajPitanjaSQL (ArrayList<Pitanje> listaPitanja , String nazivKviza) {
 
         try {
             SQLiteDatabase db = pitanjeDB.getWritableDatabase();
             ContentValues dodajPitanje = new ContentValues();
             for (Pitanje p : listaPitanja) {
-                 ucitajOdgovoreSQL(p.getOdgovori(), p.getNaziv());
+                 dodajOdgovoreSQL(p.getOdgovori(), p.getNaziv());
                 dodajPitanje.put (PITANJE_ID, p.getNaziv());
                 dodajPitanje.put (TACAN_ODGOVOR, p.getTacan());
                 dodajPitanje.put (KVIZ_FK, nazivKviza);
@@ -358,7 +359,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         }
     }
 
-    public void ucitajKategorijeSQL (ArrayList<Kategorija> kat) {
+    public void dodajKategorijeSQL(ArrayList<Kategorija> kat) {
         try {
             SQLiteDatabase db = kategorijaDB.getWritableDatabase();
             ContentValues dodajKategorije = new ContentValues();
@@ -378,7 +379,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     }
 
-    public void ucitajOdgovoreSQL (ArrayList<String> odgovori, String nazivPitanja) {
+    public void dodajOdgovoreSQL(ArrayList<String> odgovori, String nazivPitanja) {
         try {
             SQLiteDatabase db = odgovorDB.getWritableDatabase();
             ContentValues dodajOdgovore = new ContentValues();
@@ -431,6 +432,118 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
     }
 
+   private void dobaviPodatkeIzSQL () {
+        try {
+            String[] koloneRezultat = new String[] {KOLONA_ID ,KVIZ_ID, KATEGORIJA_ID};
+            String where = null;
+            String whereArgs[] = null;
+            String groupBy = null;
+            String having = null;
+            String order = null;
+            SQLiteDatabase db = kvizDB.getWritableDatabase();
+
+            Cursor cursor = db.query(KvizDB.DATABASE_TABLE, koloneRezultat,where, whereArgs,groupBy,having,order);
+            Log.d ("SQLite Kvizovi baza ",  "Povucena lista kvizova, broj kolona: " + cursor.getCount());
+            cursor.moveToFirst();
+            Kviz noviKviz= null;
+            Kategorija kat= null;
+            ArrayList<Pitanje> p = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                       String naziv = cursor.getString (1);
+                       kat = dobaviKategorijuIzSQL(naziv);
+                       p = dobaviListuPitanjaIzSQL(naziv);
+                       listaKvizova.add (new Kviz (naziv, p, kat));
+            }
+
+        }
+        catch (Exception e) {
+
+        }
+    }
+
+    private ArrayList<Kategorija> dobaviSveKategorijeSQL () {
+        return  null;
+    }
+
+   private Kategorija dobaviKategorijuIzSQL (String nazivKategorije) {
+        Kategorija k=null;
+        if (nazivKategorije.equals("Svi")) return k;
+        try {
+            SQLiteDatabase db = kategorijaDB.getWritableDatabase();
+            String[] koloneRezultat = new String [] {KategorijaDB.KOLONA_ID, KategorijaDB.KATEGORIJA_ID, IKONICA_ID};
+            String where = KategorijaDB.KATEGORIJA_ID + " LIKE  '" + nazivKategorije + "'";
+            String whereArgs[] = null;
+            String groupBy = null;
+            String having = null;
+            String order = null;
+            Cursor cursor = db.query(KategorijaDB.DATABASE_TABLE, koloneRezultat,where, whereArgs,groupBy,having,order);
+            Log.d ("SQLite Kategorija ",  "Povucena kategorija iz baze , get count je : " + cursor.getCount());
+            cursor.moveToFirst();
+            k = new Kategorija(cursor.getString(1), cursor.getString(2));
+            cursor.close();
+        }
+        catch ( Exception e) {
+            System.out.println("Nesto nije uredu sa ucitavanjem kategorija: " + e);
+        }
+        return k;
+    }
+
+
+    private ArrayList<Pitanje> dobaviListuPitanjaIzSQL (String nazivKviza) {
+        ArrayList<Pitanje> list = new ArrayList<>();
+
+        try {
+            SQLiteDatabase db = pitanjeDB.getWritableDatabase();
+            String[] koloneRezultat = new String [] {PitanjeDB.KOLONA_ID, PitanjeDB.PITANJE_ID , PitanjeDB.TACAN_ODGOVOR, KVIZ_FK};
+            String where = PitanjeDB.KVIZ_FK + " LIKE  '" + nazivKviza + "'";
+            String whereArgs[] = null;
+            String groupBy = null;
+            String having = null;
+            String order = null;
+            Cursor cursor = db.query(PitanjeDB.DATABASE_TABLE, koloneRezultat,where, whereArgs,groupBy,having,order);
+            Log.d ("SQLite Pitanja ",  "Povucena lista pitanja iz baze , broj pitanja je: " + cursor.getCount());
+            cursor.moveToFirst();
+            if (cursor.getCount()==0) return list;
+            ArrayList<String> listaOdgovora = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                String nazivPitanja = cursor.getString(1);
+                String tacanOdg = cursor.getString(2);
+                listaOdgovora = dobaviListuOdgovora(nazivPitanja);
+                list.add (new Pitanje (nazivPitanja, nazivPitanja, tacanOdg,listaOdgovora));
+            }
+          cursor.close();
+        }
+        catch ( Exception e) {
+
+            System.out.println("Nesto nije uredu sa ucitavanjem kategorija: " + e);
+        }
+
+        return list;
+    }
+
+    private ArrayList<String> dobaviListuOdgovora (String nazivPitanja) {
+        ArrayList<String> listaOdgovora = new ArrayList<>();
+        try {
+            SQLiteDatabase db = odgovorDB.getWritableDatabase();
+            String[] koloneRezultat = new String [] {OdgovorDB.KOLONA_ID, OdgovorDB.ODGOVOR_ID, OdgovorDB.PITANJE_ID};
+            String where = OdgovorDB.PITANJE_ID + " LIKE  '" + nazivPitanja + "'";
+            String whereArgs[] = null;
+            String groupBy = null;
+            String having = null;
+            String order = null;
+            Cursor cursor = db.query(OdgovorDB.DATABASE_TABLE, koloneRezultat,where, whereArgs,groupBy,having,order);
+            Log.d ("SQLite Odgovori ",  "Povucena lista pitanja iz baze , broj odgovora je: " + cursor.getCount());
+            cursor.moveToFirst();
+            while (cursor.moveToNext()) {
+                listaOdgovora.add (cursor.getString(1));
+            }
+            cursor.close();
+        }
+        catch ( Exception e) {
+            System.out.println("Nesto nije uredu sa ucitavanjem odgovora: " + e);
+        }
+        return listaOdgovora;
+    }
     private void dugiKlik(int mPosition) {
         //  Dugim klikom inicira poziv DodajKvizAkt (azuriranje ili dodavanje u ovisnosti od uslova)
         if (mPosition == odabraniKvizovi.size() - 1) {
