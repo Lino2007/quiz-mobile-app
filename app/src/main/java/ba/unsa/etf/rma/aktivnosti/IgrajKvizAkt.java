@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.provider.AlarmClock;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,10 +29,12 @@ import ba.unsa.etf.rma.fragmenti.RangLista;
 import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
+import java.lang.Object.*;
 
 public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.UpdateListener, InformacijeFrag.UpdateListener, Firebase.Rangliste {
     FrameLayout zaPit, zaInfo;
     Context context = null;
+
     Kviz kviz;
     ArrayList<Pitanje> preostalaPitanja = new ArrayList<>();
     ArrayList<Pitanje> odgovorenaPitanja = new ArrayList<>();
