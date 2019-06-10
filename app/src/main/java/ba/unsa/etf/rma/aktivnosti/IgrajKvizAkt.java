@@ -81,8 +81,9 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    timerIstekao=true;
-                    updateByAction(false);
+                    //timerIstekao=true;
+                  //  updateByAction(false);
+
                     Toast toast =  Toast.makeText(getApplicationContext(), "Kviz je zavrsio!", Toast.LENGTH_LONG);
                     toast.show();
 

@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.aktivnosti;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +26,11 @@ import android.widget.Toast;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 //import com.google.api.services.sqladmin.SQLAdminScopes;
@@ -38,6 +43,7 @@ import ba.unsa.etf.rma.baza.OdgovorDB;
 import ba.unsa.etf.rma.baza.PitanjeDB;
 import ba.unsa.etf.rma.fragmenti.DetailFrag;
 import ba.unsa.etf.rma.fragmenti.ListaFrag;
+import ba.unsa.etf.rma.klase.CalendarProvider;
 import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
@@ -83,6 +89,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     DetailFrag dfm = null;
     boolean isConnected=false;
     public  Intent alarmClock = null;
+    final String datePattern = "yyyy-MM-dd";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +136,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         //Postavka ponasanja pri razlicitim konfiguracijama (portrait ili landscape)
         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            System.out.println(listaKvizova.size() + "             "+  listaKategorija.size()  + "                              **********");
+
             spinner.setOnItemSelectedListener(this);
             final ListView mainList = (ListView) findViewById(R.id.lvKvizovi);
             mainListAdapter = new MainListAdapter(kvizoviAkt, listaKvizova, res);
@@ -158,10 +165,42 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                     if (position != odabraniKvizovi.size() - 1) {
                         int brojPitanja= 0;
                         Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
-                     //   if (odabraniKvizovi.get(position).getPitanja()!= null) {
-                      //    brojPitanja= odabraniKvizovi.get(position).getPitanja().size();
-                      //  }
-                   //     if (brojPitanja!=0) aktivirajAlarm(brojPitanja);
+                       if (odabraniKvizovi.get(position).getPitanja()!= null) {
+                         brojPitanja= odabraniKvizovi.get(position).getPitanja().size();
+                       }
+                        SimpleDateFormat date = new SimpleDateFormat(datePattern);
+                       int qDuration = (int) Math.round((double)brojPitanja/2);
+                       new CalendarProvider(KvizoviAkt.this).ucitajDogadjaje();
+
+                       if (CalendarProvider.listaDogadjaja.size()>0) {
+                           Date date2= new Date();
+                           for (Map.Entry<String, String> e : CalendarProvider.listaDogadjaja.entrySet()) {
+                               long vrijemeDogadjaja = Long.parseLong((e.getKey()));
+                               Date date1 = new Date(vrijemeDogadjaja);
+
+                               if(date.format(date2).equals(date.format(date1))){
+                                   long qDurInMs = TimeUnit.MINUTES.toMillis(qDuration);
+                                   long tNow = date2.getTime();
+                                   long tNxt = date1.getTime();
+
+
+                                   int alrm = (int) (TimeUnit.MILLISECONDS.toMinutes(tNow - tNxt) + 1);
+                                   //ako trenutno vrijeme + trajanje kviza je vece od vremena kad je event
+                                   if(tNow + qDurInMs > alrm && tNow < tNxt){
+                                       new AlertDialog.Builder(KvizoviAkt.this)
+                                               .setTitle("Pokusaj igranja")
+                                               .setMessage("Imate događaj u kalendaru za minuta!")
+                                               .setNegativeButton(android.R.string.ok, null)
+                                               .setIcon(android.R.drawable.ic_dialog_alert)
+                                               .show();
+                                       return;
+                                   }
+                               }
+
+                           }
+
+
+                       }
                         newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(position));
                         KvizoviAkt.this.startActivityForResult(newIntent, 32000);
                     }
@@ -180,16 +219,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     }
 
-    private void aktivirajAlarm (int brP) {
-        System.out.println("***********************************************************************");
-        double x = (double) brP/2;
-         alarmClock = new Intent (AlarmClock.ACTION_SET_ALARM);
-          alarmClock.putExtra (AlarmClock.EXTRA_MINUTES, 0);
-          alarmClock.putExtra (AlarmClock.EXTRA_LENGTH , 10);
-          alarmClock.putExtra (AlarmClock.EXTRA_VIBRATE, true);
-          startActivity(alarmClock);
 
-    }
     @Override
     protected void onStart() {
         super.onStart();
