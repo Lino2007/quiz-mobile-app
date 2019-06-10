@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
 import android.provider.AlarmClock;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +44,8 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     static double procT = 0;
     int inx = -1;
     String nazivKv = new String();
-
+   // Intent alarmClock = null;
+    public  boolean timerIstekao= false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +65,42 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
 
         int a = -1;
         if (preostalaPitanja != null && !preostalaPitanja.isEmpty()) {
+            System.out.println("....................................................");
             a = getRandomIndex(preostalaPitanja.size());
+            int minute = (int)Math.round((double)preostalaPitanja.size()/2);
+            final long milis= (minute*60*1000)+5;
+            Toast toast =  Toast.makeText(getApplicationContext(), "Kviz je zapoceo, vrijeme preostalo: " +  minute + " minuta.", Toast.LENGTH_LONG);
+            toast.show();
+            Intent alarmClock = new Intent (AlarmClock.ACTION_SET_TIMER);
+            alarmClock.putExtra (AlarmClock.EXTRA_LENGTH ,  minute *60);
+            alarmClock.putExtra (AlarmClock.EXTRA_VIBRATE, true);
+            alarmClock.putExtra (AlarmClock.EXTRA_SKIP_UI, true);
+            alarmClock.putExtra(AlarmClock.EXTRA_MESSAGE, true);
+            IgrajKvizAkt.this.startActivity(alarmClock);
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    timerIstekao=true;
+                    updateByAction(false);
+                    Toast toast =  Toast.makeText(getApplicationContext(), "Kviz je zavrsio!", Toast.LENGTH_LONG);
+                    toast.show();
+
+
+                }
+            }, milis);
+            final Thread r = new Thread() {
+                public void run() {
+                    // DO WORK
+
+                    // Call function.
+                    handler.postDelayed(this, milis);
+
+
+
+                }
+            };
+            r.start();
             inx = a;
         }
         nazivKv = kviz.getNaziv();
@@ -108,6 +145,26 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
         PitanjeFrag pitFrag = new PitanjeFrag();
         Bundle zaFragPit = new Bundle(), zaFragInfo = new Bundle();
         zaFragInfo.putString("naziv_kviza", nazivKv);
+        if (timerIstekao) {
+            procenatTacnih = (double) brojTacnih/ (odgovorenaPitanja.size() + preostalaPitanja.size());
+            procenatTacnih = Math.round(procenatTacnih * 10000.0) / 10000.0;
+            zaFragPit.putSerializable("pitanja", null);
+            zaFragInfo.putInt("broj_preostalih", 0);
+            zaFragInfo.putDouble("procenat_tacnih", procenatTacnih);
+            zaFragInfo.putInt("broj_tacnih", brojTacnih);
+
+            infoFrag.setArguments(zaFragInfo);
+            pitFrag.setArguments(zaFragPit);
+               preostalaPitanja.clear();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
+            try {
+                fragmentManager.beginTransaction().replace(R.id.informacijePlace, infoFrag, infoFrag.getTag()).commit();
+                fragmentManager.beginTransaction().replace(R.id.pitanjePlace, pitFrag, infoFrag.getTag()).commit();
+            } catch (Exception e) {
+                buttonClick();
+            }
+        }
 
         if (preostalaPitanja.size() > 1) {
             odgovorenaPitanja.add(preostalaPitanja.get(inx));

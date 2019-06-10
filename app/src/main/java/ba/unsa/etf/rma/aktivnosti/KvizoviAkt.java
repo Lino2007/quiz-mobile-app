@@ -158,10 +158,10 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                     if (position != odabraniKvizovi.size() - 1) {
                         int brojPitanja= 0;
                         Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
-                        if (odabraniKvizovi.get(position).getPitanja()!= null) {
-                          brojPitanja= odabraniKvizovi.get(position).getPitanja().size();
-                        }
-                        if (brojPitanja!=0) aktivirajAlarm(brojPitanja);
+                     //   if (odabraniKvizovi.get(position).getPitanja()!= null) {
+                      //    brojPitanja= odabraniKvizovi.get(position).getPitanja().size();
+                      //  }
+                   //     if (brojPitanja!=0) aktivirajAlarm(brojPitanja);
                         newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(position));
                         KvizoviAkt.this.startActivityForResult(newIntent, 32000);
                     }
