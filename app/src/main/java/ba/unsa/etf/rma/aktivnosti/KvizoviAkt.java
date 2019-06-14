@@ -259,7 +259,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
     @Override
     protected void onStop() {
-        super.onStart();
+        super.onStop();
         unregisterReceiver(internetRisiver);
     }
 
@@ -846,6 +846,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     @Override
     public void filterList(int i) {
         if (i < 0) return;
+
         new Firebase(OCstatus.GET_SPINNER_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, categories.get(i));
     }
 
