@@ -18,6 +18,7 @@ import android.provider.AlarmClock;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -32,6 +33,7 @@ import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -64,14 +66,14 @@ import static ba.unsa.etf.rma.baza.PitanjeDB.PITANJE_ID;
 import static ba.unsa.etf.rma.baza.PitanjeDB.TACAN_ODGOVOR;
 
 
-public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
+public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus, Firebase.Rangliste {
 
 
 
     //Statusni signali za poziv metoda u firebase-u
     public enum OCstatus {
         UNDEFINED, ADD_PITANJE, ADD_KVIZ, EDIT_KVIZ, GET_MOGUCA, GET_KATEGORIJE, ADD_KAT, GET_DB_CONTENT, GET_SPINNER_CONTENT, V_GET_KATEGORIJE, GET_RL, ADD_RL, IMPORT_PITANJA_CHECK, IMPORT_PITANJA_ADD
-    }
+           , GET_ALL_RL   }
 
     //instanca baze podataka
     KvizDB kvizDB;
@@ -97,6 +99,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     boolean isConnected=false;
     public  Intent alarmClock = null;
     final String datePattern = "yyyy-MM-dd";
+    Map<String, Pair<Double, String>> sveRangliste = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +127,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             toast.show();
             try {
                 new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
+                new Firebase(OCstatus.GET_ALL_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.GET_ALL_RL);
             } catch (Exception e) {
                 System.out.println("Nesto nije uredu sa pristupom tokenu!");
             }
@@ -248,6 +252,20 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         }
     };
+
+
+
+    @Override
+    public void getRangliste(ArrayList<String> rl) {
+
+    }
+
+    @Override
+    public void ugrabiSve(Map<String, Pair<Double, String>> rl) {
+        sveRangliste=rl;
+        System.out.println(sveRangliste.size()  + "ucitano je......................................");
+
+    }
 
     @Override
     protected void onStart() {

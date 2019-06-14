@@ -24,6 +24,7 @@ import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,6 +49,7 @@ public class Firebase extends AsyncTask {
 
     private ArrayList<Kviz> ucitaniKvizovi = new ArrayList<>();
     private ArrayList<Kviz> ucitaniOdabraniKvizovi= new ArrayList<>();
+    private Map<String, Pair<Double,String>> sveRangListe = new HashMap<>();
 
     //Mjesto za intefejse
     public interface ProvjeriStatus{
@@ -59,6 +61,7 @@ public class Firebase extends AsyncTask {
     }
     public interface Rangliste {
         public void getRangliste (ArrayList<String> rl);
+        public void ugrabiSve (Map<String, Pair<Double,String>> rl);
     }
 
     private ProvjeriStatus pozivatelj;
@@ -149,6 +152,9 @@ public class Firebase extends AsyncTask {
         else if (opcode == KvizoviAkt.OCstatus.IMPORT_PITANJA_ADD) {
             ucitajListuPitanja(objects);
         }
+        else if (opcode == KvizoviAkt.OCstatus.GET_ALL_RL) {
+            dajSveRangListe();
+        }
         return null;
     }
 
@@ -173,6 +179,59 @@ public class Firebase extends AsyncTask {
             System.out.println("Something went wrong");
         }
 
+    }
+
+
+    private void dajSveRangListe () {
+
+        try {
+            URL url = new URL("https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/Rangliste?access_token=" + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+            System.out.println(url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+
+            System.out.println(connection.getResponseMessage() + "+test");
+            String content = streamToString(new BufferedReader(new InputStreamReader(connection.getInputStream())));
+            System.out.println(content);
+            JSONObject dokumenti = new JSONObject(content);
+            JSONArray statistike = dokumenti.getJSONArray("documents");
+            if (statistike.length() == 0) throw new Exception("Array statistike je prazan!");
+
+
+            for (int j =0; j<statistike.length() ; j++) {
+                JSONObject doc = statistike.getJSONObject(j);
+                doc = doc.getJSONObject("fields");
+                JSONObject jsn = doc.getJSONObject("nazivKviza");
+                 String nazKviza = jsn.getString("stringValue");
+                JSONObject poz = doc.getJSONObject("brojPozicija");
+                int brojPozicija = poz.getInt("integerValue");
+                JSONObject polja = doc;
+                polja = polja.getJSONObject("lista");
+                polja = polja.getJSONObject("mapValue");
+
+                polja = polja.getJSONObject("fields");
+                for (Integer i = 1; i <= brojPozicija; i++) {
+                    JSONObject mapVal = polja.getJSONObject(i.toString());
+                    mapVal = mapVal.getJSONObject("mapValue");
+                    mapVal = mapVal.getJSONObject("fields");
+                    String naziv = new String(dajIme(mapVal));
+                    mapVal = mapVal.getJSONObject(naziv);
+                    String procen = mapVal.getString("stringValue");
+                    Double procenat = Double.parseDouble(procen);
+                    System.out.println(nazKviza + "|||||||||||||||||||||||||||||||||" + procenat+ "|||||||||||| " + naziv);
+                    sveRangListe.put(nazKviza, new Pair<Double,String>(procenat,naziv));
+
+                }
+
+            }
+
+        }
+            catch (Exception e) {
+                System.out.println("##### Greska pri ucitavanju svih kvizova: "+ e);
+            }
     }
 
     private void ucitajRanglistu (Object[] objects) {
@@ -441,7 +500,7 @@ public class Firebase extends AsyncTask {
       else if (globalniStatus== KvizoviAkt.OCstatus.V_GET_KATEGORIJE) pozivatelj.dobaviKategorije(ucitaneKategorije);
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_RL || globalniStatus==KvizoviAkt.OCstatus.ADD_RL)  poziv.getRangliste(rangList);
       else if (globalniStatus== KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK) pozivatelj.validacijaPitanja(zaValidacijuPitanja);
-
+      else if (globalniStatus== KvizoviAkt.OCstatus.GET_ALL_RL) poziv.ugrabiSve(sveRangListe);
       globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
   }
 

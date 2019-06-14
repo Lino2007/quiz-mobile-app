@@ -3,16 +3,21 @@ package ba.unsa.etf.rma.aktivnosti;
 
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.AlarmClock;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +27,11 @@ import android.widget.Toast;
 
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 import ba.unsa.etf.rma.R;
+import ba.unsa.etf.rma.baza.RanglistaDB;
 import ba.unsa.etf.rma.fragmenti.InformacijeFrag;
 import ba.unsa.etf.rma.fragmenti.PitanjeFrag;
 import ba.unsa.etf.rma.fragmenti.RangLista;
@@ -33,10 +40,14 @@ import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 import java.lang.Object.*;
 
+import static ba.unsa.etf.rma.baza.RanglistaDB.IME_IGRACA;
+import static ba.unsa.etf.rma.baza.RanglistaDB.KVIZ_FK;
+import static ba.unsa.etf.rma.baza.RanglistaDB.PROCENAT;
+
 public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.UpdateListener, InformacijeFrag.UpdateListener, Firebase.Rangliste {
     FrameLayout zaPit, zaInfo;
     Context context = null;
-
+     RanglistaDB ranglistaDB = null;
     Kviz kviz;
     ArrayList<Pitanje> preostalaPitanja = new ArrayList<>();
     ArrayList<Pitanje> odgovorenaPitanja = new ArrayList<>();
@@ -46,12 +57,18 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     int inx = -1;
     String nazivKv = new String();
     Intent alarmClock;
+    boolean isConnected=false;
    // Intent alarmClock = null;
     public  boolean timerIstekao= false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_igraj_kviz_akt);
+        ranglistaDB= new  RanglistaDB(this,"Rangliste", null, 1);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         zaPit = (FrameLayout) findViewById(R.id.pitanjePlace);
         zaInfo = (FrameLayout) findViewById(R.id.informacijePlace);
@@ -253,7 +270,8 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
                     Toast.makeText(context, "Greska, niste unjeli validno ime i prezime, pokusajte ponovo ili kliknite cancel!", Toast.LENGTH_LONG).show();
                 } else {
                     String imeIgraca = userInput.getText().toString();
-                    new Firebase(KvizoviAkt.OCstatus.GET_RL, getApplicationContext(), (Firebase.Rangliste) IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL, nazivKv, imeIgraca, procenatTacnih * 100);
+                  if(isConnected)  new Firebase(KvizoviAkt.OCstatus.GET_RL, getApplicationContext(), (Firebase.Rangliste) IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL, nazivKv, imeIgraca, procenatTacnih * 100);
+                    dodajIgraca(nazivKv,  procenatTacnih * 100 ,imeIgraca);
                     procT = 0;
                     userInput.setBackgroundColor(Color.WHITE);
                     alertDialog.dismiss();
@@ -285,6 +303,11 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     }
 
     @Override
+    public void ugrabiSve(Map<String, Pair<Double, String>> rl) {
+
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             Intent x = getIntent();
@@ -292,4 +315,21 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
         }
         return super.onKeyDown(keyCode, event);
     }
+
+
+    private void dodajIgraca (String nazivKv, double procenat, String nazivIgraca) {
+        try {
+            SQLiteDatabase db = ranglistaDB.getWritableDatabase();
+            ContentValues dodajRL = new ContentValues();
+           dodajRL.put(KVIZ_FK, nazivKv);
+            dodajRL.put(PROCENAT, Double.toString(procenat));
+            dodajRL.put (IME_IGRACA, nazivIgraca);
+            db.insert(ranglistaDB.DATABASE_TABLE, null, dodajRL);
+        }
+        catch (Exception e) {
+            System.out.println("##############Greska prilikom dodavanja rang liste u lokalnu bazu: "+ e);
+        }
+
+    }
+
 }
