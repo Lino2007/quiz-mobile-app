@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Handler;
 import android.provider.AlarmClock;
 import android.support.v4.app.FragmentManager;
@@ -44,6 +45,7 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     static double procT = 0;
     int inx = -1;
     String nazivKv = new String();
+    Intent alarmClock;
    // Intent alarmClock = null;
     public  boolean timerIstekao= false;
     @Override
@@ -71,8 +73,8 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
             final long milis= (minute*60*1000)+5;
             Toast toast =  Toast.makeText(getApplicationContext(), "Kviz je zapoceo, vrijeme preostalo: " +  minute + " minuta.", Toast.LENGTH_LONG);
             toast.show();
-            Intent alarmClock = new Intent (AlarmClock.ACTION_SET_TIMER);
-            alarmClock.putExtra (AlarmClock.EXTRA_LENGTH ,  minute *60);
+            alarmClock = new Intent (AlarmClock.ACTION_SET_TIMER);
+            alarmClock.putExtra (AlarmClock.EXTRA_LENGTH ,  /*minute *60*/ 7);
             alarmClock.putExtra (AlarmClock.EXTRA_VIBRATE, true);
             alarmClock.putExtra (AlarmClock.EXTRA_SKIP_UI, true);
             alarmClock.putExtra(AlarmClock.EXTRA_MESSAGE, true);
@@ -264,6 +266,8 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     @Override
     public void buttonClick() {
         //Forsirani izlaz
+
+
         Intent zavrsi = getIntent();
         setResult(32000, zavrsi);
         finish();

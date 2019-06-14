@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -47,6 +48,7 @@ import ba.unsa.etf.rma.klase.CalendarProvider;
 import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
+import ba.unsa.etf.rma.klase.NetworkChangeReceiver;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 import static ba.unsa.etf.rma.baza.KategorijaDB.IKONICA_ID;
@@ -59,7 +61,9 @@ import static ba.unsa.etf.rma.baza.PitanjeDB.PITANJE_ID;
 import static ba.unsa.etf.rma.baza.PitanjeDB.TACAN_ODGOVOR;
 
 
-public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
+public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus, NetworkChangeReceiver.ConnecitivityChangeAction {
+
+
 
     //Statusni signali za poziv metoda u firebase-u
     public enum OCstatus {
@@ -96,6 +100,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent bcReceiver = new Intent(KvizoviAkt.this, NetworkChangeReceiver.class);
+        KvizoviAkt.this.sendBroadcast(bcReceiver);
 
         kvizDB = new KvizDB(this,"Kvizovi", null, 1);
         odgovorDB = new OdgovorDB (this, "Odgovori", null, 1);
@@ -505,6 +512,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
             }
         }
+            popuniLokalnuBazu();
             odblokirajElemente();
 
     }
@@ -733,6 +741,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         //Result kod 9000 oznacava izlazak na back dugme
         // 32000 oznacava izlazak iz IgrajKvizAkt klikom na zavrsi kviz button
         // 9000 izlazak iz IgrajKvizAkt putem back buttona
+
         config = getResources().getConfiguration();
         blokirajElemente();
         if (resultCode == -32) {
@@ -750,6 +759,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             listaKvizova.add(new Kviz(null, null, null));
             new Firebase(OCstatus.ADD_KVIZ, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.ADD_KVIZ, noviKviz);
             dodajKviz(noviKviz);
+            dodajKvizSQL (noviKviz);
         } else if (resultCode == -133) {
             Toast toast = Toast.makeText(getApplicationContext(), "Ucitavam izmjene, pricekajte!", Toast.LENGTH_SHORT);
             toast.show();
@@ -769,6 +779,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 odabraniKvizovi.get(pozicija).setKategorija(null);
             }
             new Firebase(OCstatus.EDIT_KVIZ, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.EDIT_KVIZ, odabraniKvizovi.get(pozicija), stariNaziv);
+
         } else if (resultCode == 9000) {
             odblokirajElemente();
             refreshCategories();
@@ -818,6 +829,26 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             newIntent.putExtra("kviz", (Serializable) odabraniKvizovi.get(i));
             KvizoviAkt.this.startActivityForResult(newIntent, 32000);
         }
+
+    }
+
+
+    @Override
+    public void onConnected() {
+        isConnected=true;
+        blokirajElemente();
+        Toast toast = Toast.makeText(getApplicationContext(), "Internet dostupan- dobavljam listu kvizova, sacekajte!", Toast.LENGTH_SHORT);
+        toast.show();
+        new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
+
+    }
+
+    @Override
+    public void onDisconnected() {
+        isConnected=false;
+        Toast toast = Toast.makeText(getApplicationContext(), "Internet nije dostupan!", Toast.LENGTH_SHORT);
+        toast.show();
+
 
     }
 
