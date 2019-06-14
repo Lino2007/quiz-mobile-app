@@ -1,6 +1,7 @@
 package ba.unsa.etf.rma.aktivnosti;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.AlarmClock;
 import android.support.v4.app.FragmentManager;
@@ -49,6 +51,7 @@ import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kategorija;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.NetworkChangeReceiver;
+import ba.unsa.etf.rma.klase.NetworkUtil;
 import ba.unsa.etf.rma.klase.Pitanje;
 
 import static ba.unsa.etf.rma.baza.KategorijaDB.IKONICA_ID;
@@ -61,7 +64,7 @@ import static ba.unsa.etf.rma.baza.PitanjeDB.PITANJE_ID;
 import static ba.unsa.etf.rma.baza.PitanjeDB.TACAN_ODGOVOR;
 
 
-public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus, NetworkChangeReceiver.ConnecitivityChangeAction {
+public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListener, ListaFrag.ListUpdater, DetailFrag.ListFunction, Firebase.ProvjeriStatus {
 
 
 
@@ -100,20 +103,22 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        Intent bcReceiver = new Intent(KvizoviAkt.this, NetworkChangeReceiver.class);
-        KvizoviAkt.this.sendBroadcast(bcReceiver);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+
+     /*   Intent bcReceiver = new Intent(KvizoviAkt.this, NetworkChangeReceiver.class);
+        KvizoviAkt.this.sendBroadcast(bcReceiver); */
 
         kvizDB = new KvizDB(this,"Kvizovi", null, 1);
         odgovorDB = new OdgovorDB (this, "Odgovori", null, 1);
         pitanjeDB = new PitanjeDB(this, "Pitanja", null, 1);
         kategorijaDB = new KategorijaDB(this, "Kategorije", null, 1);
 
-        ConnectivityManager cm =
-                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-       isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         if (isConnected) {
             Toast toast = Toast.makeText(getApplicationContext(), "Ima internet konekcije!", Toast.LENGTH_SHORT);
             toast.show();
@@ -224,13 +229,42 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         }
 
 
+
+
     }
 
+    private  BroadcastReceiver internetRisiver= new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int status = NetworkUtil.getConnectivityStatusString(context);
+            if ("android.net.conn.CONNECTIVITY_CHANGE".equals(intent.getAction())) {
+                if (status == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+                    onDisconnected();
+                } else {
+                   if (isConnected==false)
+                    onConnected();
+                }
+            }
+
+        }
+    };
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(internetRisiver,intentFilter);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStart();
+        unregisterReceiver(internetRisiver);
+    }
+
+
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -392,6 +426,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         try {
             dodajKategorijeSQL(listaKategorija);
             for (Kviz a : listaKvizova) {
+                if (a.getNaziv()!=null)
                 dodajKvizSQL(a);
             }
         }
@@ -756,10 +791,12 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             if ((data.getExtras().getInt("kategorija") - 1) != -1) {
                 noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, listaKategorija.get(data.getExtras().getInt("kategorija") - 1));
             } else noviKviz = new Kviz(data.getStringExtra("naziv"), novaPitanja, null);
+
             listaKvizova.add(new Kviz(null, null, null));
+
             new Firebase(OCstatus.ADD_KVIZ, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.ADD_KVIZ, noviKviz);
             dodajKviz(noviKviz);
-            dodajKvizSQL (noviKviz);
+
         } else if (resultCode == -133) {
             Toast toast = Toast.makeText(getApplicationContext(), "Ucitavam izmjene, pricekajte!", Toast.LENGTH_SHORT);
             toast.show();
@@ -833,17 +870,17 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     }
 
 
-    @Override
+
     public void onConnected() {
-        isConnected=true;
+       isConnected=true;
         blokirajElemente();
-        Toast toast = Toast.makeText(getApplicationContext(), "Internet dostupan- dobavljam listu kvizova, sacekajte!", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getApplicationContext(), "Internet je dostupan! Dobavljam podatke iz baze, sacekajte..", Toast.LENGTH_SHORT);
         toast.show();
-        new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
+       new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
 
     }
 
-    @Override
+
     public void onDisconnected() {
         isConnected=false;
         Toast toast = Toast.makeText(getApplicationContext(), "Internet nije dostupan!", Toast.LENGTH_SHORT);
