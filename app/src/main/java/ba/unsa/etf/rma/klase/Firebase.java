@@ -6,6 +6,7 @@ import android.util.Pair;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.json.JsonParser;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 
 import org.json.JSONArray;
@@ -49,7 +50,7 @@ public class Firebase extends AsyncTask {
 
     private ArrayList<Kviz> ucitaniKvizovi = new ArrayList<>();
     private ArrayList<Kviz> ucitaniOdabraniKvizovi= new ArrayList<>();
-    private Map<String, Pair<Double,String>> sveRangListe = new HashMap<>();
+    private ArrayListMultimap<String, Pair<Double,String>> sveRangListe = ArrayListMultimap.create();
 
     //Mjesto za intefejse
     public interface ProvjeriStatus{
@@ -61,7 +62,7 @@ public class Firebase extends AsyncTask {
     }
     public interface Rangliste {
         public void getRangliste (ArrayList<String> rl);
-        public void ugrabiSve (Map<String, Pair<Double,String>> rl);
+        public void ugrabiSve (ArrayListMultimap<String, Pair<Double,String>> rl);
     }
 
     private ProvjeriStatus pozivatelj;
@@ -155,6 +156,10 @@ public class Firebase extends AsyncTask {
         else if (opcode == KvizoviAkt.OCstatus.GET_ALL_RL) {
             dajSveRangListe();
         }
+        else if (opcode == KvizoviAkt.OCstatus.UPDATE_RL) {
+            updateRangLists(objects);
+           // dajSveRangListe();
+        }
         return null;
     }
 
@@ -221,7 +226,7 @@ public class Firebase extends AsyncTask {
                     mapVal = mapVal.getJSONObject(naziv);
                     String procen = mapVal.getString("stringValue");
                     Double procenat = Double.parseDouble(procen);
-                    System.out.println(nazKviza + "|||||||||||||||||||||||||||||||||" + procenat+ "|||||||||||| " + naziv);
+
                     sveRangListe.put(nazKviza, new Pair<Double,String>(procenat,naziv));
 
                 }
@@ -234,7 +239,17 @@ public class Firebase extends AsyncTask {
             }
     }
 
-    private void ucitajRanglistu (Object[] objects) {
+    private void updateRangLists (Object[] objects) {
+      globalniStatus=KvizoviAkt.OCstatus.ADD_RL;
+        ArrayListMultimap<String, Pair<Double,String>> lista =  ( ArrayListMultimap<String, Pair<Double,String>>) objects[1];
+        for (Map.Entry<String, Pair<Double,String>> x : lista.entries()) {
+            Object[] newObject = new Object[] { KvizoviAkt.OCstatus.ADD_RL,  x.getKey(),  x.getValue().second , x.getValue().first};
+            ucitajRanglistu(newObject );
+        }
+
+    }
+   public void ucitajRanglistu (Object[] objects) {
+      mapRangLista.clear();
         String imeIgraca =null;
         double procent =0;
             String nazivKviza=null;
@@ -298,8 +313,8 @@ public class Firebase extends AsyncTask {
                 String naziv =  new String (dajIme(mapVal));
                 mapVal = mapVal.getJSONObject(naziv);
                String procen = mapVal.getString("stringValue");
-               Double procenat = Double.parseDouble(procen);
-               mapRangLista.put(procenat,naziv);
+               Double procenat = Double.parseDouble(procen) + (double) i/10000;
+               mapRangLista.put(procenat ,naziv);
             }
            if (globalniStatus== KvizoviAkt.OCstatus.ADD_RL || globalniStatus== KvizoviAkt.OCstatus.GET_RL ) dodajIgraca(nazivKviza,imeIgraca,procent);
            else {
@@ -501,6 +516,7 @@ public class Firebase extends AsyncTask {
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_RL || globalniStatus==KvizoviAkt.OCstatus.ADD_RL)  poziv.getRangliste(rangList);
       else if (globalniStatus== KvizoviAkt.OCstatus.IMPORT_PITANJA_CHECK) pozivatelj.validacijaPitanja(zaValidacijuPitanja);
       else if (globalniStatus== KvizoviAkt.OCstatus.GET_ALL_RL) poziv.ugrabiSve(sveRangListe);
+      else if (globalniStatus== KvizoviAkt.OCstatus.UPDATE_RL) poziv.getRangliste(null);
       globalniStatus=KvizoviAkt.OCstatus.UNDEFINED;
   }
 
@@ -541,7 +557,82 @@ public class Firebase extends AsyncTask {
         rangList.clear();
         int i=0;
         for (Map.Entry<Double,String> obj : mapRangLista.entrySet()) {
-            rangList.add ("Pozicija "+ ++i + " Ime i prezime: " + obj.getValue() + "\nProcenat tacnih: "+ obj.getKey() + "%");
+            rangList.add ("Pozicija "+ ++i + " Ime i prezime: " + obj.getValue() + "\nProcenat tacnih: "+ Math.round(obj.getKey()) + "%");
+            map += " \"" + i + "\": {\n" +
+                    "                \"mapValue\": {\n" +
+                    "                  \"fields\": {\n" +
+                    "                   " + "\"" + obj.getValue() + "\": {\n" +
+                    "                      \"stringValue\": \"" + obj.getKey() + "\"\n" +
+                    "                    }\n" +
+                    "                  }\n" +
+                    "                }\n" +
+                    "              }";
+            if (i<mapRangLista.size()) {
+                map+=",";
+            }
+            else {
+                map+="  }\n" +
+                        "          }\n" +
+                        "        },";
+            }
+
+        }
+
+        map+= "    \"nazivKviza\": {\n" +
+                "          \"stringValue\": \"" +nazivKviza+ "\"\n" +
+                "        },\n" +
+                "        \"brojPozicija\": {\n" +
+                "          \"integerValue\": \""+mapRangLista.size()+"\"\n" +
+                "        }\n" +
+                "      } }";
+        if (mapRangLista.size()==0) map= "{}";
+        System.out.println(map);
+        try {
+            URL url = new URL("https://firestore.googleapis.com/v1/projects/rma-spirala3-baza/databases/(default)/documents/Rangliste/" + nazivKviza+ "?access_token=" + URLEncoder.encode(KvizoviAkt.TOKEN, "UTF-8"));
+            System.out.println(url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setRequestMethod("PATCH");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+
+
+
+            DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+            os.writeBytes(map);
+
+            System.out.println(connection.getResponseMessage() + "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            try(BufferedReader br = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                System.out.println(response.toString());
+            }
+        }
+
+
+        catch (Exception e) {
+
+        }
+
+    }
+
+
+    private void addRanglistIzSQL (Object ... object) {
+        Kviz noviKviz = (Kviz) object[1];
+        String nazivKviza = noviKviz.getNaziv();
+        String jsonObj = "{ \"fields\": {\n" +
+                "        \"lista\": {\n" +
+                "          \"mapValue\": {\n" +
+                "            \"fields\": {";
+        String map = jsonObj+ " ";
+        rangList.clear();
+        int i=0;
+        for (Map.Entry<Double,String> obj : mapRangLista.entrySet()) {
+            rangList.add ("Pozicija "+ ++i + " Ime i prezime: " + obj.getValue() + "\nProcenat tacnih: "+ Math.round(obj.getKey()) + "%");
             map += " \"" + i + "\": {\n" +
                     "                \"mapValue\": {\n" +
                     "                  \"fields\": {\n" +
@@ -617,7 +708,7 @@ public class Firebase extends AsyncTask {
           rangList.clear();
           int i=0;
           for (Map.Entry<Double,String> obj : mapRangLista.entrySet()) {
-              rangList.add ("Pozicija "+ ++i + " Ime i prezime: " + obj.getValue() + "\nProcenat tacnih: "+ obj.getKey() + "%");
+              rangList.add ("Pozicija "+ ++i + " Ime i prezime: " + obj.getValue() + "\nProcenat tacnih: "+ Math.round(obj.getKey()) + "%");
               map += " \"" + i + "\": {\n" +
                       "                \"mapValue\": {\n" +
                       "                  \"fields\": {\n" +

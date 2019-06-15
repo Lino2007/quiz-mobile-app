@@ -26,6 +26,8 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
+import com.google.common.collect.ArrayListMultimap;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
@@ -303,7 +305,7 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     }
 
     @Override
-    public void ugrabiSve(Map<String, Pair<Double, String>> rl) {
+    public void ugrabiSve(ArrayListMultimap<String, Pair<Double, String>> rl) {
 
     }
 
