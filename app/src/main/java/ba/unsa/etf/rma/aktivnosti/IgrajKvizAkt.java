@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 import com.google.common.collect.ArrayListMultimap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
@@ -41,6 +43,7 @@ import ba.unsa.etf.rma.klase.Firebase;
 import ba.unsa.etf.rma.klase.Kviz;
 import ba.unsa.etf.rma.klase.Pitanje;
 import java.lang.Object.*;
+import java.util.TreeMap;
 
 import static ba.unsa.etf.rma.baza.RanglistaDB.IME_IGRACA;
 import static ba.unsa.etf.rma.baza.RanglistaDB.KVIZ_FK;
@@ -93,7 +96,7 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
             Toast toast =  Toast.makeText(getApplicationContext(), "Kviz je zapoceo, vrijeme preostalo: " +  minute + " minuta.", Toast.LENGTH_LONG);
             toast.show();
             alarmClock = new Intent (AlarmClock.ACTION_SET_TIMER);
-            alarmClock.putExtra (AlarmClock.EXTRA_LENGTH ,  /*minute *60*/ 7);
+            alarmClock.putExtra (AlarmClock.EXTRA_LENGTH ,  minute *60);
             alarmClock.putExtra (AlarmClock.EXTRA_VIBRATE, true);
             alarmClock.putExtra (AlarmClock.EXTRA_SKIP_UI, true);
             alarmClock.putExtra(AlarmClock.EXTRA_MESSAGE, true);
@@ -272,8 +275,10 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
                     Toast.makeText(context, "Greska, niste unjeli validno ime i prezime, pokusajte ponovo ili kliknite cancel!", Toast.LENGTH_LONG).show();
                 } else {
                     String imeIgraca = userInput.getText().toString();
-                  if(isConnected)  new Firebase(KvizoviAkt.OCstatus.GET_RL, getApplicationContext(), (Firebase.Rangliste) IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL, nazivKv, imeIgraca, procenatTacnih * 100);
                     dodajIgraca(nazivKv,  procenatTacnih * 100 ,imeIgraca);
+                  if(isConnected)  new Firebase(KvizoviAkt.OCstatus.GET_RL, getApplicationContext(), (Firebase.Rangliste) IgrajKvizAkt.this).execute(KvizoviAkt.OCstatus.GET_RL, nazivKv, imeIgraca, procenatTacnih * 100);
+                   else getRanglisteSQL(nazivKv);
+
                     procT = 0;
                     userInput.setBackgroundColor(Color.WHITE);
                     alertDialog.dismiss();
@@ -327,11 +332,48 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
             dodajRL.put(PROCENAT, Double.toString(procenat));
             dodajRL.put (IME_IGRACA, nazivIgraca);
             db.insert(ranglistaDB.DATABASE_TABLE, null, dodajRL);
+
         }
         catch (Exception e) {
             System.out.println("##############Greska prilikom dodavanja rang liste u lokalnu bazu: "+ e);
         }
 
+    }
+
+    private void getRanglisteSQL(String nazivKv) {
+
+
+        try {
+            SQLiteDatabase db = ranglistaDB.getWritableDatabase();
+            String[] koloneRezultat = new String[]{RanglistaDB.KOLONA_ID, RanglistaDB.IME_IGRACA, RanglistaDB.KVIZ_FK, RanglistaDB.PROCENAT};
+            String where =  RanglistaDB.KVIZ_FK + " LIKE '" + nazivKv + "'";
+            String whereArgs[] = null;
+            String groupBy = null;
+            String having = null;
+            String order = RanglistaDB.PROCENAT + " desc" ;
+            Cursor cursor = db.query(RanglistaDB.DATABASE_TABLE, koloneRezultat, where, whereArgs, groupBy, having, order);
+             cursor.moveToFirst();
+            int i=0;
+          int size =cursor.getCount();
+            ArrayList<String> rl = new ArrayList<>();
+            while (i<size){
+                rl.add ("Pozicija "+ ++i +  " Ime i prezime: " + cursor.getString(1)  + "\nProcenat tacnih: "+ cursor.getString (3) + "%");
+                cursor.moveToNext();
+
+            }
+
+
+            Bundle zaRangFrag = new Bundle();
+            RangLista rlf = new RangLista();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            zaRangFrag.putStringArrayList("ranglista", rl);
+            zaRangFrag.putString("nazivKviza", nazivKv);
+            rlf.setArguments(zaRangFrag);
+            fragmentManager.beginTransaction().replace(R.id.pitanjePlace, rlf, rlf.getTag()).commitAllowingStateLoss();
+            cursor.close();
+        } catch (Exception e) {
+            System.out.println("Nesto nije uredu sa ucitavanjem ranglista: " + e);
+        }
     }
 
 }

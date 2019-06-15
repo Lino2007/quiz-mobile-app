@@ -133,7 +133,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             toast.show();
             try {
                 new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
-               new Firebase(OCstatus.GET_ALL_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.GET_ALL_RL);
+
 
             } catch (Exception e) {
                 System.out.println("Nesto nije uredu sa pristupom tokenu!");
@@ -282,10 +282,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         for ( Map.Entry<String, Pair<Double, String>> entry : sveRangliste.entries()) {
             if (ranglisteSQL.containsEntry(entry.getKey(), entry.getValue())) {
-                ranglisteSQL.remove(entry.getKey() , entry.getValue());
+                ranglisteSQL.remove(entry.getKey(), entry.getValue());
             }
         }
-        System.out.println("VELICINA RANG LISTE JE::::::::::::::::::::"+  ranglisteSQL.size()+ "|||||||||||||||||||||||||||||||||||||||");
         new Firebase (OCstatus.UPDATE_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.UPDATE_RL, ranglisteSQL);
      //   System.out.println(sveRangliste.size()  + "ucitano je......................................");
 
@@ -306,7 +305,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             String order = null;
             Cursor cursor = db.query(RanglistaDB.DATABASE_TABLE, koloneRezultat,where, whereArgs,groupBy,having,order);
             Log.d ("SQLite Ranglista ",  "Povucene rangliste iz baze , get count je : " + cursor.getCount());
-            cursor.moveToFirst();
             while (cursor.moveToNext()) {
                rangliste.put (cursor.getString(2), new Pair<Double, String>(Double.parseDouble(cursor.getString(3)), cursor.getString(1)));
             }
@@ -487,6 +485,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                 fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
                 fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
             }
+            new Firebase(OCstatus.GET_ALL_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.GET_ALL_RL);
         }
         odblokirajElemente();
 
@@ -951,11 +950,14 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
 
     public void onConnected() {
+        ArrayListMultimap<String, Pair<Double, String>> ranglisteSQL = ugrabiSveRLizSQL();
        isConnected=true;
         blokirajElemente();
         Toast toast = Toast.makeText(getApplicationContext(), "Internet je dostupan! Dobavljam podatke iz baze, sacekajte..", Toast.LENGTH_SHORT);
         toast.show();
-       new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
+    /*    new Firebase (OCstatus.UPDATE_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.UPDATE_RL, ranglisteSQL);
+       new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi"); */
+
 
     }
 

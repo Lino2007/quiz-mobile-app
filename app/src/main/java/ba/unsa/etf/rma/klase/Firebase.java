@@ -713,7 +713,7 @@ public class Firebase extends AsyncTask {
                       "                \"mapValue\": {\n" +
                       "                  \"fields\": {\n" +
                       "                   " + "\"" + obj.getValue() + "\": {\n" +
-                      "                      \"stringValue\": \"" + obj.getKey() + "\"\n" +
+                      "                      \"stringValue\": \"" + Math.round(obj.getKey()) + "\"\n" +
                       "                    }\n" +
                       "                  }\n" +
                       "                }\n" +
