@@ -79,6 +79,7 @@ public class DetailFrag extends Fragment  {
     @Override
     public void onResume() {
         if (x) instanca.editKviz();
+        System.out.println(KvizoviAkt.odabraniKvizovi.size() + "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         gridViewAdapter= new GridViewAdapter(getActivity(), KvizoviAkt.odabraniKvizovi, getResources() );
         grid.setAdapter(gridViewAdapter);
         x=false;

@@ -140,6 +140,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             }
         }
         else {
+            clearAll();
             dobaviPodatkeIzSQL();
              popuni();
             Toast toast = Toast.makeText(getApplicationContext(), "Nema internet konekcije!", Toast.LENGTH_SHORT);
@@ -233,6 +234,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
 
         } else {
             //Inicijalizacija fragmenata u landscape modu
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             lfm = new ListaFrag();
             dfm = new DetailFrag();
             fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commit();
@@ -268,9 +270,33 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         listaKategorija.clear();
     }
 
+    private void ucitajRanglisteSQL () {
+
+        try {
+            SQLiteDatabase db = ranglistaDB.getWritableDatabase();
+            db.execSQL("delete from Rangliste");
+            ContentValues dodajRangliste = new ContentValues();
+        //    dodajKviz.put(KVIZ_ID, kviz.getNaziv());
+            for (Map.Entry<String, Pair<Double, String>> entry : sveRangliste.entries()) {
+                dodajRangliste.put (RanglistaDB.IME_IGRACA, entry.getValue().second);
+                dodajRangliste.put (RanglistaDB.PROCENAT, entry.getValue().first);
+                dodajRangliste.put (RanglistaDB.KVIZ_FK, entry.getKey());
+                db.insert(RanglistaDB.DATABASE_TABLE, null, dodajRangliste);
+                dodajRangliste.clear();
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println("##############Greska prilikom dodavanja kviza u lokalnu bazu: "+ e);
+        }
+
+
+    }
+
     @Override
     public void getRangliste(ArrayList<String> rl) {
-
+        ucitajRanglisteSQL();
+       odblokirajElemente();
     }
 
     @Override
@@ -284,6 +310,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             if (ranglisteSQL.containsEntry(entry.getKey(), entry.getValue())) {
                 ranglisteSQL.remove(entry.getKey(), entry.getValue());
             }
+        }
+        for ( Map.Entry<String, Pair<Double, String>> entry : ranglisteSQL.entries()) {
+            sveRangliste.put(entry.getKey(), new Pair<Double, String>( entry.getValue().first, entry.getValue().second));
         }
         new Firebase (OCstatus.UPDATE_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.UPDATE_RL, ranglisteSQL);
      //   System.out.println(sveRangliste.size()  + "ucitano je......................................");
@@ -344,10 +373,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         config = getResources().getConfiguration();
         Toast toast = Toast.makeText(getApplicationContext(), "Ucitavaju se kvizovi, molimo sacekajte!", Toast.LENGTH_SHORT);
         toast.show();
-        System.out.println(isConnected + "|||||||||||||||||||||||||||||||||||||||");
-        System.out.println(odabraniKvizovi.size() + "||||||||||||"    + listaKvizova.size());
         if (position >= 0 && position < categories.size()) {
-            System.out.println("usao..............................");
            if (isConnected) {
                if (listaKvizova.size() > 1) {
                    blokirajElemente();
@@ -487,7 +513,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             }
             new Firebase(OCstatus.GET_ALL_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.GET_ALL_RL);
         }
-        odblokirajElemente();
+        else odblokirajElemente();
 
     }
 
@@ -608,6 +634,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     @Override
     public void azurirajPodatke(ArrayList<Kviz> oKv, ArrayList<Kviz> sKv) {
         //Koristi se prilikom klika na spinner ili listu (u ovisnosti od konfiguracije)
+
         if (isConnected) {
             odabraniKvizovi = oKv;
             listaKvizova = sKv;
@@ -793,6 +820,7 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         }
         return listaOdgovora;
     }
+
     private void dugiKlik(int mPosition) {
         //  Dugim klikom inicira poziv DodajKvizAkt (azuriranje ili dodavanje u ovisnosti od uslova)
         if (mPosition == odabraniKvizovi.size() - 1) {
@@ -924,7 +952,22 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
     public void filterList(int i) {
         if (i < 0) return;
 
-        new Firebase(OCstatus.GET_SPINNER_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, categories.get(i));
+        if (isConnected)  new Firebase(OCstatus.GET_SPINNER_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_SPINNER_CONTENT, categories.get(i));
+        else {
+
+            if (listaKvizova.size() > 1) {
+
+                dajKvizoveKategorije(categories.get(i));
+            } else {
+                odabraniKvizovi = kopiraj(listaKvizova, odabraniKvizovi);
+            }
+
+            fragmentm = getSupportFragmentManager();
+            lfm = new ListaFrag();
+            dfm = new DetailFrag();
+            fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
+            fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
+        }
     }
 
     @Override
@@ -953,10 +996,10 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         ArrayListMultimap<String, Pair<Double, String>> ranglisteSQL = ugrabiSveRLizSQL();
        isConnected=true;
         blokirajElemente();
+        new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi");
         Toast toast = Toast.makeText(getApplicationContext(), "Internet je dostupan! Dobavljam podatke iz baze, sacekajte..", Toast.LENGTH_SHORT);
         toast.show();
-    /*    new Firebase (OCstatus.UPDATE_RL, this , (Firebase.Rangliste) KvizoviAkt.this).execute(OCstatus.UPDATE_RL, ranglisteSQL);
-       new Firebase(OCstatus.GET_DB_CONTENT, this, (Firebase.ProvjeriStatus) KvizoviAkt.this).execute(OCstatus.GET_DB_CONTENT, "Svi"); */
+
 
 
     }
@@ -971,7 +1014,13 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
         dobaviPodatkeIzSQL();
         popuni();
         odblokirajElemente();
-
+        if (!isItPortrait()) {
+            fragmentm = getSupportFragmentManager();
+            lfm = new ListaFrag();
+            dfm = new DetailFrag();
+            fragmentm.beginTransaction().replace(R.id.listPlace, lfm, lfm.getTag()).commitAllowingStateLoss();
+            fragmentm.beginTransaction().replace(R.id.detailPlace, dfm, dfm.getTag()).commitAllowingStateLoss();
+        }
 
 
     }

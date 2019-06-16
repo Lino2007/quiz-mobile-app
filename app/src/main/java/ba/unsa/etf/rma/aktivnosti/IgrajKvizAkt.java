@@ -350,13 +350,15 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
             String whereArgs[] = null;
             String groupBy = null;
             String having = null;
-            String order = RanglistaDB.PROCENAT + " desc" ;
+            String order = " cast(procenat as REAL) DESC" ;
             Cursor cursor = db.query(RanglistaDB.DATABASE_TABLE, koloneRezultat, where, whereArgs, groupBy, having, order);
+           // Cursor cursor = db.exec
              cursor.moveToFirst();
             int i=0;
           int size =cursor.getCount();
             ArrayList<String> rl = new ArrayList<>();
             while (i<size){
+                System.out.println(cursor.getString(1) + "_____________________" + cursor.getString(3));
                 rl.add ("Pozicija "+ ++i +  " Ime i prezime: " + cursor.getString(1)  + "\nProcenat tacnih: "+ cursor.getString (3) + "%");
                 cursor.moveToNext();
 
