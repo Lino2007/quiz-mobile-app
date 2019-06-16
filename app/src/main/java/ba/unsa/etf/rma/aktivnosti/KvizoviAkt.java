@@ -188,36 +188,50 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                                         int position, long id) {
                     if (position != odabraniKvizovi.size() - 1) {
                         int brojPitanja= 0;
+
                         Intent newIntent = new Intent(KvizoviAkt.this, IgrajKvizAkt.class);
                        if (odabraniKvizovi.get(position).getPitanja()!= null) {
                          brojPitanja= odabraniKvizovi.get(position).getPitanja().size();
                        }
                         SimpleDateFormat date = new SimpleDateFormat(datePattern);
                        int qDuration = (int) Math.round((double)brojPitanja/2);
+
                        new CalendarProvider(KvizoviAkt.this).ucitajDogadjaje();
 
                        if (CalendarProvider.listaDogadjaja.size()>0) {
                            Date date2= new Date();
                            for (Map.Entry<String, String> e : CalendarProvider.listaDogadjaja.entrySet()) {
                                long vrijemeDogadjaja = Long.parseLong((e.getKey()));
+                               long krajDogadjaja = Long.parseLong((e.getValue()));
                                Date date1 = new Date(vrijemeDogadjaja);
-
+                               Date krajDate = new Date (krajDogadjaja);
                                if(date.format(date2).equals(date.format(date1))){
                                    long qDurInMs = TimeUnit.MINUTES.toMillis(qDuration);
                                    long tNow = date2.getTime();
                                    long tNxt = date1.getTime();
-
+                                   long krajD = krajDate.getTime();
 
                                    int alrm = (int) (TimeUnit.MILLISECONDS.toMinutes(tNow - tNxt) + 1);
                                    //ako trenutno vrijeme + trajanje kviza je vece od vremena kad je event
-                                   if(tNow + qDurInMs > alrm && tNow < tNxt){
+                                   System.out.println(tNow + " "  +  tNxt +" " +qDurInMs    + " " + alrm);
+                                   if(tNow + qDurInMs > tNxt && tNow < tNxt){
                                        new AlertDialog.Builder(KvizoviAkt.this)
                                                .setTitle("Pokusaj igranja")
-                                               .setMessage("Imate događaj u kalendaru za minuta!")
+                                               .setMessage("Imate događaj u kalendaru za " +alrm +" minuta!")
                                                .setNegativeButton(android.R.string.ok, null)
                                                .setIcon(android.R.drawable.ic_dialog_alert)
                                                .show();
                                        return;
+                                   }
+                                   else if (tNow> tNxt && tNow<krajD) {
+                                       new AlertDialog.Builder(KvizoviAkt.this)
+                                               .setTitle("Pokusaj igranja")
+                                               .setMessage("Trenutno je aktivan događaj u kalendaru!")
+                                               .setNegativeButton(android.R.string.ok, null)
+                                               .setIcon(android.R.drawable.ic_dialog_alert)
+                                               .show();
+                                       return;
+
                                    }
                                }
 

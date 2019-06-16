@@ -17,7 +17,7 @@ public class CalendarProvider {
     private Cursor eventCursor= null;
 
     //setup columns
-    public static final String[] queryColums = new String[]{ CalendarContract.Events.DTSTART, CalendarContract.Events.TITLE};
+    public static final String[] queryColums = new String[]{ CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND};
 
     public CalendarProvider (Context context) {this.activityContext=context;}
 
@@ -25,7 +25,7 @@ public class CalendarProvider {
 
 
 
-       if (listaDogadjaja!=null && listaDogadjaja.size()!=0) listaDogadjaja.clear();
+       if ( listaDogadjaja.size()!=0) listaDogadjaja.clear();
        try {
            eventCursor = activityContext.getContentResolver().query(CalendarContract.Events.CONTENT_URI, queryColums, null, null, null);
        }
@@ -37,8 +37,8 @@ public class CalendarProvider {
        try {
            while (eventCursor.moveToNext()) {
                String dat = eventCursor.getString(0);
-               String imeDog = eventCursor.getString(1);
-               listaDogadjaja.put(dat, imeDog);
+               String end = eventCursor.getString(1);
+               listaDogadjaja.put(dat, end);
            }
        }
        catch (Exception e) {
