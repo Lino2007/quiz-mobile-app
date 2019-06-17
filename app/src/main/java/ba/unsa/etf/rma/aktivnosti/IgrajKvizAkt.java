@@ -89,10 +89,11 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
 
         int a = -1;
         if (preostalaPitanja != null && !preostalaPitanja.isEmpty()) {
-            System.out.println("....................................................");
+
             a = getRandomIndex(preostalaPitanja.size());
             int minute = (int)Math.round((double)preostalaPitanja.size()/2);
             final long milis= (minute*60*1000)+5;
+            //Postavka tajmera (laksa implementacija od alarma)
             Toast toast =  Toast.makeText(getApplicationContext(), "Kviz je zapoceo, vrijeme preostalo: " +  minute + " minuta.", Toast.LENGTH_LONG);
             toast.show();
             alarmClock = new Intent (AlarmClock.ACTION_SET_TIMER);
@@ -101,31 +102,6 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
             alarmClock.putExtra (AlarmClock.EXTRA_SKIP_UI, true);
             alarmClock.putExtra(AlarmClock.EXTRA_MESSAGE, true);
             IgrajKvizAkt.this.startActivity(alarmClock);
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    //timerIstekao=true;
-                  //  updateByAction(false);
-
-                    Toast toast =  Toast.makeText(getApplicationContext(), "Kviz je zavrsio!", Toast.LENGTH_LONG);
-                    toast.show();
-
-
-                }
-            }, milis);
-            final Thread r = new Thread() {
-                public void run() {
-                    // DO WORK
-
-                    // Call function.
-                    handler.postDelayed(this, milis);
-
-
-
-                }
-            };
-            r.start();
             inx = a;
         }
         nazivKv = kviz.getNaziv();
@@ -291,8 +267,6 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     @Override
     public void buttonClick() {
         //Forsirani izlaz
-
-
         Intent zavrsi = getIntent();
         setResult(32000, zavrsi);
         finish();
@@ -341,8 +315,7 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
     }
 
     private void getRanglisteSQL(String nazivKv) {
-
-
+        //Prikupljaju se rang liste i povezuju sa adapterom
         try {
             SQLiteDatabase db = ranglistaDB.getWritableDatabase();
             String[] koloneRezultat = new String[]{RanglistaDB.KOLONA_ID, RanglistaDB.IME_IGRACA, RanglistaDB.KVIZ_FK, RanglistaDB.PROCENAT};
@@ -358,13 +331,9 @@ public class IgrajKvizAkt extends AppCompatActivity implements PitanjeFrag.Updat
           int size =cursor.getCount();
             ArrayList<String> rl = new ArrayList<>();
             while (i<size){
-                System.out.println(cursor.getString(1) + "_____________________" + cursor.getString(3));
                 rl.add ("Pozicija "+ ++i +  " Ime i prezime: " + cursor.getString(1)  + "\nProcenat tacnih: "+ cursor.getString (3) + "%");
                 cursor.moveToNext();
-
             }
-
-
             Bundle zaRangFrag = new Bundle();
             RangLista rlf = new RangLista();
             FragmentManager fragmentManager = getSupportFragmentManager();

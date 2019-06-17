@@ -243,7 +243,7 @@ public class Firebase extends AsyncTask {
       globalniStatus=KvizoviAkt.OCstatus.ADD_RL;
         ArrayListMultimap<String, Pair<Double,String>> lista =  ( ArrayListMultimap<String, Pair<Double,String>>) objects[1];
         for (Map.Entry<String, Pair<Double,String>> x : lista.entries()) {
-            Object[] newObject = new Object[] { KvizoviAkt.OCstatus.ADD_RL,  x.getKey(),  x.getValue().second , x.getValue().first};
+            Object[] newObject = new Object[] { KvizoviAkt.OCstatus.ADD_RL,  x.getKey(),   x.getValue().second , x.getValue().first};
             ucitajRanglistu(newObject );
         }
 
@@ -256,6 +256,7 @@ public class Firebase extends AsyncTask {
         if (globalniStatus== KvizoviAkt.OCstatus.ADD_RL || globalniStatus== KvizoviAkt.OCstatus.GET_RL) {
             imeIgraca =(String) objects[2];
             procent =(double) objects[3];
+            procent= Math.round(procent);
             nazivKviza=(String) objects[1];
         }
         else {

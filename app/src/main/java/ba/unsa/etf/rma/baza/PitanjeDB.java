@@ -24,14 +24,10 @@ public class PitanjeDB extends SQLiteOpenHelper {
           KVIZ_FK + " text not null);";
 
 
-
-
     public PitanjeDB (Context context, String name,
                         CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
-
-
 
 
     @Override
