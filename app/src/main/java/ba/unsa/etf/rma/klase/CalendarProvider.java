@@ -23,7 +23,7 @@ public class CalendarProvider {
 
     public void ucitajDogadjaje () {
 
-
+        System.out.println("...................................");
 
        if ( listaDogadjaja.size()!=0) listaDogadjaja.clear();
        try {

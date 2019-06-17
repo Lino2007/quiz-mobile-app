@@ -193,7 +193,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                         SimpleDateFormat date = new SimpleDateFormat(datePattern);
                         int qDuration = (int) Math.round((double) brojPitanja / 2);
                         new CalendarProvider(KvizoviAkt.this).ucitajDogadjaje();
-
+                        System.out.println(CalendarProvider.listaDogadjaja.size());
+                        System.out.println("++++++++++++++++++++++++++++++++++");
                         if (CalendarProvider.listaDogadjaja.size() > 0) {
                             Date date2 = new Date();
                             for (Map.Entry<String, String> e : CalendarProvider.listaDogadjaja.entrySet()) {
@@ -201,15 +202,18 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                                 long krajDogadjaja = Long.parseLong((e.getValue()));
                                 Date date1 = new Date(vrijemeDogadjaja);
                                 Date krajDate = new Date(krajDogadjaja);
-                          //    if (date.format(date2).equals(date.format(date1))) {
+
                                     long qDurInMs = TimeUnit.MINUTES.toMillis(qDuration);
                                     long tNow = date2.getTime();
                                     long tNxt = date1.getTime();
                                     long krajD = krajDate.getTime();
 
-                                    int alrm = (int) (TimeUnit.MILLISECONDS.toMinutes(tNow - tNxt) + 1);
+
+                               // System.out.println(tNow + "_---" + tNxt  + "---_" + alrm);
                                     //Ukoliko suma trenutnog vremena i trajanja kviza je vece od vremena kad pocinje event
                                     if (tNow + qDurInMs > tNxt && tNow < tNxt) {
+                                        int alrm = (int) (TimeUnit.MILLISECONDS.toMinutes((tNow - tNxt)) );
+                                        if (alrm<0) alrm*=(-1);
                                         new AlertDialog.Builder(KvizoviAkt.this)
                                                 .setTitle("Pokusaj igranja")
                                                 .setMessage("Imate događaj u kalendaru za " + alrm + " minuta!")
@@ -229,7 +233,6 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
                                         return;
 
                                     }
-                              //  }
 
                             }
 
@@ -676,7 +679,8 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             while (!cursor.isAfterLast()) {
                 String naziv = cursor.getString(1);
                 int inxKat = getCategoriesByName(cursor.getString(2));
-                if (inxKat != -1) kat = listaKategorija.get(inxKat);
+                System.out.println("test" + inxKat);
+                if (inxKat != 0) kat = listaKategorija.get(inxKat-1);
                 else kat = null;
                 p = dobaviListuPitanjaIzSQL(naziv);
                 listaKvizova.add(new Kviz(naziv, p, kat));
@@ -700,8 +704,9 @@ public class KvizoviAkt extends AppCompatActivity implements OnItemSelectedListe
             Cursor cursor = db.query(KategorijaDB.DATABASE_TABLE, koloneRezultat, where, whereArgs, groupBy, having, order);
             Log.d("SQLite Kategorija ", "Povucena kategorija iz baze , get count je : " + cursor.getCount());
             cursor.moveToFirst();
-            while (cursor.moveToNext()) {
+            while (!cursor.isAfterLast()) {
                 listaKategorija.add(new Kategorija(cursor.getString(1), cursor.getString(2)));
+                cursor.moveToNext();
             }
             cursor.close();
         } catch (Exception e) {
