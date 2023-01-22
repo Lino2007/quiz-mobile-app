@@ -10,7 +10,7 @@ Application uses [SQLite](https://www.sqlite.org/index.html) as local storage pr
 ## Application preview
 
 - Quiz list
-![Quiz list](/img/quiz_list.jpg)
+<img src="/img/quiz_list.jpg" width="470" height="970" />
 - Quiz create/edit page
 ![Quiz edit](/img/quiz_edit_page.jpg)
 - Question page
