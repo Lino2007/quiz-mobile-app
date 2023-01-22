@@ -12,9 +12,9 @@ Application uses [SQLite](https://www.sqlite.org/index.html) as local storage pr
 - Quiz list
 <img src="/img/quiz_list.jpg" width="470" height="970" />
 - Quiz create/edit page
-![Quiz edit](/img/quiz_edit_page.jpg)
+<img src="/img/quiz_edit_page.jpg" width="470" height="970" />
 - Question page
-![Question creation](/img/question_creation.jpg)
+<img src="/img/question_creation.jpg" width="470" height="970" />
 - Quiz game 
-![Wrong answer](/img/wrong_answer.jpg)
-![Correct answer](/img/correct_answer.jpg)
+<img src="/img/wrong_answer.jpg" width="470" height="970" />
+<img src="/img/correct_answer.jpg" width="470" height="970" />
