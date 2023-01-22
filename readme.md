@@ -10,11 +10,11 @@ Application uses [SQLite](https://www.sqlite.org/index.html) as local storage pr
 ## Application preview
 
 - Quiz list
-<img src="/img/quiz_list.jpg" width="470" height="970" />
+<img src="/img/quiz_list.jpg" width="235" height="485" />
 - Quiz create/edit page
-<img src="/img/quiz_edit_page.jpg" width="470" height="970" />
+<img src="/img/quiz_edit_page.jpg" width="235" height="485" />
 - Question page
-<img src="/img/question_creation.jpg" width="470" height="970" />
+<img src="/img/question_creation.jpg" width="235" height="485" />
 - Quiz game 
-<img src="/img/wrong_answer.jpg" width="470" height="970" />
-<img src="/img/correct_answer.jpg" width="470" height="970" />
+<img src="/img/wrong_answer.jpg" width="235" height="485" />
+<img src="/img/correct_answer.jpg" width="235" height="485" />
